@@ -4,13 +4,136 @@
 <head>
     <meta charset="UTF-8">
     <title>Nueva Pestaña</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-    <h1>¡Mi extensión funciona!</h1>
+    <!-- Encabezado -->
 
-    <p>Esta es mi nueva pestaña personalizada.</p>
+    <header>
+
+        <div class="search-container">
+            <input type="text" id="google-search" placeholder="Buscar en Google...">
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="sites-search" placeholder="Buscar mis sitios...">
+        </div>
+
+        <button id="settings-button">
+            ⚙️
+        </button>
+
+    </header>
+
+
+    <!-- Cuerpo -->
+
+    <main>
+
+        <!-- Grupo: Mis sitios -->
+
+        <section class="site-group">
+
+            <h2>Mis sitios</h2>
+
+            <div class="sites-container">
+
+                <div class="site-card">
+
+                    <div class="site-icon">🌐</div>
+
+                    <span class="site-name">Google</span>
+
+                    <div class="site-description">
+                        Motor de búsqueda para encontrar información en Internet.
+                    </div>
+
+                </div>
+
+
+                <div class="site-card">
+
+                    <div class="site-icon">▶️</div>
+
+                    <span class="site-name">YouTube</span>
+
+                    <div class="site-description">
+                        Plataforma para ver y compartir videos.
+                    </div>
+
+                </div>
+
+
+                <div class="site-card">
+
+                    <div class="site-icon">💻</div>
+
+                    <span class="site-name">GitHub</span>
+
+                    <div class="site-description">
+                        Plataforma para alojar y gestionar proyectos de código.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Grupo: Inteligencia Artificial -->
+
+        <section class="site-group">
+
+            <h2>Inteligencia Artificial</h2>
+
+            <div class="sites-container">
+
+                <div class="site-card">
+
+                    <div class="site-icon">🤖</div>
+
+                    <span class="site-name">ChatGPT</span>
+
+                    <div class="site-description">
+                        Asistente de inteligencia artificial para conversar y realizar diferentes tareas.
+                    </div>
+
+                </div>
+
+
+                <div class="site-card">
+
+                    <div class="site-icon">✨</div>
+
+                    <span class="site-name">Gemini</span>
+
+                    <div class="site-description">
+                        Asistente de inteligencia artificial desarrollado por Google.
+                    </div>
+
+                </div>
+
+
+                <div class="site-card">
+
+                    <div class="site-icon">🧠</div>
+
+                    <span class="site-name">DeepSeek</span>
+
+                    <div class="site-description">
+                        Herramienta de inteligencia artificial para conversación y generación de contenido.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
 
 </body>
 
