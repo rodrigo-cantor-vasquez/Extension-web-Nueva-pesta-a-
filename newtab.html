@@ -4,22 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Nueva Pestaña</title>
+
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-    <!-- Encabezado -->
+    <!-- ================================= -->
+    <!-- ENCABEZADO -->
+    <!-- ================================= -->
 
     <header>
 
         <div class="search-container">
+
             <input type="text" id="google-search" placeholder="Buscar en Google...">
+
         </div>
 
+
         <div class="search-container">
+
             <input type="text" id="sites-search" placeholder="Buscar mis sitios...">
+
         </div>
+
 
         <button id="settings-button">
             ⚙️
@@ -28,112 +37,482 @@
     </header>
 
 
-    <!-- Cuerpo -->
+    <!-- ================================= -->
+    <!-- CONTENIDO PRINCIPAL -->
+    <!-- ================================= -->
 
     <main>
 
-        <!-- Grupo: Mis sitios -->
+
+        <!-- ================================= -->
+        <!-- GRUPO: MIS SITIOS -->
+        <!-- ================================= -->
 
         <section class="site-group">
 
-            <h2>Mis sitios</h2>
+
+            <!-- Encabezado -->
+
+            <div class="group-header">
+
+                <h2>
+                    Mis sitios
+                </h2>
+
+                <button class="group-menu-button">
+                    ⋮
+                </button>
+
+
+                <!-- Menú del grupo -->
+
+                <div class="group-menu">
+
+                    <button class="edit-group-button">
+                        Editar grupo
+                    </button>
+
+                    <button class="delete-group-button">
+                        Eliminar grupo
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Sitios -->
 
             <div class="sites-container">
 
+
+                <!-- GOOGLE -->
+
                 <div class="site-card">
 
-                    <div class="site-icon">🌐</div>
+                    <div class="site-icon">
+                        🌐
+                    </div>
 
-                    <span class="site-name">Google</span>
+                    <span class="site-name">
+                        Google
+                    </span>
 
                     <div class="site-description">
                         Motor de búsqueda para encontrar información en Internet.
                     </div>
 
+                    <button class="site-menu-button">
+                        ⋮
+                    </button>
+
+                    <div class="site-menu">
+
+                        <button class="edit-site-button">
+                            Editar sitio
+                        </button>
+
+                        <button class="delete-site-button">
+                            Eliminar sitio
+                        </button>
+
+                    </div>
+
                 </div>
 
 
+                <!-- YOUTUBE -->
+
                 <div class="site-card">
 
-                    <div class="site-icon">▶️</div>
+                    <div class="site-icon">
+                        ▶️
+                    </div>
 
-                    <span class="site-name">YouTube</span>
+                    <span class="site-name">
+                        YouTube
+                    </span>
 
                     <div class="site-description">
                         Plataforma para ver y compartir videos.
                     </div>
 
+                    <button class="site-menu-button">
+                        ⋮
+                    </button>
+
+                    <div class="site-menu">
+
+                        <button class="edit-site-button">
+                            Editar sitio
+                        </button>
+
+                        <button class="delete-site-button">
+                            Eliminar sitio
+                        </button>
+
+                    </div>
+
                 </div>
 
 
+                <!-- GITHUB -->
+
                 <div class="site-card">
 
-                    <div class="site-icon">💻</div>
+                    <div class="site-icon">
+                        💻
+                    </div>
 
-                    <span class="site-name">GitHub</span>
+                    <span class="site-name">
+                        GitHub
+                    </span>
 
                     <div class="site-description">
                         Plataforma para alojar y gestionar proyectos de código.
                     </div>
 
+                    <button class="site-menu-button">
+                        ⋮
+                    </button>
+
+                    <div class="site-menu">
+
+                        <button class="edit-site-button">
+                            Editar sitio
+                        </button>
+
+                        <button class="delete-site-button">
+                            Eliminar sitio
+                        </button>
+
+                    </div>
+
                 </div>
+
+
+                <!-- AGREGAR SITIO A MIS SITIOS -->
+
+                <div class="add-site-card">
+
+                    <div class="add-site-icon">
+                        +
+                    </div>
+
+                    <span class="add-site-name">
+                        Agregar sitio
+                    </span>
+
+                </div>
+
 
             </div>
 
         </section>
 
 
-        <!-- Grupo: Inteligencia Artificial -->
+
+        <!-- ================================= -->
+        <!-- GRUPO: INTELIGENCIA ARTIFICIAL -->
+        <!-- ================================= -->
 
         <section class="site-group">
 
-            <h2>Inteligencia Artificial</h2>
+
+            <!-- Encabezado -->
+
+            <div class="group-header">
+
+                <h2>
+                    Inteligencia Artificial
+                </h2>
+
+                <button class="group-menu-button">
+                    ⋮
+                </button>
+
+
+                <!-- Menú del grupo -->
+
+                <div class="group-menu">
+
+                    <button class="edit-group-button">
+                        Editar grupo
+                    </button>
+
+                    <button class="delete-group-button">
+                        Eliminar grupo
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Sitios -->
 
             <div class="sites-container">
 
+
+                <!-- CHATGPT -->
+
                 <div class="site-card">
 
-                    <div class="site-icon">🤖</div>
+                    <div class="site-icon">
+                        🤖
+                    </div>
 
-                    <span class="site-name">ChatGPT</span>
+                    <span class="site-name">
+                        ChatGPT
+                    </span>
 
                     <div class="site-description">
                         Asistente de inteligencia artificial para conversar y realizar diferentes tareas.
                     </div>
 
+                    <button class="site-menu-button">
+                        ⋮
+                    </button>
+
+                    <div class="site-menu">
+
+                        <button class="edit-site-button">
+                            Editar sitio
+                        </button>
+
+                        <button class="delete-site-button">
+                            Eliminar sitio
+                        </button>
+
+                    </div>
+
                 </div>
 
 
+                <!-- GEMINI -->
+
                 <div class="site-card">
 
-                    <div class="site-icon">✨</div>
+                    <div class="site-icon">
+                        ✨
+                    </div>
 
-                    <span class="site-name">Gemini</span>
+                    <span class="site-name">
+                        Gemini
+                    </span>
 
                     <div class="site-description">
                         Asistente de inteligencia artificial desarrollado por Google.
                     </div>
 
+                    <button class="site-menu-button">
+                        ⋮
+                    </button>
+
+                    <div class="site-menu">
+
+                        <button class="edit-site-button">
+                            Editar sitio
+                        </button>
+
+                        <button class="delete-site-button">
+                            Eliminar sitio
+                        </button>
+
+                    </div>
+
                 </div>
 
 
+                <!-- DEEPSEEK -->
+
                 <div class="site-card">
 
-                    <div class="site-icon">🧠</div>
+                    <div class="site-icon">
+                        🧠
+                    </div>
 
-                    <span class="site-name">DeepSeek</span>
+                    <span class="site-name">
+                        DeepSeek
+                    </span>
 
                     <div class="site-description">
                         Herramienta de inteligencia artificial para conversación y generación de contenido.
                     </div>
 
+                    <button class="site-menu-button">
+                        ⋮
+                    </button>
+
+                    <div class="site-menu">
+
+                        <button class="edit-site-button">
+                            Editar sitio
+                        </button>
+
+                        <button class="delete-site-button">
+                            Eliminar sitio
+                        </button>
+
+                    </div>
+
                 </div>
+
+
+                <!-- AGREGAR SITIO A INTELIGENCIA ARTIFICIAL -->
+
+                <div class="add-site-card">
+
+                    <div class="add-site-icon">
+                        +
+                    </div>
+
+                    <span class="add-site-name">
+                        Agregar sitio
+                    </span>
+
+                </div>
+
 
             </div>
 
         </section>
 
+
     </main>
+
+
+
+    <!-- ================================= -->
+    <!-- ACCIONES GENERALES -->
+    <!-- ================================= -->
+
+    <div class="global-actions">
+
+
+        <!-- Agregar sitio general -->
+
+        <button id="add-site-button">
+            + Agregar sitio
+        </button>
+
+
+        <!-- Agregar grupo -->
+
+        <button id="add-group-button">
+            + Agregar grupo
+        </button>
+
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- PANEL DE CONFIGURACIÓN -->
+    <!-- ================================= -->
+
+    <aside id="settings-panel">
+
+        <!-- Encabezado del panel -->
+
+        <div class="settings-header">
+
+            <h2>
+                Configuración
+            </h2>
+
+            <button id="close-settings-button">
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- Contenido del panel -->
+
+        <div class="settings-content">
+
+
+            <!-- ================================= -->
+            <!-- TAMAÑO DE LOS ICONOS -->
+            <!-- ================================= -->
+
+            <section class="settings-section">
+
+                <h3>
+                    Tamaño de los iconos
+                </h3>
+
+                <label for="icon-size">
+                    Tamaño
+                </label>
+
+                <input type="number" id="icon-size" min="80" max="200" value="140">
+
+                <span>
+                    px
+                </span>
+
+            </section>
+
+
+            <!-- ================================= -->
+            <!-- FONDO -->
+            <!-- ================================= -->
+
+            <section class="settings-section">
+
+                <h3>
+                    Fondo
+                </h3>
+
+
+                <!-- Color sólido -->
+
+                <div class="background-option">
+
+                    <input type="radio" id="background-solid" name="background-type" value="solid" checked>
+
+                    <label for="background-solid">
+                        Color sólido
+                    </label>
+
+                </div>
+
+
+                <!-- Degradado -->
+
+                <div class="background-option">
+
+                    <input type="radio" id="background-gradient" name="background-type" value="gradient">
+
+                    <label for="background-gradient">
+                        Degradado
+                    </label>
+
+                </div>
+
+
+                <!-- Imagen -->
+
+                <div class="background-option">
+
+                    <input type="radio" id="background-image" name="background-type" value="image">
+
+                    <label for="background-image">
+                        Imagen
+                    </label>
+
+                </div>
+
+
+            </section>
+
+
+        </div>
+
+    </aside>
+
 
 </body>
 
