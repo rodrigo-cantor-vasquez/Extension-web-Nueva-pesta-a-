@@ -1,3 +1,4 @@
+
 /* ================================= */
 /* CONFIGURACIÓN GENERAL */
 /* ================================= */
@@ -155,6 +156,20 @@ main {
 
     border-bottom: 1px solid #dce6fa;
     border-radius: 16px 16px 0 0;
+}
+
+
+/* ================================= */
+/* CONTENEDOR DEL TÍTULO DEL GRUPO */
+/* ================================= */
+
+.group-title-container {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
 }
 
 
@@ -631,44 +646,6 @@ main {
 
 
 /* ================================= */
-/* RESPONSIVE */
-/* ================================= */
-
-@media (max-width: 800px) {
-
-    header {
-        flex-wrap: wrap;
-    }
-
-    .search-container {
-        width: 100%;
-        max-width: 350px;
-    }
-
-}
-
-
-@media (max-width: 500px) {
-
-    main {
-        width: 94%;
-    }
-
-    .site-group {
-        padding: 16px;
-    }
-
-    .sites-container {
-        justify-content: center;
-    }
-
-    .global-actions {
-        flex-direction: column;
-    }
-
-}
-
-/* ================================= */
 /* PANEL DE CONFIGURACIÓN */
 /* ================================= */
 
@@ -719,7 +696,9 @@ main {
 }
 
 
-/* TÍTULO */
+/* ================================= */
+/* TÍTULO DEL PANEL */
+/* ================================= */
 
 .settings-header h2 {
     margin: 0;
@@ -865,3 +844,406 @@ main {
 
     color: #34445f;
 }
+
+
+/* ================================= */
+/* CONFIGURACIÓN DEL DEGRADADO */
+/* ================================= */
+
+#gradient-settings {
+    margin-top: 15px;
+
+    padding: 15px;
+
+    background-color: #f8faff;
+
+    border: 1px solid #dbe6ff;
+    border-radius: 10px;
+}
+
+
+/* ================================= */
+/* OPCIONES DEL DEGRADADO */
+/* ================================= */
+
+.gradient-setting {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 15px;
+}
+
+.gradient-setting label {
+    font-size: 14px;
+
+    color: #52627d;
+}
+
+
+/* ================================= */
+/* DIRECCIÓN */
+/* ================================= */
+
+#gradient-direction {
+    min-width: 140px;
+
+    padding: 8px 10px;
+
+    border: 1px solid #cddcff;
+    border-radius: 7px;
+
+    background-color: white;
+
+    color: #34445f;
+
+    font-size: 14px;
+
+    outline: none;
+
+    cursor: pointer;
+}
+
+
+/* ================================= */
+/* COLORES DEL DEGRADADO */
+/* ================================= */
+
+#gradient-colors {
+    margin-top: 5px;
+}
+
+
+.gradient-color {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 12px;
+}
+
+
+.gradient-color label {
+    font-size: 14px;
+
+    color: #52627d;
+}
+
+
+/* ================================= */
+/* CONTROLES DEL COLOR */
+/* ================================= */
+
+.gradient-color-controls {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+
+.gradient-color input[type="color"] {
+    width: 45px;
+    height: 35px;
+
+    padding: 2px;
+
+    border: 1px solid #cddcff;
+    border-radius: 7px;
+
+    background-color: white;
+
+    cursor: pointer;
+}
+
+
+/* ================================= */
+/* BOTÓN ELIMINAR COLOR */
+/* ================================= */
+
+.remove-gradient-color-button {
+    width: 28px;
+    height: 28px;
+
+    padding: 0;
+
+    border: 1px solid #d6dff2;
+    border-radius: 6px;
+
+    background-color: white;
+
+    color: #7b879d;
+
+    font-size: 18px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        border-color 0.2s,
+        color 0.2s;
+}
+
+
+.remove-gradient-color-button:hover {
+    background-color: #f1f4fa;
+
+    border-color: #b9c7df;
+
+    color: #d14b4b;
+}
+
+
+/* ================================= */
+/* BOTÓN AGREGAR COLOR */
+/* ================================= */
+
+#add-gradient-color-button {
+    width: 100%;
+
+    margin-top: 5px;
+
+    padding: 9px 12px;
+
+    border: 1px dashed #a9c3f5;
+    border-radius: 7px;
+
+    background-color: white;
+
+    color: #5270a5;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        border-color 0.2s,
+        color 0.2s;
+}
+
+
+#add-gradient-color-button:hover {
+    background-color: #eaf1ff;
+
+    border-color: #6f9ef0;
+
+    color: #315ca8;
+}
+
+
+.background-option input[type="color"] {
+    width: 45px;
+    height: 35px;
+
+    margin-left: auto;
+
+    padding: 2px;
+
+    border: 1px solid #cddcff;
+    border-radius: 7px;
+
+    background-color: white;
+
+    cursor: pointer;
+}
+
+
+/* ================================= */
+/* CAPA TRANSPARENTE */
+/* ================================= */
+
+#settings-overlay {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100vh;
+
+    background-color: rgba(0, 0, 0, 0.45);
+
+    z-index: 90;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+}
+
+
+/* ================================= */
+/* CONFIGURACIÓN DE COLORES */
+/* ================================= */
+
+.color-setting {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 15px;
+}
+
+.color-setting label {
+    font-size: 14px;
+
+    color: #52627d;
+}
+
+.color-setting input[type="color"] {
+    width: 45px;
+    height: 35px;
+
+    padding: 2px;
+
+    border: 1px solid #cddcff;
+    border-radius: 7px;
+
+    background-color: white;
+
+    cursor: pointer;
+}
+
+
+/* ================================= */
+/* CONTROL DE TRANSPARENCIA */
+/* ================================= */
+
+.transparency-setting {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+}
+
+.transparency-setting label {
+    min-width: 80px;
+
+    font-size: 13px;
+
+    color: #52627d;
+}
+
+.transparency-setting input[type="range"] {
+    flex: 1;
+
+    cursor: pointer;
+}
+
+.transparency-setting span {
+    min-width: 35px;
+
+    font-size: 13px;
+
+    text-align: right;
+
+    color: #52627d;
+}
+
+
+/* ================================= */
+/* BOTÓN REINICIAR CONFIGURACIÓN */
+/* ================================= */
+
+#reset-background-button {
+    width: 100%;
+
+    margin-top: 5px;
+
+    padding: 9px 12px;
+
+    border: 1px solid #cddcff;
+    border-radius: 7px;
+
+    background-color: white;
+
+    color: #5270a5;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        border-color 0.2s,
+        color 0.2s;
+}
+
+
+#reset-background-button:hover {
+    background-color: #eaf1ff;
+
+    border-color: #6f9ef0;
+
+    color: #315ca8;
+}
+
+
+#reset-background-button:hover {
+    background-color: #eaf1ff;
+
+    border-color: #6f9ef0;
+
+    color: #315ca8;
+}
+
+
+/* ================================= */
+/* RESPONSIVE */
+/* ================================= */
+
+@media (max-width: 800px) {
+
+    header {
+        flex-wrap: wrap;
+    }
+
+    .search-container {
+        width: 100%;
+        max-width: 350px;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    main {
+        width: 94%;
+    }
+
+    .site-group {
+        padding: 16px;
+    }
+
+    .sites-container {
+        justify-content: center;
+    }
+
+    .global-actions {
+        flex-direction: column;
+    }
+
+}
+

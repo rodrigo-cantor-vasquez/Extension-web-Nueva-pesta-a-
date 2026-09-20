@@ -55,13 +55,17 @@
 
             <div class="group-header">
 
-                <h2>
-                    Mis sitios
-                </h2>
+                <div class="group-title-container">
 
-                <button class="group-menu-button">
-                    ⋮
-                </button>
+                    <h2>
+                        Mis sitios
+                    </h2>
+
+                    <button class="group-menu-button">
+                        ⋮
+                    </button>
+
+                </div>
 
 
                 <!-- Menú del grupo -->
@@ -223,13 +227,17 @@
 
             <div class="group-header">
 
-                <h2>
-                    Inteligencia Artificial
-                </h2>
+                <div class="group-title-container">
 
-                <button class="group-menu-button">
-                    ⋮
-                </button>
+                    <h2>
+                        Inteligencia Artificial
+                    </h2>
+
+                    <button class="group-menu-button">
+                        ⋮
+                    </button>
+
+                </div>
 
 
                 <!-- Menú del grupo -->
@@ -408,6 +416,13 @@
 
 
     <!-- ================================= -->
+    <!-- CAPA TRANSPARENTE -->
+    <!-- ================================= -->
+
+    <div id="settings-overlay"></div>
+
+
+    <!-- ================================= -->
     <!-- PANEL DE CONFIGURACIÓN -->
     <!-- ================================= -->
 
@@ -447,7 +462,7 @@
                     Tamaño
                 </label>
 
-                <input type="number" id="icon-size" min="80" max="200" value="140">
+                <input type="number" id="icon-size" min="42" max="80" value="42">
 
                 <span>
                     px
@@ -466,6 +481,18 @@
                     Fondo
                 </h3>
 
+                <!-- Imagen -->
+
+                <div class="background-option">
+
+                    <input type="radio" id="background-image" name="background-type" value="image">
+
+                    <label for="background-image">
+                        Imagen
+                    </label>
+
+                </div>
+
 
                 <!-- Color sólido -->
 
@@ -476,6 +503,8 @@
                     <label for="background-solid">
                         Color sólido
                     </label>
+
+                    <input type="color" id="background-color" value="#eef4ff">
 
                 </div>
 
@@ -493,26 +522,197 @@
                 </div>
 
 
-                <!-- Imagen -->
+                <!-- Configuración del degradado -->
 
-                <div class="background-option">
+                <div id="gradient-settings">
 
-                    <input type="radio" id="background-image" name="background-type" value="image">
+                    <!-- Dirección -->
 
-                    <label for="background-image">
-                        Imagen
+                    <div class="gradient-setting">
+
+                        <label for="gradient-direction">
+                            Dirección
+                        </label>
+
+                        <select id="gradient-direction">
+
+                            <option value="90">
+                                Horizontal
+                            </option>
+
+                            <option value="180">
+                                Vertical
+                            </option>
+
+                            <option value="135">
+                                Diagonal ↘
+                            </option>
+
+                            <option value="45">
+                                Diagonal ↗
+                            </option>
+
+                            <option value="225">
+                                Diagonal ↙
+                            </option>
+
+                            <option value="315">
+                                Diagonal ↖
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Colores -->
+
+                    <div id="gradient-colors">
+
+                        <!-- Color 1 -->
+
+                        <div class="gradient-color">
+
+                            <label for="gradient-color-1">
+                                Color 1
+                            </label>
+
+                            <div class="gradient-color-controls">
+
+                                <input type="color" id="gradient-color-1" value="#eef4ff">
+
+                                <button type="button" class="remove-gradient-color-button"
+                                    aria-label="Eliminar color 1">
+                                    ×
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Color 2 -->
+
+                        <div class="gradient-color">
+
+                            <label for="gradient-color-2">
+                                Color 2
+                            </label>
+
+                            <div class="gradient-color-controls">
+
+                                <input type="color" id="gradient-color-2" value="#d6e3ff">
+
+                                <button type="button" class="remove-gradient-color-button"
+                                    aria-label="Eliminar color 2">
+                                    ×
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Agregar color -->
+
+                    <button id="add-gradient-color-button" type="button">
+                        + Agregar color
+                    </button>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================================= -->
+            <!-- COLORES -->
+            <!-- ================================= -->
+
+            <section class="settings-section">
+
+                <h3>
+                    Colores de grupos
+                </h3>
+
+
+                <!-- Color de los grupos -->
+
+                <div class="color-setting">
+
+                    <label for="group-color">
+                        Color de los grupos
                     </label>
+
+                    <input type="color" id="group-color" value="#ffffff">
 
                 </div>
 
 
+                <!-- Transparencia de los grupos -->
+
+                <div class="transparency-setting">
+
+                    <label for="group-transparency">
+                        Transparencia
+                    </label>
+
+                    <input type="range" id="group-transparency" min="0" max="100" value="0">
+
+                    <span id="group-transparency-value">
+                        0%
+                    </span>
+
+                </div>
+
+
+                <!-- Color de las tarjetas -->
+
+                <div class="color-setting">
+
+                    <label for="card-color">
+                        Color de las tarjetas
+                    </label>
+
+                    <input type="color" id="card-color" value="#f8faff">
+
+                </div>
+
+
+                <!-- Transparencia de las tarjetas -->
+
+                <div class="transparency-setting">
+
+                    <label for="card-transparency">
+                        Transparencia
+                    </label>
+
+                    <input type="range" id="card-transparency" min="0" max="100" value="0">
+
+                    <span id="card-transparency-value">
+                        0%
+                    </span>
+
+                </div>
+
+                <!-- Reiniciar configuración de colores -->
+                <button id="reset-background-button" type="button">
+                    ↺ Reiniciar
+                </button>
+
+
             </section>
+
 
 
         </div>
 
     </aside>
 
+
+    <script src="newtab.js"></script>
 
 </body>
 
