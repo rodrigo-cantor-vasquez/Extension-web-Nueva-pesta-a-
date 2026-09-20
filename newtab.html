@@ -94,7 +94,7 @@
 
                 <!-- GOOGLE -->
 
-                <div class="site-card">
+                <div class="site-card" data-url="https://www.google.com">
 
                     <div class="site-icon">
                         🌐
@@ -115,10 +115,12 @@
                     <div class="site-menu">
 
                         <button class="edit-site-button">
+                            <span class="menu-icon">✏️</span>
                             Editar sitio
                         </button>
 
                         <button class="delete-site-button">
+                            <span class="menu-icon">🗑️</span>
                             Eliminar sitio
                         </button>
 
@@ -129,7 +131,7 @@
 
                 <!-- YOUTUBE -->
 
-                <div class="site-card">
+                <div class="site-card" data-url="https://www.youtube.com">
 
                     <div class="site-icon">
                         ▶️
@@ -150,10 +152,12 @@
                     <div class="site-menu">
 
                         <button class="edit-site-button">
+                            <span class="menu-icon">✏️</span>
                             Editar sitio
                         </button>
 
                         <button class="delete-site-button">
+                            <span class="menu-icon">🗑️</span>
                             Eliminar sitio
                         </button>
 
@@ -164,7 +168,7 @@
 
                 <!-- GITHUB -->
 
-                <div class="site-card">
+                <div class="site-card" data-url="https://github.com">
 
                     <div class="site-icon">
                         💻
@@ -185,10 +189,12 @@
                     <div class="site-menu">
 
                         <button class="edit-site-button">
+                            <span class="menu-icon">✏️</span>
                             Editar sitio
                         </button>
 
                         <button class="delete-site-button">
+                            <span class="menu-icon">🗑️</span>
                             Eliminar sitio
                         </button>
 
@@ -268,7 +274,7 @@
 
                 <!-- CHATGPT -->
 
-                <div class="site-card">
+                <div class="site-card" data-url="https://chatgpt.com">
 
                     <div class="site-icon">
                         🤖
@@ -289,10 +295,12 @@
                     <div class="site-menu">
 
                         <button class="edit-site-button">
+                            <span class="menu-icon">✏️</span>
                             Editar sitio
                         </button>
 
                         <button class="delete-site-button">
+                            <span class="menu-icon">🗑️</span>
                             Eliminar sitio
                         </button>
 
@@ -303,7 +311,7 @@
 
                 <!-- GEMINI -->
 
-                <div class="site-card">
+                <div class="site-card" data-url="https://gemini.google.com">
 
                     <div class="site-icon">
                         ✨
@@ -324,10 +332,12 @@
                     <div class="site-menu">
 
                         <button class="edit-site-button">
+                            <span class="menu-icon">✏️</span>
                             Editar sitio
                         </button>
 
                         <button class="delete-site-button">
+                            <span class="menu-icon">🗑️</span>
                             Eliminar sitio
                         </button>
 
@@ -338,7 +348,7 @@
 
                 <!-- DEEPSEEK -->
 
-                <div class="site-card">
+                <div class="site-card" data-url="https://chat.deepseek.com">
 
                     <div class="site-icon">
                         🧠
@@ -359,10 +369,12 @@
                     <div class="site-menu">
 
                         <button class="edit-site-button">
+                            <span class="menu-icon">✏️</span>
                             Editar sitio
                         </button>
 
                         <button class="delete-site-button">
+                            <span class="menu-icon">🗑️</span>
                             Eliminar sitio
                         </button>
 
@@ -752,6 +764,68 @@
                     </button>
 
                     <button id="save-edit-group-button">
+                        Guardar
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================================= -->
+    <!-- VENTANA EDITAR SITIO -->
+    <!-- ================================= -->
+
+    <div id="edit-site-overlay">
+
+        <div id="edit-site-modal">
+
+            <div class="edit-site-header">
+
+                <h2>
+                    Editar sitio
+                </h2>
+
+                <button id="close-edit-site-button">
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="edit-site-content">
+
+                <label for="edit-site-name">
+                    Nombre del sitio
+                </label>
+
+                <input type="text" id="edit-site-name">
+
+
+                <label for="edit-site-url">
+                    URL
+                </label>
+
+                <input type="url" id="edit-site-url">
+
+
+                <label for="edit-site-description">
+                    Descripción
+                </label>
+
+                <textarea id="edit-site-description" rows="3"></textarea>
+
+
+                <div class="edit-site-actions">
+
+                    <button id="cancel-edit-site-button">
+                        Cancelar
+                    </button>
+
+                    <button id="save-edit-site-button">
                         Guardar
                     </button>
 

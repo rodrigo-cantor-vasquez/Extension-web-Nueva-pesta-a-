@@ -95,10 +95,62 @@ groupMenuButtons.forEach((button) => {
 });
 
 
-// Cerrar menús al hacer clic fuera
+
+// =========================================
+// MENÚS DE LOS SITIOS
+// =========================================
+
+// Botones ⋮
+const siteMenuButtons = document.querySelectorAll(".site-menu-button");
+
+
+// Abrir / cerrar menú
+siteMenuButtons.forEach((button) => {
+
+    button.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+        const site = button.closest(".site-card");
+        const menu = site.querySelector(".site-menu");
+
+
+        // Cerrar los demás menús
+        document.querySelectorAll(".site-menu").forEach((otherMenu) => {
+
+            if (otherMenu !== menu) {
+
+                otherMenu.style.display = "none";
+
+            }
+
+        });
+
+
+        // Alternar menú actual
+        if (menu.style.display === "block") {
+
+            menu.style.display = "none";
+
+        } else {
+
+            menu.style.display = "block";
+
+        }
+
+    });
+
+});
+
+
+
+// =========================================
+// CERRAR MENÚS AL HACER CLIC FUERA
+// =========================================
+
 document.addEventListener("click", () => {
 
-    document.querySelectorAll(".group-menu").forEach((menu) => {
+    document.querySelectorAll(".group-menu, .site-menu").forEach((menu) => {
 
         menu.style.display = "none";
 
@@ -107,6 +159,139 @@ document.addEventListener("click", () => {
 });
 
 
+
+// =========================================
+// EDITAR SITIO
+// =========================================
+
+// Elementos
+const editSiteOverlay = document.getElementById("edit-site-overlay");
+const editSiteName = document.getElementById("edit-site-name");
+const editSiteUrl = document.getElementById("edit-site-url");
+const editSiteDescription = document.getElementById("edit-site-description");
+
+const closeEditSiteButton = document.getElementById("close-edit-site-button");
+const cancelEditSiteButton = document.getElementById("cancel-edit-site-button");
+const saveEditSiteButton = document.getElementById("save-edit-site-button");
+
+
+// Sitio que se está editando
+let siteBeingEdited = null;
+
+
+// =========================================
+// ABRIR EDICIÓN DE SITIO
+// =========================================
+
+document.querySelectorAll(".edit-site-button").forEach((button) => {
+
+    button.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+
+        // Obtener sitio
+        const site = button.closest(".site-card");
+
+        siteBeingEdited = site;
+
+
+        // Obtener datos actuales
+        const siteName = site.querySelector(".site-name");
+        const siteDescription = site.querySelector(".site-description");
+
+
+        editSiteName.value = siteName.textContent.trim();
+
+        editSiteUrl.value = site.dataset.url || "";
+
+        editSiteDescription.value = siteDescription.textContent.trim();
+
+
+        // Mostrar ventana
+        editSiteOverlay.style.opacity = "1";
+        editSiteOverlay.style.visibility = "visible";
+        editSiteOverlay.style.pointerEvents = "auto";
+
+
+        // Cerrar menú
+        site.querySelector(".site-menu").style.display = "none";
+
+
+        // Seleccionar nombre
+        editSiteName.focus();
+        editSiteName.select();
+
+    });
+
+});
+
+// =========================================
+// GUARDAR CAMBIOS DEL SITIO
+// =========================================
+
+saveEditSiteButton.addEventListener("click", () => {
+
+    const newName = editSiteName.value.trim();
+    const newUrl = editSiteUrl.value.trim();
+    const newDescription = editSiteDescription.value.trim();
+
+
+    // No permitir nombre vacío
+    if (newName === "") {
+
+        return;
+
+    }
+
+
+    // No permitir URL vacía
+    if (newUrl === "") {
+
+        return;
+
+    }
+
+
+    // Obtener elementos del sitio
+    const siteName = siteBeingEdited.querySelector(".site-name");
+    const siteDescription = siteBeingEdited.querySelector(".site-description");
+
+
+    // Actualizar nombre
+    siteName.textContent = newName;
+
+
+    // Actualizar URL
+    siteBeingEdited.dataset.url = newUrl;
+
+
+    // Actualizar descripción
+    siteDescription.textContent = newDescription;
+
+        // Cerrar ventana
+    closeEditSite();
+
+});
+
+// =========================================
+// CANCELAR EDICIÓN DEL SITIO
+// =========================================
+
+cancelEditSiteButton.addEventListener("click", closeEditSite);
+// Botón X
+closeEditSiteButton.addEventListener("click", closeEditSite);
+
+// Clic fuera de la ventana
+editSiteOverlay.addEventListener("click", (event) => {
+
+    if (event.target === editSiteOverlay) {
+
+        closeEditSite();
+
+    }
+
+});
 
 // =========================================
 // EDITAR GRUPO
@@ -166,6 +351,7 @@ document.querySelectorAll(".edit-group-button").forEach((button) => {
 });
 
 
+
 // =========================================
 // GUARDAR CAMBIOS DEL GRUPO
 // =========================================
@@ -195,8 +381,9 @@ saveEditGroupButton.addEventListener("click", () => {
 });
 
 
+
 // =========================================
-// CANCELAR EDICIÓN
+// CANCELAR EDICIÓN DEL GRUPO
 // =========================================
 
 cancelEditGroupButton.addEventListener("click", closeEditGroup);
@@ -218,8 +405,9 @@ editGroupOverlay.addEventListener("click", (event) => {
 });
 
 
+
 // =========================================
-// CERRAR VENTANA DE EDICIÓN
+// CERRAR VENTANA DE EDICIÓN DE GRUPO
 // =========================================
 
 function closeEditGroup() {
@@ -229,6 +417,20 @@ function closeEditGroup() {
     editGroupOverlay.style.pointerEvents = "none";
 
     groupBeingEdited = null;
+
+}
+
+// =========================================
+// CERRAR VENTANA DE EDICIÓN DEL SITIO
+// =========================================
+
+function closeEditSite() {
+
+    editSiteOverlay.style.opacity = "0";
+    editSiteOverlay.style.visibility = "hidden";
+    editSiteOverlay.style.pointerEvents = "none";
+
+    siteBeingEdited = null;
 
 }
 
