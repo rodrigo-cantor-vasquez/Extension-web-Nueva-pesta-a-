@@ -73,10 +73,12 @@
                 <div class="group-menu">
 
                     <button class="edit-group-button">
+                        <span class="menu-icon">✏️</span>
                         Editar grupo
                     </button>
 
                     <button class="delete-group-button">
+                        <span class="menu-icon">🗑️</span>
                         Eliminar grupo
                     </button>
 
@@ -245,10 +247,12 @@
                 <div class="group-menu">
 
                     <button class="edit-group-button">
+                        <span class="menu-icon">✏️</span>
                         Editar grupo
                     </button>
 
                     <button class="delete-group-button">
+                        <span class="menu-icon">🗑️</span>
                         Eliminar grupo
                     </button>
 
@@ -711,6 +715,53 @@
 
     </aside>
 
+    <!-- ================================= -->
+    <!-- VENTANA EDITAR GRUPO -->
+    <!-- ================================= -->
+
+    <div id="edit-group-overlay">
+
+        <div id="edit-group-modal">
+
+            <div class="edit-group-header">
+
+                <h2>
+                    Editar grupo
+                </h2>
+
+                <button id="close-edit-group-button">
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="edit-group-content">
+
+                <label for="edit-group-name">
+                    Nombre del grupo
+                </label>
+
+                <input type="text" id="edit-group-name">
+
+
+                <div class="edit-group-actions">
+
+                    <button id="cancel-edit-group-button">
+                        Cancelar
+                    </button>
+
+                    <button id="save-edit-group-button">
+                        Guardar
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
     <script src="newtab.js"></script>
 
