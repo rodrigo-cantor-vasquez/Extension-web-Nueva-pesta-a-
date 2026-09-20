@@ -359,6 +359,7 @@ editSiteOverlay.addEventListener("click", (event) => {
 const editGroupOverlay = document.getElementById("edit-group-overlay");
 const editGroupName = document.getElementById("edit-group-name");
 const closeEditGroupButton = document.getElementById("close-edit-group-button");
+const editGroupNameError = document.getElementById("edit-group-name-error");
 const cancelEditGroupButton = document.getElementById("cancel-edit-group-button");
 const saveEditGroupButton = document.getElementById("save-edit-group-button");
 
@@ -388,7 +389,7 @@ document.querySelectorAll(".edit-group-button").forEach((button) => {
         const groupTitle = group.querySelector("h2");
 
         editGroupName.value = groupTitle.textContent.trim();
-
+        editGroupNameError.textContent = "";
 
         // Mostrar ventana
         editGroupOverlay.style.opacity = "1";
@@ -418,9 +419,13 @@ saveEditGroupButton.addEventListener("click", () => {
 
     const newName = editGroupName.value.trim();
 
+    editGroupNameError.textContent = "";
+
 
     // No permitir nombres vacíos
     if (newName === "") {
+
+        editGroupNameError.textContent = "Por favor, introduce un nombre.";
 
         return;
 

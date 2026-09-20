@@ -1390,6 +1390,9 @@ main {
     padding: 10px 12px;
 
     border: 1px solid #cddcff;
+
+    margin-bottom: 16px;
+
     border-radius: 7px;
 
     outline: none;
@@ -1632,7 +1635,8 @@ main {
 }
 
 #edit-site-url-error,
-#edit-site-name-error {
+#edit-site-name-error,
+#edit-group-name-error {
     margin: -8px 0 16px;
     text-align: center;
     color: #d14b4b;
