@@ -194,8 +194,10 @@ const addSiteOverlay = document.getElementById("add-site-overlay");
 const addSiteName = document.getElementById("add-site-name");
 const addSiteUrl = document.getElementById("add-site-url");
 const addSiteDescription = document.getElementById("add-site-description");
+const addSiteGroup = document.getElementById("add-site-group");
 const addSiteNameError = document.getElementById("add-site-name-error");
 const addSiteUrlError = document.getElementById("add-site-url-error");
+
 
 const closeAddSiteButton = document.getElementById("close-add-site-button");
 const cancelAddSiteButton = document.getElementById("cancel-add-site-button");
@@ -209,6 +211,30 @@ let groupBeingAddedTo = null;
 // Botones "+ Agregar sitio"
 const addSiteButtons = document.querySelectorAll(".add-site-card");
 
+// =========================================
+// CARGAR GRUPOS EN EL SELECT
+// =========================================
+
+function loadSiteGroups() {
+
+    addSiteGroup.innerHTML = "";
+
+    const groups = document.querySelectorAll(".site-group");
+
+    groups.forEach((group) => {
+
+        const groupTitle = group.querySelector("h2");
+
+        const option = document.createElement("option");
+
+        option.value = groupTitle.textContent.trim();
+        option.textContent = groupTitle.textContent.trim();
+
+        addSiteGroup.appendChild(option);
+
+    });
+
+}
 
 // Abrir modal
 addSiteButtons.forEach((button) => {
@@ -232,6 +258,7 @@ addSiteButtons.forEach((button) => {
         addSiteNameError.textContent = "";
         addSiteUrlError.textContent = "";
 
+        addSiteGroup.style.display = "none";
 
         // Mostrar ventana
         addSiteOverlay.style.opacity = "1";
@@ -247,6 +274,47 @@ addSiteButtons.forEach((button) => {
 });
 
 
+// =========================================
+// BOTÓN GLOBAL AGREGAR SITIO
+// =========================================
+
+const addSiteButton = document.getElementById("add-site-button");
+
+
+addSiteButton.addEventListener("click", (event) => {
+
+    event.stopPropagation();
+
+
+    // No pertenece a ningún grupo todavía
+    groupBeingAddedTo = null;
+
+
+    // Limpiar campos
+    addSiteName.value = "";
+    addSiteUrl.value = "";
+    addSiteDescription.value = "";
+
+    addSiteNameError.textContent = "";
+    addSiteUrlError.textContent = "";
+
+
+    // Cargar grupos disponibles
+    loadSiteGroups();
+
+    addSiteGroup.style.display = "block";
+
+
+    // Mostrar ventana
+    addSiteOverlay.style.opacity = "1";
+    addSiteOverlay.style.visibility = "visible";
+    addSiteOverlay.style.pointerEvents = "auto";
+
+
+    // Seleccionar nombre
+    addSiteName.focus();
+
+});
 
 // =========================================
 // GUARDAR NUEVO SITIO
@@ -311,6 +379,26 @@ saveAddSiteButton.addEventListener("click", () => {
 
     }
 
+    // Obtener el grupo seleccionado
+    if (groupBeingAddedTo === null) {
+
+        const selectedGroupName = addSiteGroup.value;
+
+        const groups = document.querySelectorAll(".site-group");
+
+        groups.forEach((group) => {
+
+            const groupTitle = group.querySelector("h2");
+
+            if (groupTitle.textContent.trim() === selectedGroupName) {
+
+                groupBeingAddedTo = group;
+
+            }
+
+        });
+
+    }
 
     // Obtener el contenedor de sitios del grupo
     const sitesContainer = groupBeingAddedTo.querySelector(".sites-container");

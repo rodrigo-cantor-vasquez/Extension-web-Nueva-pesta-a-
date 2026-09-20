@@ -1729,7 +1729,8 @@ main {
 
 #add-site-name,
 #add-site-url,
-#add-site-description {
+#add-site-description,
+#add-site-group {
     width: 100%;
     padding: 10px 12px;
     margin-bottom: 16px;
@@ -1746,7 +1747,8 @@ main {
 
 #add-site-name:focus,
 #add-site-url:focus,
-#add-site-description:focus {
+#add-site-description:focus,
+#add-site-group:focus {
     border-color: #6d9dfc;
     box-shadow: 0 0 0 3px rgba(70, 120, 220, 0.12);
 }
