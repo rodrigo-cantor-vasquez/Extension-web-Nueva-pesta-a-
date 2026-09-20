@@ -1630,3 +1630,11 @@ main {
     background-color: #527fd1;
     border-color: #527fd1;
 }
+
+#edit-site-url-error,
+#edit-site-name-error {
+    margin: -8px 0 16px;
+    text-align: center;
+    color: #d14b4b;
+    font-size: 13px;
+}

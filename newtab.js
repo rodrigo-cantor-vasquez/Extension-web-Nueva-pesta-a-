@@ -158,7 +158,28 @@ document.addEventListener("click", () => {
 
 });
 
+// =========================================
+// ABRIR SITIOS
+// =========================================
 
+const siteCards = document.querySelectorAll(".site-card");
+
+
+siteCards.forEach((site) => {
+
+    site.addEventListener("click", () => {
+
+        const url = site.dataset.url;
+
+        if (url) {
+
+            window.location.href = url;
+
+        }
+
+    });
+
+});
 
 // =========================================
 // EDITAR SITIO
@@ -169,6 +190,8 @@ const editSiteOverlay = document.getElementById("edit-site-overlay");
 const editSiteName = document.getElementById("edit-site-name");
 const editSiteUrl = document.getElementById("edit-site-url");
 const editSiteDescription = document.getElementById("edit-site-description");
+const editSiteUrlError = document.getElementById("edit-site-url-error");
+const editSiteNameError = document.getElementById("edit-site-name-error");
 
 const closeEditSiteButton = document.getElementById("close-edit-site-button");
 const cancelEditSiteButton = document.getElementById("cancel-edit-site-button");
@@ -207,6 +230,8 @@ document.querySelectorAll(".edit-site-button").forEach((button) => {
 
         editSiteDescription.value = siteDescription.textContent.trim();
 
+        editSiteUrlError.textContent = "";
+        editSiteNameError.textContent = "";
 
         // Mostrar ventana
         editSiteOverlay.style.opacity = "1";
@@ -233,21 +258,54 @@ document.querySelectorAll(".edit-site-button").forEach((button) => {
 saveEditSiteButton.addEventListener("click", () => {
 
     const newName = editSiteName.value.trim();
-    const newUrl = editSiteUrl.value.trim();
+    let newUrl = editSiteUrl.value.trim();
     const newDescription = editSiteDescription.value.trim();
-
+    editSiteUrlError.textContent = "";
+    editSiteNameError.textContent = "";
 
     // No permitir nombre vacío
     if (newName === "") {
 
+        editSiteNameError.textContent = "Por favor, introduce un nombre.";
+        
         return;
 
     }
 
 
     // No permitir URL vacía
+
     if (newUrl === "") {
 
+        editSiteUrlError.textContent = "Por favor, introduce una URL.";
+
+        return;
+
+    }
+
+
+    // Agregar https si no se escribió el protocolo
+    if (!newUrl.startsWith("http://") && !newUrl.startsWith("https://")) {
+
+        newUrl = "https://" + newUrl;
+
+    }
+
+
+    // Validar URL
+    try {
+
+        const url = new URL(newUrl);
+
+        if (!url.hostname.includes(".")) {
+            editSiteUrlError.textContent = "Introduce una URL válida.";
+            return;
+
+        }
+
+    } catch {
+
+        editSiteUrlError.textContent = "Introduce una URL válida.";
         return;
 
     }
@@ -269,7 +327,7 @@ saveEditSiteButton.addEventListener("click", () => {
     // Actualizar descripción
     siteDescription.textContent = newDescription;
 
-        // Cerrar ventana
+    // Cerrar ventana
     closeEditSite();
 
 });
