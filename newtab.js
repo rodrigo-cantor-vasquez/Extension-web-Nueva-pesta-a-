@@ -158,6 +158,8 @@ document.addEventListener("click", () => {
 
 });
 
+
+
 // =========================================
 // ABRIR SITIOS
 // =========================================
@@ -181,6 +183,359 @@ siteCards.forEach((site) => {
 
 });
 
+
+
+// =========================================
+// AGREGAR SITIO
+// =========================================
+
+// Elementos
+const addSiteOverlay = document.getElementById("add-site-overlay");
+const addSiteName = document.getElementById("add-site-name");
+const addSiteUrl = document.getElementById("add-site-url");
+const addSiteDescription = document.getElementById("add-site-description");
+const addSiteNameError = document.getElementById("add-site-name-error");
+const addSiteUrlError = document.getElementById("add-site-url-error");
+
+const closeAddSiteButton = document.getElementById("close-add-site-button");
+const cancelAddSiteButton = document.getElementById("cancel-add-site-button");
+const saveAddSiteButton = document.getElementById("save-add-site-button");
+
+
+// Grupo al que se agregará el sitio
+let groupBeingAddedTo = null;
+
+
+// Botones "+ Agregar sitio"
+const addSiteButtons = document.querySelectorAll(".add-site-card");
+
+
+// Abrir modal
+addSiteButtons.forEach((button) => {
+
+    button.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+
+        // Obtener el grupo al que pertenece el botón
+        const group = button.closest(".site-group");
+
+        groupBeingAddedTo = group;
+
+
+        // Limpiar campos
+        addSiteName.value = "";
+        addSiteUrl.value = "";
+        addSiteDescription.value = "";
+
+        addSiteNameError.textContent = "";
+        addSiteUrlError.textContent = "";
+
+
+        // Mostrar ventana
+        addSiteOverlay.style.opacity = "1";
+        addSiteOverlay.style.visibility = "visible";
+        addSiteOverlay.style.pointerEvents = "auto";
+
+
+        // Seleccionar nombre
+        addSiteName.focus();
+
+    });
+
+});
+
+
+
+// =========================================
+// GUARDAR NUEVO SITIO
+// =========================================
+
+saveAddSiteButton.addEventListener("click", () => {
+
+    const newName = addSiteName.value.trim();
+    let newUrl = addSiteUrl.value.trim();
+    const newDescription = addSiteDescription.value.trim();
+
+    addSiteNameError.textContent = "";
+    addSiteUrlError.textContent = "";
+
+
+    // No permitir nombre vacío
+    if (newName === "") {
+
+        addSiteNameError.textContent = "Por favor, introduce un nombre.";
+
+        return;
+
+    }
+
+
+    // No permitir URL vacía
+    if (newUrl === "") {
+
+        addSiteUrlError.textContent = "Por favor, introduce una URL.";
+
+        return;
+
+    }
+
+
+    // Agregar https si no se escribió el protocolo
+    if (!newUrl.startsWith("http://") && !newUrl.startsWith("https://")) {
+
+        newUrl = "https://" + newUrl;
+
+    }
+
+
+    // Validar URL
+    try {
+
+        const url = new URL(newUrl);
+
+        if (!url.hostname.includes(".")) {
+
+            addSiteUrlError.textContent = "Introduce una URL válida.";
+
+            return;
+
+        }
+
+    } catch {
+
+        addSiteUrlError.textContent = "Introduce una URL válida.";
+
+        return;
+
+    }
+
+
+    // Obtener el contenedor de sitios del grupo
+    const sitesContainer = groupBeingAddedTo.querySelector(".sites-container");
+
+
+    // Crear tarjeta del nuevo sitio
+    const newSite = document.createElement("div");
+
+    newSite.className = "site-card";
+    newSite.dataset.url = newUrl;
+
+
+    // Crear icono
+    const siteIcon = document.createElement("div");
+
+    siteIcon.className = "site-icon";
+    siteIcon.textContent = "🌐";
+
+
+    // Crear nombre
+    const siteName = document.createElement("span");
+
+    siteName.className = "site-name";
+    siteName.textContent = newName;
+
+
+    // Crear descripción
+    const siteDescription = document.createElement("div");
+
+    siteDescription.className = "site-description";
+    siteDescription.textContent = newDescription;
+
+
+    // Agregar elementos a la tarjeta
+    newSite.appendChild(siteIcon);
+    newSite.appendChild(siteName);
+    newSite.appendChild(siteDescription);
+
+
+    // Crear botón del menú
+    const siteMenuButton = document.createElement("button");
+
+    siteMenuButton.className = "site-menu-button";
+    siteMenuButton.textContent = "⋮";
+
+
+    // Crear menú del sitio
+    const siteMenu = document.createElement("div");
+
+    siteMenu.className = "site-menu";
+
+
+    // Crear botón "Editar sitio"
+    const editSiteButton = document.createElement("button");
+
+    editSiteButton.className = "edit-site-button";
+    editSiteButton.innerHTML = `
+        <span class="menu-icon">✏️</span>
+        Editar sitio
+    `;
+
+
+    // Crear botón "Eliminar sitio"
+    const deleteSiteButton = document.createElement("button");
+
+    deleteSiteButton.className = "delete-site-button";
+    deleteSiteButton.innerHTML = `
+        <span class="menu-icon">🗑️</span>
+        Eliminar sitio
+    `;
+
+
+    // Agregar botones al menú
+    siteMenu.appendChild(editSiteButton);
+    siteMenu.appendChild(deleteSiteButton);
+
+
+    // Agregar botón y menú a la tarjeta
+    newSite.appendChild(siteMenuButton);
+    newSite.appendChild(siteMenu);
+
+
+    // Insertar la tarjeta antes de "Agregar sitio"
+    const addSiteCard = groupBeingAddedTo.querySelector(".add-site-card");
+
+    sitesContainer.insertBefore(newSite, addSiteCard);
+
+
+    // =========================================
+    // EVENTOS DE LA NUEVA TARJETA
+    // =========================================
+
+    // Abrir sitio
+    newSite.addEventListener("click", () => {
+
+        const url = newSite.dataset.url;
+
+        if (url) {
+
+            window.location.href = url;
+
+        }
+
+    });
+
+
+    // Abrir / cerrar menú
+    siteMenuButton.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+
+        // Cerrar los demás menús
+        document.querySelectorAll(".site-menu").forEach((otherMenu) => {
+
+            if (otherMenu !== siteMenu) {
+
+                otherMenu.style.display = "none";
+
+            }
+
+        });
+
+
+        // Alternar menú actual
+        if (siteMenu.style.display === "block") {
+
+            siteMenu.style.display = "none";
+
+        } else {
+
+            siteMenu.style.display = "block";
+
+        }
+
+    });
+
+
+    // Evitar que el clic dentro del menú abra el sitio
+    siteMenu.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+    });
+
+
+    // Cerrar menú después de editar
+    editSiteButton.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+        siteBeingEdited = newSite;
+
+        editSiteName.value = newSite.querySelector(".site-name").textContent.trim();
+        editSiteUrl.value = newSite.dataset.url || "";
+        editSiteDescription.value = newSite.querySelector(".site-description").textContent.trim();
+
+        editSiteNameError.textContent = "";
+        editSiteUrlError.textContent = "";
+
+        editSiteOverlay.style.opacity = "1";
+        editSiteOverlay.style.visibility = "visible";
+        editSiteOverlay.style.pointerEvents = "auto";
+
+        siteMenu.style.display = "none";
+
+        editSiteName.focus();
+        editSiteName.select();
+
+    });
+
+
+    // Eliminar sitio
+    deleteSiteButton.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+        newSite.remove();
+
+    });
+
+
+    // Cerrar modal
+    closeAddSite();
+
+});
+
+
+
+// =========================================
+// CERRAR MODAL AGREGAR SITIO
+// =========================================
+
+function closeAddSite() {
+
+    addSiteOverlay.style.opacity = "0";
+    addSiteOverlay.style.visibility = "hidden";
+    addSiteOverlay.style.pointerEvents = "none";
+
+    groupBeingAddedTo = null;
+
+}
+
+
+// Botón X
+closeAddSiteButton.addEventListener("click", closeAddSite);
+
+
+// Botón Cancelar
+cancelAddSiteButton.addEventListener("click", closeAddSite);
+
+
+// Clic fuera de la ventana
+addSiteOverlay.addEventListener("click", (event) => {
+
+    if (event.target === addSiteOverlay) {
+
+        closeAddSite();
+
+    }
+
+});
+
+
+
 // =========================================
 // EDITAR SITIO
 // =========================================
@@ -200,6 +555,7 @@ const saveEditSiteButton = document.getElementById("save-edit-site-button");
 
 // Sitio que se está editando
 let siteBeingEdited = null;
+
 
 
 // =========================================
@@ -233,6 +589,7 @@ document.querySelectorAll(".edit-site-button").forEach((button) => {
         editSiteUrlError.textContent = "";
         editSiteNameError.textContent = "";
 
+
         // Mostrar ventana
         editSiteOverlay.style.opacity = "1";
         editSiteOverlay.style.visibility = "visible";
@@ -251,6 +608,8 @@ document.querySelectorAll(".edit-site-button").forEach((button) => {
 
 });
 
+
+
 // =========================================
 // GUARDAR CAMBIOS DEL SITIO
 // =========================================
@@ -260,8 +619,10 @@ saveEditSiteButton.addEventListener("click", () => {
     const newName = editSiteName.value.trim();
     let newUrl = editSiteUrl.value.trim();
     const newDescription = editSiteDescription.value.trim();
+
     editSiteUrlError.textContent = "";
     editSiteNameError.textContent = "";
+
 
     // No permitir nombre vacío
     if (newName === "") {
@@ -274,7 +635,6 @@ saveEditSiteButton.addEventListener("click", () => {
 
 
     // No permitir URL vacía
-
     if (newUrl === "") {
 
         editSiteUrlError.textContent = "Por favor, introduce una URL.";
@@ -298,7 +658,9 @@ saveEditSiteButton.addEventListener("click", () => {
         const url = new URL(newUrl);
 
         if (!url.hostname.includes(".")) {
+
             editSiteUrlError.textContent = "Introduce una URL válida.";
+
             return;
 
         }
@@ -306,6 +668,7 @@ saveEditSiteButton.addEventListener("click", () => {
     } catch {
 
         editSiteUrlError.textContent = "Introduce una URL válida.";
+
         return;
 
     }
@@ -327,18 +690,24 @@ saveEditSiteButton.addEventListener("click", () => {
     // Actualizar descripción
     siteDescription.textContent = newDescription;
 
+
     // Cerrar ventana
     closeEditSite();
 
 });
+
+
 
 // =========================================
 // CANCELAR EDICIÓN DEL SITIO
 // =========================================
 
 cancelEditSiteButton.addEventListener("click", closeEditSite);
+
+
 // Botón X
 closeEditSiteButton.addEventListener("click", closeEditSite);
+
 
 // Clic fuera de la ventana
 editSiteOverlay.addEventListener("click", (event) => {
@@ -350,6 +719,8 @@ editSiteOverlay.addEventListener("click", (event) => {
     }
 
 });
+
+
 
 // =========================================
 // EDITAR GRUPO
@@ -366,6 +737,7 @@ const saveEditGroupButton = document.getElementById("save-edit-group-button");
 
 // Grupo que se está editando
 let groupBeingEdited = null;
+
 
 
 // =========================================
@@ -388,8 +760,11 @@ document.querySelectorAll(".edit-group-button").forEach((button) => {
         // Obtener nombre actual
         const groupTitle = group.querySelector("h2");
 
+
         editGroupName.value = groupTitle.textContent.trim();
+
         editGroupNameError.textContent = "";
+
 
         // Mostrar ventana
         editGroupOverlay.style.opacity = "1";
@@ -483,6 +858,8 @@ function closeEditGroup() {
 
 }
 
+
+
 // =========================================
 // CERRAR VENTANA DE EDICIÓN DEL SITIO
 // =========================================
@@ -496,4 +873,3 @@ function closeEditSite() {
     siteBeingEdited = null;
 
 }
-

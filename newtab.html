@@ -806,7 +806,7 @@
                 <input type="text" id="edit-site-name">
 
                 <p id="edit-site-name-error"></p>
-                
+
                 <label for="edit-site-url">
                     URL
                 </label>
@@ -837,6 +837,43 @@
 
         </div>
 
+    </div>
+
+    <!-- =========================================
+     MODAL AGREGAR SITIO
+     ========================================= -->
+
+    <div id="add-site-overlay">
+        <div id="add-site-modal">
+
+            <div class="add-site-header">
+                <h2>Agregar sitio</h2>
+                <button id="close-add-site-button">×</button>
+            </div>
+
+            <div class="add-site-content">
+
+                <label for="add-site-name">Nombre del sitio</label>
+                <input type="text" id="add-site-name">
+
+                <p id="add-site-name-error"></p>
+
+                <label for="add-site-url">URL</label>
+                <input type="url" id="add-site-url">
+
+                <p id="add-site-url-error"></p>
+
+                <label for="add-site-description">Descripción</label>
+                <textarea id="add-site-description" rows="3"></textarea>
+
+                <div class="add-site-actions">
+                    <button id="cancel-add-site-button">Cancelar</button>
+                    <button id="save-add-site-button">Guardar</button>
+                </div>
+
+            </div>
+
+        </div>
     </div>
 
     <script src="newtab.js"></script>
