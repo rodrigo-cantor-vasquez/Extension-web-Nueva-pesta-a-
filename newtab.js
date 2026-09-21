@@ -198,7 +198,6 @@ const addSiteGroup = document.getElementById("add-site-group");
 const addSiteNameError = document.getElementById("add-site-name-error");
 const addSiteUrlError = document.getElementById("add-site-url-error");
 
-
 const closeAddSiteButton = document.getElementById("close-add-site-button");
 const cancelAddSiteButton = document.getElementById("cancel-add-site-button");
 const saveAddSiteButton = document.getElementById("save-add-site-button");
@@ -210,6 +209,7 @@ let groupBeingAddedTo = null;
 
 // Botones "+ Agregar sitio"
 const addSiteButtons = document.querySelectorAll(".add-site-card");
+
 
 // =========================================
 // CARGAR GRUPOS EN EL SELECT
@@ -236,6 +236,7 @@ function loadSiteGroups() {
 
 }
 
+
 // Abrir modal
 addSiteButtons.forEach((button) => {
 
@@ -260,6 +261,7 @@ addSiteButtons.forEach((button) => {
 
         addSiteGroup.style.display = "none";
 
+
         // Mostrar ventana
         addSiteOverlay.style.opacity = "1";
         addSiteOverlay.style.visibility = "visible";
@@ -272,6 +274,7 @@ addSiteButtons.forEach((button) => {
     });
 
 });
+
 
 
 // =========================================
@@ -316,6 +319,8 @@ addSiteButton.addEventListener("click", (event) => {
 
 });
 
+
+
 // =========================================
 // GUARDAR NUEVO SITIO
 // =========================================
@@ -333,7 +338,8 @@ saveAddSiteButton.addEventListener("click", () => {
     // No permitir nombre vacío
     if (newName === "") {
 
-        addSiteNameError.textContent = "Por favor, introduce un nombre.";
+        addSiteNameError.textContent =
+            "Por favor, introduce un nombre.";
 
         return;
 
@@ -343,7 +349,8 @@ saveAddSiteButton.addEventListener("click", () => {
     // No permitir URL vacía
     if (newUrl === "") {
 
-        addSiteUrlError.textContent = "Por favor, introduce una URL.";
+        addSiteUrlError.textContent =
+            "Por favor, introduce una URL.";
 
         return;
 
@@ -351,7 +358,10 @@ saveAddSiteButton.addEventListener("click", () => {
 
 
     // Agregar https si no se escribió el protocolo
-    if (!newUrl.startsWith("http://") && !newUrl.startsWith("https://")) {
+    if (
+        !newUrl.startsWith("http://") &&
+        !newUrl.startsWith("https://")
+    ) {
 
         newUrl = "https://" + newUrl;
 
@@ -365,7 +375,8 @@ saveAddSiteButton.addEventListener("click", () => {
 
         if (!url.hostname.includes(".")) {
 
-            addSiteUrlError.textContent = "Introduce una URL válida.";
+            addSiteUrlError.textContent =
+                "Introduce una URL válida.";
 
             return;
 
@@ -373,11 +384,13 @@ saveAddSiteButton.addEventListener("click", () => {
 
     } catch {
 
-        addSiteUrlError.textContent = "Introduce una URL válida.";
+        addSiteUrlError.textContent =
+            "Introduce una URL válida.";
 
         return;
 
     }
+
 
     // Obtener el grupo seleccionado
     if (groupBeingAddedTo === null) {
@@ -390,7 +403,9 @@ saveAddSiteButton.addEventListener("click", () => {
 
             const groupTitle = group.querySelector("h2");
 
-            if (groupTitle.textContent.trim() === selectedGroupName) {
+            if (
+                groupTitle.textContent.trim() === selectedGroupName
+            ) {
 
                 groupBeingAddedTo = group;
 
@@ -400,8 +415,10 @@ saveAddSiteButton.addEventListener("click", () => {
 
     }
 
+
     // Obtener el contenedor de sitios del grupo
-    const sitesContainer = groupBeingAddedTo.querySelector(".sites-container");
+    const sitesContainer =
+        groupBeingAddedTo.querySelector(".sites-container");
 
 
     // Crear tarjeta del nuevo sitio
@@ -455,6 +472,7 @@ saveAddSiteButton.addEventListener("click", () => {
     const editSiteButton = document.createElement("button");
 
     editSiteButton.className = "edit-site-button";
+
     editSiteButton.innerHTML = `
         <span class="menu-icon">✏️</span>
         Editar sitio
@@ -465,6 +483,7 @@ saveAddSiteButton.addEventListener("click", () => {
     const deleteSiteButton = document.createElement("button");
 
     deleteSiteButton.className = "delete-site-button";
+
     deleteSiteButton.innerHTML = `
         <span class="menu-icon">🗑️</span>
         Eliminar sitio
@@ -482,7 +501,8 @@ saveAddSiteButton.addEventListener("click", () => {
 
 
     // Insertar la tarjeta antes de "Agregar sitio"
-    const addSiteCard = groupBeingAddedTo.querySelector(".add-site-card");
+    const addSiteCard =
+        groupBeingAddedTo.querySelector(".add-site-card");
 
     sitesContainer.insertBefore(newSite, addSiteCard);
 
@@ -545,16 +565,22 @@ saveAddSiteButton.addEventListener("click", () => {
     });
 
 
-    // Cerrar menú después de editar
+    // Editar sitio
     editSiteButton.addEventListener("click", (event) => {
 
         event.stopPropagation();
 
         siteBeingEdited = newSite;
 
-        editSiteName.value = newSite.querySelector(".site-name").textContent.trim();
-        editSiteUrl.value = newSite.dataset.url || "";
-        editSiteDescription.value = newSite.querySelector(".site-description").textContent.trim();
+        editSiteName.value =
+            newSite.querySelector(".site-name").textContent.trim();
+
+        editSiteUrl.value =
+            newSite.dataset.url || "";
+
+        editSiteDescription.value =
+            newSite.querySelector(".site-description")
+                .textContent.trim();
 
         editSiteNameError.textContent = "";
         editSiteUrlError.textContent = "";
@@ -600,6 +626,13 @@ function closeAddSite() {
 
     groupBeingAddedTo = null;
 
+    addSiteName.value = "";
+    addSiteUrl.value = "";
+    addSiteDescription.value = "";
+
+    addSiteNameError.textContent = "";
+    addSiteUrlError.textContent = "";
+
 }
 
 
@@ -625,20 +658,394 @@ addSiteOverlay.addEventListener("click", (event) => {
 
 
 // =========================================
+// AGREGAR GRUPO
+// =========================================
+
+// Elementos
+const addGroupButton =
+    document.getElementById("add-group-button");
+
+const addGroupOverlay =
+    document.getElementById("add-group-overlay");
+
+const addGroupName =
+    document.getElementById("add-group-name");
+
+const addGroupNameError =
+    document.getElementById("add-group-name-error");
+
+const closeAddGroupButton =
+    document.getElementById("close-add-group-button");
+
+const cancelAddGroupButton =
+    document.getElementById("cancel-add-group-button");
+
+
+
+// =========================================
+// ABRIR MODAL AGREGAR GRUPO
+// =========================================
+
+addGroupButton.addEventListener("click", () => {
+
+    addGroupName.value = "";
+    addGroupNameError.textContent = "";
+
+    addGroupOverlay.style.opacity = "1";
+    addGroupOverlay.style.visibility = "visible";
+    addGroupOverlay.style.pointerEvents = "auto";
+
+    addGroupName.focus();
+
+});
+
+
+
+// =========================================
+// CERRAR MODAL AGREGAR GRUPO
+// =========================================
+
+function closeAddGroup() {
+
+    addGroupOverlay.style.opacity = "0";
+    addGroupOverlay.style.visibility = "hidden";
+    addGroupOverlay.style.pointerEvents = "none";
+
+}
+
+
+// Botón X
+closeAddGroupButton.addEventListener("click", closeAddGroup);
+
+
+// Botón Cancelar
+cancelAddGroupButton.addEventListener("click", closeAddGroup);
+
+
+// Clic fuera de la ventana
+addGroupOverlay.addEventListener("click", (event) => {
+
+    if (event.target === addGroupOverlay) {
+
+        closeAddGroup();
+
+    }
+
+});
+
+
+
+// =========================================
+// GUARDAR NUEVO GRUPO
+// =========================================
+
+const saveAddGroupButton =
+    document.getElementById("save-add-group-button");
+
+
+saveAddGroupButton.addEventListener("click", () => {
+
+    const newName = addGroupName.value.trim();
+
+    addGroupNameError.textContent = "";
+
+
+    // No permitir nombre vacío
+    if (newName === "") {
+
+        addGroupNameError.textContent =
+            "Por favor, introduce un nombre.";
+
+        return;
+
+    }
+
+
+    // Crear grupo
+    const newGroup = document.createElement("section");
+
+    newGroup.className = "site-group";
+
+
+    // Crear encabezado
+    const groupHeader = document.createElement("div");
+
+    groupHeader.className = "group-header";
+
+
+    // Crear contenedor del título
+    const groupTitleContainer =
+        document.createElement("div");
+
+    groupTitleContainer.className =
+        "group-title-container";
+
+
+    // Crear título
+    const groupTitle =
+        document.createElement("h2");
+
+    groupTitle.textContent = newName;
+
+
+    // Crear botón del menú
+    const groupMenuButton =
+        document.createElement("button");
+
+    groupMenuButton.className =
+        "group-menu-button";
+
+    groupMenuButton.textContent = "⋮";
+
+
+    // Agregar título y botón al contenedor
+    groupTitleContainer.appendChild(groupTitle);
+    groupTitleContainer.appendChild(groupMenuButton);
+
+
+    // Agregar contenedor del título al encabezado
+    groupHeader.appendChild(groupTitleContainer);
+
+
+    // Crear menú del grupo
+    const groupMenu =
+        document.createElement("div");
+
+    groupMenu.className = "group-menu";
+
+
+    // Crear botón Editar grupo
+    const editGroupButton =
+        document.createElement("button");
+
+    editGroupButton.className =
+        "edit-group-button";
+
+    editGroupButton.innerHTML = `
+        <span class="menu-icon">✏️</span>
+        Editar grupo
+    `;
+
+
+    // Crear botón Eliminar grupo
+    const deleteGroupButton =
+        document.createElement("button");
+
+    deleteGroupButton.className =
+        "delete-group-button";
+
+    deleteGroupButton.innerHTML = `
+        <span class="menu-icon">🗑️</span>
+        Eliminar grupo
+    `;
+
+    deleteGroupButton.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+        newGroup.remove();
+
+    });
+
+    // Agregar botones al menú
+    groupMenu.appendChild(editGroupButton);
+    groupMenu.appendChild(deleteGroupButton);
+
+
+    // Agregar menú al encabezado
+    groupHeader.appendChild(groupMenu);
+
+
+    // Agregar encabezado al nuevo grupo
+    newGroup.appendChild(groupHeader);
+
+
+    // Crear contenedor de sitios
+    const sitesContainer =
+        document.createElement("div");
+
+    sitesContainer.className =
+        "sites-container";
+
+
+    // Crear tarjeta para agregar sitio
+    const addSiteCard =
+        document.createElement("div");
+
+    addSiteCard.className =
+        "add-site-card";
+
+
+    // Crear ícono
+    const addSiteIcon =
+        document.createElement("div");
+
+    addSiteIcon.className =
+        "add-site-icon";
+
+    addSiteIcon.textContent = "+";
+
+
+    // Crear nombre
+    const addSiteName =
+        document.createElement("span");
+
+    addSiteName.className =
+        "add-site-name";
+
+    addSiteName.textContent =
+        "Agregar sitio";
+
+
+    // Agregar ícono y nombre a la tarjeta
+    addSiteCard.appendChild(addSiteIcon);
+    addSiteCard.appendChild(addSiteName);
+
+
+    // Agregar tarjeta al contenedor de sitios
+    sitesContainer.appendChild(addSiteCard);
+
+    // Evento para agregar sitio al nuevo grupo
+    addSiteCard.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+        groupBeingAddedTo = newGroup;
+
+        // Limpiar campos
+        addSiteName.value = "";
+        addSiteUrl.value = "";
+        addSiteDescription.value = "";
+
+        addSiteNameError.textContent = "";
+        addSiteUrlError.textContent = "";
+
+        addSiteGroup.style.display = "none";
+
+        // Mostrar ventana
+        addSiteOverlay.style.opacity = "1";
+        addSiteOverlay.style.visibility = "visible";
+        addSiteOverlay.style.pointerEvents = "auto";
+
+        addSiteName.focus();
+
+    });
+
+    // Agregar contenedor de sitios al grupo
+    newGroup.appendChild(sitesContainer);
+
+
+    // Agregar el nuevo grupo a la página
+    const main =
+        document.querySelector("main");
+
+    // Evento para abrir/cerrar el menú del nuevo grupo
+    groupMenuButton.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+        // Cerrar los demás menús
+        document.querySelectorAll(".group-menu").forEach((otherMenu) => {
+
+            if (otherMenu !== groupMenu) {
+                otherMenu.style.display = "none";
+            }
+
+        });
+
+        // Abrir o cerrar este menú
+        if (groupMenu.style.display === "block") {
+
+            groupMenu.style.display = "none";
+
+        } else {
+
+            groupMenu.style.display = "block";
+
+        }
+
+    });
+
+    editGroupButton.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+        groupBeingEdited = newGroup;
+
+        editGroupName.value =
+            groupTitle.textContent.trim();
+
+        editGroupNameError.textContent = "";
+
+        editGroupOverlay.style.opacity = "1";
+        editGroupOverlay.style.visibility = "visible";
+        editGroupOverlay.style.pointerEvents = "auto";
+
+        groupMenu.style.display = "none";
+
+        editGroupName.focus();
+        editGroupName.select();
+
+    });
+
+    main.appendChild(newGroup);
+
+    // Cerrar modal
+    closeAddGroup();
+
+});
+
+
+// =========================================
+// ELIMINAR SITIO
+// =========================================
+
+document.querySelectorAll(".delete-site-button").forEach((button) => {
+
+    button.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+        const site =
+            button.closest(".site-card");
+
+        site.remove();
+
+    });
+
+});
+
+// =========================================
 // EDITAR SITIO
 // =========================================
 
 // Elementos
-const editSiteOverlay = document.getElementById("edit-site-overlay");
-const editSiteName = document.getElementById("edit-site-name");
-const editSiteUrl = document.getElementById("edit-site-url");
-const editSiteDescription = document.getElementById("edit-site-description");
-const editSiteUrlError = document.getElementById("edit-site-url-error");
-const editSiteNameError = document.getElementById("edit-site-name-error");
+const editSiteOverlay =
+    document.getElementById("edit-site-overlay");
 
-const closeEditSiteButton = document.getElementById("close-edit-site-button");
-const cancelEditSiteButton = document.getElementById("cancel-edit-site-button");
-const saveEditSiteButton = document.getElementById("save-edit-site-button");
+const editSiteName =
+    document.getElementById("edit-site-name");
+
+const editSiteUrl =
+    document.getElementById("edit-site-url");
+
+const editSiteDescription =
+    document.getElementById("edit-site-description");
+
+const editSiteUrlError =
+    document.getElementById("edit-site-url-error");
+
+const editSiteNameError =
+    document.getElementById("edit-site-name-error");
+
+const closeEditSiteButton =
+    document.getElementById("close-edit-site-button");
+
+const cancelEditSiteButton =
+    document.getElementById("cancel-edit-site-button");
+
+const saveEditSiteButton =
+    document.getElementById("save-edit-site-button");
 
 
 // Sitio que se está editando
@@ -658,21 +1065,28 @@ document.querySelectorAll(".edit-site-button").forEach((button) => {
 
 
         // Obtener sitio
-        const site = button.closest(".site-card");
+        const site =
+            button.closest(".site-card");
 
         siteBeingEdited = site;
 
 
         // Obtener datos actuales
-        const siteName = site.querySelector(".site-name");
-        const siteDescription = site.querySelector(".site-description");
+        const siteName =
+            site.querySelector(".site-name");
+
+        const siteDescription =
+            site.querySelector(".site-description");
 
 
-        editSiteName.value = siteName.textContent.trim();
+        editSiteName.value =
+            siteName.textContent.trim();
 
-        editSiteUrl.value = site.dataset.url || "";
+        editSiteUrl.value =
+            site.dataset.url || "";
 
-        editSiteDescription.value = siteDescription.textContent.trim();
+        editSiteDescription.value =
+            siteDescription.textContent.trim();
 
         editSiteUrlError.textContent = "";
         editSiteNameError.textContent = "";
@@ -704,9 +1118,14 @@ document.querySelectorAll(".edit-site-button").forEach((button) => {
 
 saveEditSiteButton.addEventListener("click", () => {
 
-    const newName = editSiteName.value.trim();
-    let newUrl = editSiteUrl.value.trim();
-    const newDescription = editSiteDescription.value.trim();
+    const newName =
+        editSiteName.value.trim();
+
+    let newUrl =
+        editSiteUrl.value.trim();
+
+    const newDescription =
+        editSiteDescription.value.trim();
 
     editSiteUrlError.textContent = "";
     editSiteNameError.textContent = "";
@@ -715,8 +1134,9 @@ saveEditSiteButton.addEventListener("click", () => {
     // No permitir nombre vacío
     if (newName === "") {
 
-        editSiteNameError.textContent = "Por favor, introduce un nombre.";
-        
+        editSiteNameError.textContent =
+            "Por favor, introduce un nombre.";
+
         return;
 
     }
@@ -725,7 +1145,8 @@ saveEditSiteButton.addEventListener("click", () => {
     // No permitir URL vacía
     if (newUrl === "") {
 
-        editSiteUrlError.textContent = "Por favor, introduce una URL.";
+        editSiteUrlError.textContent =
+            "Por favor, introduce una URL.";
 
         return;
 
@@ -733,7 +1154,10 @@ saveEditSiteButton.addEventListener("click", () => {
 
 
     // Agregar https si no se escribió el protocolo
-    if (!newUrl.startsWith("http://") && !newUrl.startsWith("https://")) {
+    if (
+        !newUrl.startsWith("http://") &&
+        !newUrl.startsWith("https://")
+    ) {
 
         newUrl = "https://" + newUrl;
 
@@ -747,7 +1171,8 @@ saveEditSiteButton.addEventListener("click", () => {
 
         if (!url.hostname.includes(".")) {
 
-            editSiteUrlError.textContent = "Introduce una URL válida.";
+            editSiteUrlError.textContent =
+                "Introduce una URL válida.";
 
             return;
 
@@ -755,7 +1180,8 @@ saveEditSiteButton.addEventListener("click", () => {
 
     } catch {
 
-        editSiteUrlError.textContent = "Introduce una URL válida.";
+        editSiteUrlError.textContent =
+            "Introduce una URL válida.";
 
         return;
 
@@ -763,8 +1189,11 @@ saveEditSiteButton.addEventListener("click", () => {
 
 
     // Obtener elementos del sitio
-    const siteName = siteBeingEdited.querySelector(".site-name");
-    const siteDescription = siteBeingEdited.querySelector(".site-description");
+    const siteName =
+        siteBeingEdited.querySelector(".site-name");
+
+    const siteDescription =
+        siteBeingEdited.querySelector(".site-description");
 
 
     // Actualizar nombre
@@ -790,11 +1219,17 @@ saveEditSiteButton.addEventListener("click", () => {
 // CANCELAR EDICIÓN DEL SITIO
 // =========================================
 
-cancelEditSiteButton.addEventListener("click", closeEditSite);
+cancelEditSiteButton.addEventListener(
+    "click",
+    closeEditSite
+);
 
 
 // Botón X
-closeEditSiteButton.addEventListener("click", closeEditSite);
+closeEditSiteButton.addEventListener(
+    "click",
+    closeEditSite
+);
 
 
 // Clic fuera de la ventana
@@ -815,12 +1250,23 @@ editSiteOverlay.addEventListener("click", (event) => {
 // =========================================
 
 // Elementos
-const editGroupOverlay = document.getElementById("edit-group-overlay");
-const editGroupName = document.getElementById("edit-group-name");
-const closeEditGroupButton = document.getElementById("close-edit-group-button");
-const editGroupNameError = document.getElementById("edit-group-name-error");
-const cancelEditGroupButton = document.getElementById("cancel-edit-group-button");
-const saveEditGroupButton = document.getElementById("save-edit-group-button");
+const editGroupOverlay =
+    document.getElementById("edit-group-overlay");
+
+const editGroupName =
+    document.getElementById("edit-group-name");
+
+const closeEditGroupButton =
+    document.getElementById("close-edit-group-button");
+
+const editGroupNameError =
+    document.getElementById("edit-group-name-error");
+
+const cancelEditGroupButton =
+    document.getElementById("cancel-edit-group-button");
+
+const saveEditGroupButton =
+    document.getElementById("save-edit-group-button");
 
 
 // Grupo que se está editando
@@ -840,16 +1286,19 @@ document.querySelectorAll(".edit-group-button").forEach((button) => {
 
 
         // Obtener grupo
-        const group = button.closest(".site-group");
+        const group =
+            button.closest(".site-group");
 
         groupBeingEdited = group;
 
 
         // Obtener nombre actual
-        const groupTitle = group.querySelector("h2");
+        const groupTitle =
+            group.querySelector("h2");
 
 
-        editGroupName.value = groupTitle.textContent.trim();
+        editGroupName.value =
+            groupTitle.textContent.trim();
 
         editGroupNameError.textContent = "";
 
@@ -880,7 +1329,8 @@ document.querySelectorAll(".edit-group-button").forEach((button) => {
 
 saveEditGroupButton.addEventListener("click", () => {
 
-    const newName = editGroupName.value.trim();
+    const newName =
+        editGroupName.value.trim();
 
     editGroupNameError.textContent = "";
 
@@ -888,7 +1338,8 @@ saveEditGroupButton.addEventListener("click", () => {
     // No permitir nombres vacíos
     if (newName === "") {
 
-        editGroupNameError.textContent = "Por favor, introduce un nombre.";
+        editGroupNameError.textContent =
+            "Por favor, introduce un nombre.";
 
         return;
 
@@ -896,7 +1347,8 @@ saveEditGroupButton.addEventListener("click", () => {
 
 
     // Cambiar nombre
-    const groupTitle = groupBeingEdited.querySelector("h2");
+    const groupTitle =
+        groupBeingEdited.querySelector("h2");
 
     groupTitle.textContent = newName;
 
@@ -912,11 +1364,17 @@ saveEditGroupButton.addEventListener("click", () => {
 // CANCELAR EDICIÓN DEL GRUPO
 // =========================================
 
-cancelEditGroupButton.addEventListener("click", closeEditGroup);
+cancelEditGroupButton.addEventListener(
+    "click",
+    closeEditGroup
+);
 
 
 // Botón X
-closeEditGroupButton.addEventListener("click", closeEditGroup);
+closeEditGroupButton.addEventListener(
+    "click",
+    closeEditGroup
+);
 
 
 // Clic fuera de la ventana
@@ -961,3 +1419,22 @@ function closeEditSite() {
     siteBeingEdited = null;
 
 }
+
+// =========================================
+// ELIMINAR GRUPO
+// =========================================
+
+document.querySelectorAll(".delete-group-button").forEach((button) => {
+
+    button.addEventListener("click", (event) => {
+
+        event.stopPropagation();
+
+        const group =
+            button.closest(".site-group");
+
+        group.remove();
+
+    });
+
+});
