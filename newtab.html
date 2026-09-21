@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 
@@ -44,14 +45,12 @@
     <main>
 
 
-        <!-- ================================= -->
-        <!-- GRUPO: MIS SITIOS -->
-        <!-- ================================= -->
+        <!--
+        =================================
+        GRUPO: MIS SITIOS
+        =================================
 
         <section class="site-group">
-
-
-            <!-- Encabezado -->
 
             <div class="group-header">
 
@@ -66,9 +65,6 @@
                     </button>
 
                 </div>
-
-
-                <!-- Menú del grupo -->
 
                 <div class="group-menu">
 
@@ -86,13 +82,7 @@
 
             </div>
 
-
-            <!-- Sitios -->
-
             <div class="sites-container">
-
-
-                <!-- GOOGLE -->
 
                 <div class="site-card" data-url="https://www.google.com">
 
@@ -129,8 +119,6 @@
                 </div>
 
 
-                <!-- YOUTUBE -->
-
                 <div class="site-card" data-url="https://www.youtube.com">
 
                     <div class="site-icon">
@@ -165,8 +153,6 @@
 
                 </div>
 
-
-                <!-- GITHUB -->
 
                 <div class="site-card" data-url="https://github.com">
 
@@ -203,8 +189,6 @@
                 </div>
 
 
-                <!-- AGREGAR SITIO A MIS SITIOS -->
-
                 <div class="add-site-card">
 
                     <div class="add-site-icon">
@@ -221,17 +205,15 @@
             </div>
 
         </section>
+        -->
 
 
-
-        <!-- ================================= -->
-        <!-- GRUPO: INTELIGENCIA ARTIFICIAL -->
-        <!-- ================================= -->
+        <!--
+        =================================
+        GRUPO: INTELIGENCIA ARTIFICIAL
+        =================================
 
         <section class="site-group">
-
-
-            <!-- Encabezado -->
 
             <div class="group-header">
 
@@ -246,9 +228,6 @@
                     </button>
 
                 </div>
-
-
-                <!-- Menú del grupo -->
 
                 <div class="group-menu">
 
@@ -267,12 +246,8 @@
             </div>
 
 
-            <!-- Sitios -->
-
             <div class="sites-container">
 
-
-                <!-- CHATGPT -->
 
                 <div class="site-card" data-url="https://chatgpt.com">
 
@@ -309,8 +284,6 @@
                 </div>
 
 
-                <!-- GEMINI -->
-
                 <div class="site-card" data-url="https://gemini.google.com">
 
                     <div class="site-icon">
@@ -345,8 +318,6 @@
 
                 </div>
 
-
-                <!-- DEEPSEEK -->
 
                 <div class="site-card" data-url="https://chat.deepseek.com">
 
@@ -383,8 +354,6 @@
                 </div>
 
 
-                <!-- AGREGAR SITIO A INTELIGENCIA ARTIFICIAL -->
-
                 <div class="add-site-card">
 
                     <div class="add-site-icon">
@@ -401,6 +370,7 @@
             </div>
 
         </section>
+        -->
 
 
     </main>
@@ -497,6 +467,7 @@
                     Fondo
                 </h3>
 
+
                 <!-- Imagen -->
 
                 <div class="background-option">
@@ -542,6 +513,7 @@
 
                 <div id="gradient-settings">
 
+
                     <!-- Dirección -->
 
                     <div class="gradient-setting">
@@ -584,6 +556,7 @@
                     <!-- Colores -->
 
                     <div id="gradient-colors">
+
 
                         <!-- Color 1 -->
 
@@ -628,6 +601,7 @@
 
                         </div>
 
+
                     </div>
 
 
@@ -636,6 +610,7 @@
                     <button id="add-gradient-color-button" type="button">
                         + Agregar color
                     </button>
+
 
                 </div>
 
@@ -713,7 +688,9 @@
 
                 </div>
 
+
                 <!-- Reiniciar configuración de colores -->
+
                 <button id="reset-background-button" type="button">
                     ↺ Reiniciar
                 </button>
@@ -726,6 +703,7 @@
         </div>
 
     </aside>
+
 
     <!-- ================================= -->
     <!-- VENTANA EDITAR GRUPO -->
@@ -776,6 +754,7 @@
 
     </div>
 
+
     <!-- ================================= -->
     <!-- VENTANA EDITAR SITIO -->
     <!-- ================================= -->
@@ -812,6 +791,7 @@
                 </label>
 
                 <input type="url" id="edit-site-url">
+
                 <p id="edit-site-url-error"></p>
 
                 <label for="edit-site-description">
@@ -839,47 +819,75 @@
 
     </div>
 
+
     <!-- =========================================
      MODAL AGREGAR SITIO
      ========================================= -->
 
     <div id="add-site-overlay">
+
         <div id="add-site-modal">
 
             <div class="add-site-header">
-                <h2>Agregar sitio</h2>
-                <button id="close-add-site-button">×</button>
+
+                <h2>
+                    Agregar sitio
+                </h2>
+
+                <button id="close-add-site-button">
+                    ×
+                </button>
+
             </div>
 
             <div class="add-site-content">
 
-                <label for="add-site-name">Nombre del sitio</label>
+                <label for="add-site-name">
+                    Nombre del sitio
+                </label>
+
                 <input type="text" id="add-site-name">
 
                 <p id="add-site-name-error"></p>
 
-                <label for="add-site-url">URL</label>
+                <label for="add-site-url">
+                    URL
+                </label>
+
                 <input type="url" id="add-site-url">
 
                 <p id="add-site-url-error"></p>
 
-                <label for="add-site-description">Descripción</label>
+                <label for="add-site-description">
+                    Descripción
+                </label>
 
                 <textarea id="add-site-description" rows="3"></textarea>
 
-                <label for="add-site-group">Grupo</label>
+                <label for="add-site-group">
+                    Grupo
+                </label>
 
                 <select id="add-site-group"></select>
 
                 <div class="add-site-actions">
-                    <button id="cancel-add-site-button">Cancelar</button>
-                    <button id="save-add-site-button">Guardar</button>
+
+                    <button id="cancel-add-site-button">
+                        Cancelar
+                    </button>
+
+                    <button id="save-add-site-button">
+                        Guardar
+                    </button>
+
                 </div>
 
             </div>
 
         </div>
+
     </div>
+
 
     <!-- =========================================
      MODAL AGREGAR GRUPO
@@ -931,8 +939,10 @@
 
     </div>
 
+
     <script src="newtab.js"></script>
 
 </body>
 
 </html>
+```
