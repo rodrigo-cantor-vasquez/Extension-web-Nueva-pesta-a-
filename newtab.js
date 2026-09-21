@@ -171,7 +171,9 @@ function setupGroupMenu(group) {
 
 
     if (!menuButton || !menu) {
+
         return;
+
     }
 
 
@@ -572,10 +574,7 @@ function createSiteCard(
     site.appendChild(siteMenu);
 
 
-    // =========================================
-    // EVENTOS
-    // =========================================
-
+    // Configurar comportamiento
     setupSiteCard(site);
 
 
@@ -597,11 +596,13 @@ function createSiteCard(
     // Eliminar sitio
     deleteSiteButton.addEventListener(
         "click",
-        (event) => {
+        async (event) => {
 
             event.stopPropagation();
 
             site.remove();
+
+            await saveCurrentData();
 
         }
     );
@@ -693,7 +694,7 @@ addSiteButton.addEventListener(
 
 saveAddSiteButton.addEventListener(
     "click",
-    () => {
+    async () => {
 
         const newName =
             addSiteName.value.trim();
@@ -815,6 +816,10 @@ saveAddSiteButton.addEventListener(
             newSite,
             addSiteCard
         );
+
+
+        // Guardar
+        await saveCurrentData();
 
 
         // Cerrar ventana
@@ -1126,11 +1131,13 @@ function createGroup(name) {
     // Eliminar grupo
     deleteGroupButton.addEventListener(
         "click",
-        (event) => {
+        async (event) => {
 
             event.stopPropagation();
 
             group.remove();
+
+            await saveCurrentData();
 
         }
     );
@@ -1147,7 +1154,7 @@ function createGroup(name) {
 
 saveAddGroupButton.addEventListener(
     "click",
-    () => {
+    async () => {
 
         const newName =
             addGroupName.value.trim();
@@ -1182,6 +1189,10 @@ saveAddGroupButton.addEventListener(
         );
 
 
+        // Guardar
+        await saveCurrentData();
+
+
         // Cerrar ventana
         closeAddGroup();
 
@@ -1193,15 +1204,10 @@ saveAddGroupButton.addEventListener(
 // CONFIGURAR GRUPOS EXISTENTES
 // =========================================
 
-// =========================================
-// CONFIGURAR GRUPOS EXISTENTES
-// =========================================
-
 document
     .querySelectorAll(".site-group")
     .forEach((group) => {
 
-        // Configurar menú
         setupGroupMenu(group);
 
     });
@@ -1214,7 +1220,7 @@ document
 
         button.addEventListener(
             "click",
-            (event) => {
+            async (event) => {
 
                 event.stopPropagation();
 
@@ -1224,6 +1230,9 @@ document
 
 
                 group.remove();
+
+
+                await saveCurrentData();
 
             }
         );
@@ -1241,7 +1250,7 @@ document
 
         button.addEventListener(
             "click",
-            (event) => {
+            async (event) => {
 
                 event.stopPropagation();
 
@@ -1251,6 +1260,9 @@ document
 
 
                 site.remove();
+
+
+                await saveCurrentData();
 
             }
         );
@@ -1453,7 +1465,7 @@ document
 
 saveEditSiteButton.addEventListener(
     "click",
-    () => {
+    async () => {
 
         const newName =
             editSiteName.value.trim();
@@ -1545,6 +1557,10 @@ saveEditSiteButton.addEventListener(
 
         siteDescription.textContent =
             newDescription;
+
+
+        // Guardar
+        await saveCurrentData();
 
 
         closeEditSite();
@@ -1714,7 +1730,7 @@ document
 
 saveEditGroupButton.addEventListener(
     "click",
-    () => {
+    async () => {
 
         const newName =
             editGroupName.value.trim();
@@ -1742,7 +1758,268 @@ saveEditGroupButton.addEventListener(
             newName;
 
 
+        // Guardar
+        await saveCurrentData();
+
+
         closeEditGroup();
 
     }
 );
+
+
+// =========================================
+// DATOS INICIALES
+// =========================================
+
+const defaultData = {
+
+    groups: []
+
+};
+
+
+// =========================================
+// GUARDAR DATOS
+// =========================================
+
+function saveData(data) {
+
+    return chrome.storage.local.set(
+        data
+    );
+
+}
+
+
+// =========================================
+// CARGAR DATOS
+// =========================================
+
+function loadData() {
+
+    return chrome.storage.local.get(
+        "groups"
+    );
+
+}
+
+
+// =========================================
+// OBTENER DATOS DEL HTML
+// =========================================
+
+function getGroupsData() {
+
+    const groups = [];
+
+
+    const groupElements =
+        document.querySelectorAll(".site-group");
+
+
+    groupElements.forEach(
+        (groupElement) => {
+
+            const group = {
+
+                name:
+                    groupElement
+                        .querySelector("h2")
+                        .textContent
+                        .trim(),
+
+                sites: []
+
+            };
+
+
+            const siteElements =
+                groupElement.querySelectorAll(
+                    ".site-card"
+                );
+
+
+            siteElements.forEach(
+                (siteElement) => {
+
+                    const site = {
+
+                        name:
+                            siteElement
+                                .querySelector(".site-name")
+                                .textContent
+                                .trim(),
+
+                        url:
+                            siteElement.dataset.url,
+
+                        description:
+                            siteElement
+                                .querySelector(".site-description")
+                                .textContent
+                                .trim()
+
+                    };
+
+
+                    group.sites.push(site);
+
+                }
+            );
+
+
+            groups.push(group);
+
+        }
+    );
+
+
+    return groups;
+
+}
+
+
+// =========================================
+// GUARDAR ESTADO ACTUAL
+// =========================================
+
+async function saveCurrentData() {
+
+    const groups =
+        getGroupsData();
+
+
+    await saveData({
+
+        groups: groups
+
+    });
+
+}
+
+
+// =========================================
+// MOSTRAR GRUPOS Y SITIOS
+// =========================================
+
+function renderGroups(groups) {
+
+    const main =
+        document.querySelector("main");
+
+
+    groups.forEach(
+        (groupData) => {
+
+            // Crear grupo
+            const group =
+                createGroup(
+                    groupData.name
+                );
+
+
+            // Obtener contenedor de sitios
+            const sitesContainer =
+                group.querySelector(
+                    ".sites-container"
+                );
+
+
+            // Obtener tarjeta "+ Agregar sitio"
+            const addSiteCard =
+                group.querySelector(
+                    ".add-site-card"
+                );
+
+
+            // Crear sitios
+            groupData.sites.forEach(
+                (siteData) => {
+
+                    const site =
+                        createSiteCard(
+                            siteData.name,
+                            siteData.url,
+                            siteData.description
+                        );
+
+
+                    sitesContainer.insertBefore(
+                        site,
+                        addSiteCard
+                    );
+
+                }
+            );
+
+
+            // Agregar grupo al HTML
+            main.appendChild(
+                group
+            );
+
+        }
+    );
+
+}
+
+
+// =========================================
+// INICIAR EXTENSIÓN
+// =========================================
+
+async function init() {
+
+    let data =
+        await loadData();
+
+
+    // Primera ejecución
+    if (!data.groups) {
+
+        const initialGroups =
+            getGroupsData();
+
+
+        await saveData({
+
+            groups: initialGroups
+
+        });
+
+
+        data = {
+
+            groups: initialGroups
+
+        };
+
+    }
+
+
+    console.log(
+        "Datos cargados:",
+        data
+    );
+
+
+    // Eliminar los grupos escritos directamente
+    // en newtab.html
+    const main =
+        document.querySelector("main");
+
+
+    main.innerHTML = "";
+
+
+    // Dibujar los grupos desde Storage
+    renderGroups(
+        data.groups
+    );
+
+}
+
+
+// Iniciar
+init();
