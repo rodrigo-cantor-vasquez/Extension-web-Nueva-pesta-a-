@@ -2421,3 +2421,7 @@ main {
 .site-group.group-drag-over {
     border-top: 3px solid #6f9ef0;
 }
+
+.site-card.site-dragging {
+    opacity: 0.5;
+}
