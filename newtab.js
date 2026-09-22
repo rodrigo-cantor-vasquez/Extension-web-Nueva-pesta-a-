@@ -3,123 +3,65 @@
 // =========================================
 
 function openOverlay(overlay) {
-
-    overlay.style.opacity =
-        "1";
-
-    overlay.style.visibility =
-        "visible";
-
-    overlay.style.pointerEvents =
-        "auto";
-
+    overlay.style.opacity = "1";
+    overlay.style.visibility = "visible";
+    overlay.style.pointerEvents = "auto";
 }
-
 
 function closeOverlay(overlay) {
-
-    overlay.style.opacity =
-        "0";
-
-    overlay.style.visibility =
-        "hidden";
-
-    overlay.style.pointerEvents =
-        "none";
-
+    overlay.style.opacity = "0";
+    overlay.style.visibility = "hidden";
+    overlay.style.pointerEvents = "none";
 }
 
-
 function toggleMenu(menu) {
-
     if (!menu) {
         return;
     }
 
-    const wasOpen =
-        menu.style.display === "block";
+    const wasOpen = menu.style.display === "block";
 
     closeAllMenus();
 
     if (!wasOpen) {
-
-        menu.style.display =
-            "block";
-
+        menu.style.display = "block";
     }
-
 }
-
 
 function closeAllMenus() {
-
     document
-        .querySelectorAll(
-            ".group-menu, .site-menu"
-        )
-        .forEach(
-            (menu) => {
-
-                menu.style.display =
-                    "none";
-
-            }
-        );
-
+        .querySelectorAll(".group-menu, .site-menu")
+        .forEach((menu) => {
+            menu.style.display = "none";
+        });
 }
 
-
 function closeMenu(menu) {
-
     if (!menu) {
         return;
     }
 
-    menu.style.display =
-        "none";
-
+    menu.style.display = "none";
 }
-
 
 function getSiteName(site) {
-
-    return site.querySelector(
-        ".site-name"
-    );
-
+    return site.querySelector(".site-name");
 }
-
 
 function getSiteDescription(site) {
-
-    return site.querySelector(
-        ".site-description"
-    );
-
+    return site.querySelector(".site-description");
 }
-
 
 function getGroupTitle(group) {
-
-    return group.querySelector(
-        "h2"
-    );
-
+    return group.querySelector("h2");
 }
 
-
 function openSite(site) {
-
-    const url =
-        site.dataset.url;
+    const url = site.dataset.url;
 
     if (url) {
-
-        window.location.href =
-            url;
-
+        window.location.href = url;
     }
-
 }
 
 
@@ -128,79 +70,40 @@ function openSite(site) {
 // =========================================
 
 const defaultSettings = {
-
-    cardSize:
-        95,
-
-    backgroundType:
-        "solid",
-
-    backgroundColor:
-        "#eef4ff",
-
-    gradientDirection:
-        90,
-
+    cardSize: 95,
+    backgroundType: "solid",
+    backgroundColor: "#eef4ff",
+    gradientDirection: 90,
     gradientColors: [
         "#eef4ff",
         "#d6e3ff"
     ],
-
-    groupColor:
-        "#ffffff",
-
-    groupTransparency:
-        0,
-
-    cardColor:
-        "#f8faff",
-
-    cardTransparency:
-        0
-
+    groupColor: "#ffffff",
+    groupTransparency: 0,
+    cardColor: "#f8faff",
+    cardTransparency: 0
 };
 
-
 const defaultData = {
-
     groups: [
-
         {
-
-            name:
-                "Mis sitios",
-
+            name: "Mis sitios",
             sites: [
-
                 {
-
-                    name:
-                        "Google",
-
-                    url:
-                        "https://www.google.com",
-
-                    description:
-                        "Motor de búsqueda"
-
+                    name: "Google",
+                    url: "https://www.google.com",
+                    description: "Motor de búsqueda"
                 }
-
             ]
-
         }
-
     ],
 
     settings: {
-
         ...defaultSettings,
-
         gradientColors: [
             ...defaultSettings.gradientColors
         ]
-
     }
-
 };
 
 
@@ -209,11 +112,7 @@ const defaultData = {
 // =========================================
 
 function saveData(data) {
-
-    return chrome.storage.local.set(
-        data
-    );
-
+    return chrome.storage.local.set(data);
 }
 
 
@@ -222,99 +121,62 @@ function saveData(data) {
 // =========================================
 
 function loadData() {
-
-    return chrome.storage.local.get(
-        [
-            "groups",
-            "settings"
-        ]
-    );
-
+    return chrome.storage.local.get([
+        "groups",
+        "settings"
+    ]);
 }
 
 
 // =========================================
-// OBTENER DATOS DEL HTML
+// OBTENER DATOS DE LOS GRUPOS
 // =========================================
 
 function getGroupsData() {
-
     const groups = [];
 
-
     const groupElements =
-        document.querySelectorAll(
-            ".site-group"
-        );
+        document.querySelectorAll(".site-group");
 
+    groupElements.forEach((groupElement) => {
+        const group = {
+            name:
+                groupElement
+                    .querySelector("h2")
+                    .textContent
+                    .trim(),
 
-    groupElements.forEach(
-        (groupElement) => {
+            sites: []
+        };
 
-            const group = {
+        const siteElements =
+            groupElement.querySelectorAll(".site-card");
 
+        siteElements.forEach((siteElement) => {
+            const site = {
                 name:
-                    groupElement
-                        .querySelector("h2")
+                    siteElement
+                        .querySelector(".site-name")
                         .textContent
                         .trim(),
 
-                sites: []
+                url:
+                    siteElement.dataset.url,
 
+                description:
+                    siteElement
+                        .querySelector(".site-description")
+                        .textContent
+                        .trim()
             };
 
+            group.sites.push(site);
+        });
 
-            const siteElements =
-                groupElement.querySelectorAll(
-                    ".site-card"
-                );
-
-
-            siteElements.forEach(
-                (siteElement) => {
-
-                    const site = {
-
-                        name:
-                            siteElement
-                                .querySelector(
-                                    ".site-name"
-                                )
-                                .textContent
-                                .trim(),
-
-                        url:
-                            siteElement.dataset.url,
-
-                        description:
-                            siteElement
-                                .querySelector(
-                                    ".site-description"
-                                )
-                                .textContent
-                                .trim()
-
-                    };
-
-
-                    group.sites.push(
-                        site
-                    );
-
-                }
-            );
-
-
-            groups.push(
-                group
-            );
-
-        }
-    );
-
+        groups.push(group);
+    });
 
     return groups;
-
 }
 
 
@@ -323,131 +185,63 @@ function getGroupsData() {
 // =========================================
 
 async function saveCurrentData() {
+    const groups = getGroupsData();
 
-    const groups =
-        getGroupsData();
-
-
-    const data =
-        await loadData();
-
+    const data = await loadData();
 
     const settings = {
-
         ...defaultSettings,
-
         ...data.settings
-
     };
 
-
     await saveData({
-
-        groups:
-            groups,
-
-        settings:
-            settings
-
+        groups: groups,
+        settings: settings
     });
-
 }
 
 
 // =========================================
-// CONVERTIR HEX A RGBA
+// HEX A RGBA
 // =========================================
 
-function hexToRgba(
-    hex,
-    transparency
-) {
+function hexToRgba(hex, transparency) {
+    const cleanHex = hex.replace("#", "");
 
-    const cleanHex =
-        hex.replace(
-            "#",
-            ""
-        );
+    const r = parseInt(
+        cleanHex.substring(0, 2),
+        16
+    );
 
+    const g = parseInt(
+        cleanHex.substring(2, 4),
+        16
+    );
 
-    const r =
-        parseInt(
-            cleanHex.substring(
-                0,
-                2
-            ),
-            16
-        );
+    const b = parseInt(
+        cleanHex.substring(4, 6),
+        16
+    );
 
+    let validTransparency = Number(transparency);
 
-    const g =
-        parseInt(
-            cleanHex.substring(
-                2,
-                4
-            ),
-            16
-        );
-
-
-    const b =
-        parseInt(
-            cleanHex.substring(
-                4,
-                6
-            ),
-            16
-        );
-
-
-    let validTransparency =
-        Number(
-            transparency
-        );
-
-
-    if (
-        isNaN(
-            validTransparency
-        )
-    ) {
-
-        validTransparency =
-            0;
-
+    if (isNaN(validTransparency)) {
+        validTransparency = 0;
     }
 
-
-    if (
-        validTransparency < 0
-    ) {
-
-        validTransparency =
-            0;
-
+    if (validTransparency < 0) {
+        validTransparency = 0;
     }
 
-
-    if (
-        validTransparency > 100
-    ) {
-
-        validTransparency =
-            100;
-
+    if (validTransparency > 100) {
+        validTransparency = 100;
     }
-
 
     const alpha =
         1 -
-        (
-            validTransparency /
-            100
-        );
-
+        (validTransparency / 100);
 
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-
 }
 
 
@@ -456,61 +250,38 @@ function hexToRgba(
 // =========================================
 
 const settingsButton =
-    document.getElementById(
-        "settings-button"
-    );
-
+    document.getElementById("settings-button");
 
 const settingsPanel =
-    document.getElementById(
-        "settings-panel"
-    );
-
+    document.getElementById("settings-panel");
 
 const closeSettingsButton =
-    document.getElementById(
-        "close-settings-button"
-    );
-
+    document.getElementById("close-settings-button");
 
 const settingsOverlay =
-    document.getElementById(
-        "settings-overlay"
-    );
-
+    document.getElementById("settings-overlay");
 
 settingsButton.addEventListener(
     "click",
     () => {
-
         settingsPanel.style.transform =
             "translateX(0)";
 
-        openOverlay(
-            settingsOverlay
-        );
-
+        openOverlay(settingsOverlay);
     }
 );
 
-
 function closeSettings() {
-
     settingsPanel.style.transform =
         "translateX(100%)";
 
-    closeOverlay(
-        settingsOverlay
-    );
-
+    closeOverlay(settingsOverlay);
 }
-
 
 closeSettingsButton.addEventListener(
     "click",
     closeSettings
 );
-
 
 settingsOverlay.addEventListener(
     "click",
@@ -519,94 +290,1133 @@ settingsOverlay.addEventListener(
 
 
 // =========================================
-// MENÚS DE LOS GRUPOS
+// MENÚ DE LOS GRUPOS
 // =========================================
 
 function setupGroupMenu(group) {
-
     const menuButton =
-        group.querySelector(
-            ".group-menu-button"
-        );
-
+        group.querySelector(".group-menu-button");
 
     const menu =
-        group.querySelector(
-            ".group-menu"
-        );
+        group.querySelector(".group-menu");
 
-
-    if (
-        !menuButton ||
-        !menu
-    ) {
-
+    if (!menuButton || !menu) {
         return;
-
     }
 
-
     if (
-        menuButton.dataset
-            .menuConfigured ===
+        menuButton.dataset.menuConfigured ===
         "true"
     ) {
-
         return;
-
     }
 
-
-    menuButton.dataset
-        .menuConfigured =
+    menuButton.dataset.menuConfigured =
         "true";
-
 
     menuButton.addEventListener(
         "click",
         (event) => {
-
             event.preventDefault();
-
             event.stopPropagation();
 
-            toggleMenu(
-                menu
-            );
-
+            toggleMenu(menu);
         }
     );
-
 
     menu.addEventListener(
         "click",
         (event) => {
-
             event.stopPropagation();
-
         }
     );
-
 }
 
 
 // =========================================
-// MENÚS DE LOS SITIOS
+// ARRASTRE DE GRUPOS
+// =========================================
+
+let draggedGroup = null;
+let hoveredGroup = null;
+
+
+// =========================================
+// AUTO-SCROLL AL ARRASTRAR GRUPOS
+// =========================================
+
+const GROUP_DRAG_SCROLL_ZONE = 120;
+const GROUP_DRAG_SCROLL_SPEED = 15;
+
+let groupDragScrollAnimation = null;
+let groupDragMouseY = 0;
+
+
+// =========================================
+// OBTENER CONTENEDOR CON SCROLL
+// =========================================
+
+function getScrollContainer() {
+
+    const main = document.querySelector("main");
+
+    if (main) {
+        const mainStyle =
+            window.getComputedStyle(main);
+
+        const mainCanScroll =
+            (
+                mainStyle.overflowY === "auto" ||
+                mainStyle.overflowY === "scroll"
+            ) &&
+            main.scrollHeight > main.clientHeight;
+
+        if (mainCanScroll) {
+            return main;
+        }
+    }
+
+    if (draggedGroup) {
+
+        let element = draggedGroup;
+
+        while (
+            element &&
+            element !== document.body &&
+            element !== document.documentElement
+        ) {
+            const style =
+                window.getComputedStyle(element);
+
+            const canScroll =
+                (
+                    style.overflowY === "auto" ||
+                    style.overflowY === "scroll"
+                ) &&
+                element.scrollHeight >
+                element.clientHeight;
+
+            if (canScroll) {
+                return element;
+            }
+
+            element = element.parentElement;
+        }
+    }
+
+    return document.scrollingElement ||
+        document.documentElement;
+}
+
+
+// =========================================
+// HACER SCROLL
+// =========================================
+
+function scrollGroupContainer(amount) {
+
+    const container =
+        getScrollContainer();
+
+    if (!container) {
+        return;
+    }
+
+    if (
+        container === document.documentElement ||
+        container === document.body
+    ) {
+        window.scrollBy(0, amount);
+    } else {
+        container.scrollTop += amount;
+    }
+}
+
+
+// =========================================
+// BUSCAR GRUPO DEBAJO DEL MOUSE
+// =========================================
+
+function updateDraggedGroupTarget() {
+
+    if (!draggedGroup) {
+        return;
+    }
+
+    const element =
+        document.elementFromPoint(
+            window.innerWidth / 2,
+            groupDragMouseY
+        );
+
+    if (!element) {
+        return;
+    }
+
+    const targetGroup =
+        element.closest(".site-group");
+
+    if (!targetGroup) {
+        return;
+    }
+
+    if (targetGroup === draggedGroup) {
+        return;
+    }
+
+    if (targetGroup === hoveredGroup) {
+        return;
+    }
+
+    hoveredGroup = targetGroup;
+
+    swapGroups(
+        draggedGroup,
+        targetGroup
+    );
+
+    document
+        .querySelectorAll(".site-group")
+        .forEach((otherGroup) => {
+            otherGroup.classList.remove(
+                "group-drag-over"
+            );
+        });
+
+    targetGroup.classList.add(
+        "group-drag-over"
+    );
+}
+
+
+// =========================================
+// ANIMACIÓN CONTINUA DEL AUTO-SCROLL
+// =========================================
+
+function runGroupDragAutoScroll() {
+
+    if (!draggedGroup) {
+        groupDragScrollAnimation = null;
+        return;
+    }
+
+    const windowHeight =
+        window.innerHeight;
+
+    let speed = 0;
+
+    if (
+        groupDragMouseY <
+        GROUP_DRAG_SCROLL_ZONE
+    ) {
+        const distance =
+            GROUP_DRAG_SCROLL_ZONE -
+            groupDragMouseY;
+
+        speed =
+            -Math.min(
+                GROUP_DRAG_SCROLL_SPEED,
+                Math.max(
+                    2,
+                    distance / 5
+                )
+            );
+    }
+
+    else if (
+        groupDragMouseY >
+        windowHeight -
+        GROUP_DRAG_SCROLL_ZONE
+    ) {
+        const distance =
+            groupDragMouseY -
+            (
+                windowHeight -
+                GROUP_DRAG_SCROLL_ZONE
+            );
+
+        speed =
+            Math.min(
+                GROUP_DRAG_SCROLL_SPEED,
+                Math.max(
+                    2,
+                    distance / 5
+                )
+            );
+    }
+
+    if (speed !== 0) {
+        scrollGroupContainer(speed);
+
+        updateDraggedGroupTarget();
+    }
+
+    groupDragScrollAnimation =
+        requestAnimationFrame(
+            runGroupDragAutoScroll
+        );
+}
+
+
+// =========================================
+// INICIAR AUTO-SCROLL
+// =========================================
+
+function startGroupDragAutoScroll() {
+
+    if (groupDragScrollAnimation) {
+        return;
+    }
+
+    groupDragScrollAnimation =
+        requestAnimationFrame(
+            runGroupDragAutoScroll
+        );
+}
+
+
+// =========================================
+// DETENER AUTO-SCROLL
+// =========================================
+
+function stopGroupDragAutoScroll() {
+
+    if (groupDragScrollAnimation) {
+        cancelAnimationFrame(
+            groupDragScrollAnimation
+        );
+    }
+
+    groupDragScrollAnimation = null;
+}
+
+
+// =========================================
+// ACTUALIZAR POSICIÓN DEL MOUSE
+// =========================================
+
+function autoScrollWhileDragging(event) {
+
+    if (!draggedGroup) {
+        return;
+    }
+
+    groupDragMouseY =
+        event.clientY;
+
+    startGroupDragAutoScroll();
+}
+
+
+// =========================================
+// INTERCAMBIAR DOS GRUPOS
+// =========================================
+
+function swapGroups(
+    groupA,
+    groupB
+) {
+
+    if (
+        !groupA ||
+        !groupB ||
+        groupA === groupB
+    ) {
+        return;
+    }
+
+    const parent =
+        groupA.parentNode;
+
+    if (
+        !parent ||
+        parent !== groupB.parentNode
+    ) {
+        return;
+    }
+
+    const placeholderA =
+        document.createElement("div");
+
+    const placeholderB =
+        document.createElement("div");
+
+    placeholderA.style.display =
+        "none";
+
+    placeholderB.style.display =
+        "none";
+
+    parent.insertBefore(
+        placeholderA,
+        groupA
+    );
+
+    parent.insertBefore(
+        placeholderB,
+        groupB
+    );
+
+    parent.insertBefore(
+        groupB,
+        placeholderA
+    );
+
+    parent.insertBefore(
+        groupA,
+        placeholderB
+    );
+
+    placeholderA.remove();
+    placeholderB.remove();
+}
+
+
+// =========================================
+// OBTENER GRUPO DEBAJO DEL MOUSE
+// =========================================
+
+function getGroupUnderMouse(event) {
+
+    const element =
+        document.elementFromPoint(
+            event.clientX,
+            event.clientY
+        );
+
+    if (!element) {
+        return null;
+    }
+
+    const group =
+        element.closest(".site-group");
+
+    return group;
+}
+
+
+// =========================================
+// CONFIGURAR ARRASTRE DE UN GRUPO
+// =========================================
+
+function setupGroupDrag(group) {
+
+    if (
+        group.dataset.dragConfigured ===
+        "true"
+    ) {
+        return;
+    }
+
+    const groupHeader =
+        group.querySelector(".group-header");
+
+    if (!groupHeader) {
+        return;
+    }
+
+    group.dataset.dragConfigured =
+        "true";
+
+    groupHeader.draggable = true;
+
+    groupHeader.addEventListener(
+        "dragstart",
+        (event) => {
+
+            const target =
+                event.target;
+
+            if (
+                target.closest &&
+                target.closest(
+                    ".group-menu-button, .group-menu"
+                )
+            ) {
+                event.preventDefault();
+                return;
+            }
+
+            draggedGroup = group;
+            hoveredGroup = null;
+
+            groupDragMouseY =
+                event.clientY;
+
+            group.classList.add(
+                "group-dragging"
+            );
+
+            event.dataTransfer.effectAllowed =
+                "move";
+
+            event.dataTransfer.setData(
+                "text/plain",
+                "group"
+            );
+
+            startGroupDragAutoScroll();
+        }
+    );
+
+    groupHeader.addEventListener(
+        "dragend",
+        async () => {
+
+            stopGroupDragAutoScroll();
+
+            if (draggedGroup) {
+                draggedGroup.classList.remove(
+                    "group-dragging"
+                );
+            }
+
+            document
+                .querySelectorAll(
+                    ".site-group"
+                )
+                .forEach(
+                    (otherGroup) => {
+                        otherGroup.classList.remove(
+                            "group-drag-over"
+                        );
+                    }
+                );
+
+            await saveCurrentData();
+
+            draggedGroup = null;
+            hoveredGroup = null;
+        }
+    );
+}
+
+
+// =========================================
+// ZONA GENERAL DE ARRASTRE DE GRUPOS
+// =========================================
+
+function setupGroupDragArea() {
+
+    const main =
+        document.querySelector("main");
+
+    if (!main) {
+        return;
+    }
+
+    if (
+        main.dataset.groupDragAreaConfigured ===
+        "true"
+    ) {
+        return;
+    }
+
+    main.dataset.groupDragAreaConfigured =
+        "true";
+
+    main.addEventListener(
+        "dragover",
+        (event) => {
+
+            if (!draggedGroup) {
+                return;
+            }
+
+            event.preventDefault();
+
+            event.dataTransfer.dropEffect =
+                "move";
+
+            autoScrollWhileDragging(event);
+
+            const targetGroup =
+                getGroupUnderMouse(event);
+
+            if (!targetGroup) {
+                hoveredGroup = null;
+                return;
+            }
+
+            if (
+                targetGroup ===
+                draggedGroup
+            ) {
+
+                hoveredGroup = null;
+
+                document
+                    .querySelectorAll(
+                        ".site-group"
+                    )
+                    .forEach(
+                        (otherGroup) => {
+                            otherGroup.classList.remove(
+                                "group-drag-over"
+                            );
+                        }
+                    );
+
+                return;
+            }
+
+            if (
+                targetGroup ===
+                hoveredGroup
+            ) {
+                return;
+            }
+
+            hoveredGroup =
+                targetGroup;
+
+            swapGroups(
+                draggedGroup,
+                targetGroup
+            );
+
+            document
+                .querySelectorAll(
+                    ".site-group"
+                )
+                .forEach(
+                    (otherGroup) => {
+                        otherGroup.classList.remove(
+                            "group-drag-over"
+                        );
+                    }
+                );
+
+            targetGroup.classList.add(
+                "group-drag-over"
+            );
+        }
+    );
+
+    main.addEventListener(
+        "drop",
+        (event) => {
+
+            if (!draggedGroup) {
+                return;
+            }
+
+            event.preventDefault();
+        }
+    );
+}
+
+
+// =========================================
+// ARRASTRE DE TARJETAS
+// =========================================
+
+let draggedSite = null;
+let hoveredSite = null;
+let draggedSiteMoved = false;
+
+
+// =========================================
+// OBTENER TARJETA DEBAJO DEL MOUSE
+// =========================================
+
+function getSiteUnderMouse(event) {
+
+    const element =
+        document.elementFromPoint(
+            event.clientX,
+            event.clientY
+        );
+
+    if (!element) {
+        return null;
+    }
+
+    const site =
+        element.closest(".site-card");
+
+    return site;
+}
+
+
+// =========================================
+// MOVER TARJETA
+// =========================================
+
+function moveSiteBefore(
+    site,
+    targetSite
+) {
+
+    if (
+        !site ||
+        !targetSite ||
+        site === targetSite
+    ) {
+        return;
+    }
+
+    const targetContainer =
+        targetSite.parentNode;
+
+    if (!targetContainer) {
+        return;
+    }
+
+    targetContainer.insertBefore(
+        site,
+        targetSite
+    );
+}
+
+
+// =========================================
+// MOVER TARJETA AL FINAL DEL GRUPO
+// =========================================
+
+function moveSiteToGroup(
+    site,
+    group
+) {
+
+    if (!site || !group) {
+        return;
+    }
+
+    const sitesContainer =
+        group.querySelector(
+            ".sites-container"
+        );
+
+    if (!sitesContainer) {
+        return;
+    }
+
+    const addSiteCard =
+        sitesContainer.querySelector(
+            ".add-site-card"
+        );
+
+    if (addSiteCard) {
+        sitesContainer.insertBefore(
+            site,
+            addSiteCard
+        );
+    } else {
+        sitesContainer.appendChild(
+            site
+        );
+    }
+}
+
+
+// =========================================
+// MOVER TARJETA SEGÚN POSICIÓN DEL MOUSE
+// =========================================
+
+function moveSiteAccordingToMouse(
+    site,
+    targetSite,
+    event
+) {
+
+    if (
+        !site ||
+        !targetSite ||
+        site === targetSite
+    ) {
+        return;
+    }
+
+    const targetRect =
+        targetSite.getBoundingClientRect();
+
+    const middleX =
+        targetRect.left +
+        targetRect.width / 2;
+
+    const middleY =
+        targetRect.top +
+        targetRect.height / 2;
+
+    let insertBefore = false;
+
+    if (
+        event.clientY < middleY
+    ) {
+        insertBefore = true;
+    } else if (
+        event.clientY > middleY
+    ) {
+        insertBefore = false;
+    } else {
+        insertBefore =
+            event.clientX < middleX;
+    }
+
+    if (insertBefore) {
+
+        if (
+            targetSite.previousElementSibling !==
+            site
+        ) {
+            moveSiteBefore(
+                site,
+                targetSite
+            );
+        }
+
+    } else {
+
+        const nextElement =
+            targetSite.nextElementSibling;
+
+        if (
+            nextElement !== site
+        ) {
+
+            if (nextElement) {
+                moveSiteBefore(
+                    site,
+                    nextElement
+                );
+            } else {
+                const group =
+                    targetSite.closest(
+                        ".site-group"
+                    );
+
+                moveSiteToGroup(
+                    site,
+                    group
+                );
+            }
+        }
+    }
+}
+
+
+// =========================================
+// CONFIGURAR ARRASTRE DE UNA TARJETA
+// =========================================
+
+function setupSiteDrag(site) {
+
+    if (
+        site.dataset.siteDragConfigured ===
+        "true"
+    ) {
+        return;
+    }
+
+    site.dataset.siteDragConfigured =
+        "true";
+
+    site.draggable = true;
+
+    site.addEventListener(
+        "dragstart",
+        (event) => {
+
+            const target =
+                event.target;
+
+            if (
+                target.closest &&
+                target.closest(
+                    ".site-menu-button, .site-menu"
+                )
+            ) {
+                event.preventDefault();
+                return;
+            }
+
+            draggedSite = site;
+            hoveredSite = null;
+            draggedSiteMoved = false;
+
+            site.classList.add(
+                "site-dragging"
+            );
+
+            event.dataTransfer.effectAllowed =
+                "move";
+
+            event.dataTransfer.setData(
+                "text/plain",
+                "site"
+            );
+        }
+    );
+
+    site.addEventListener(
+        "dragend",
+        async () => {
+
+            if (draggedSite) {
+                draggedSite.classList.remove(
+                    "site-dragging"
+                );
+            }
+
+            document
+                .querySelectorAll(
+                    ".site-card"
+                )
+                .forEach(
+                    (otherSite) => {
+                        otherSite.classList.remove(
+                            "site-drag-over"
+                        );
+                    }
+                );
+
+            if (draggedSiteMoved) {
+                await saveCurrentData();
+            }
+
+            draggedSite = null;
+            hoveredSite = null;
+
+            setTimeout(
+                () => {
+                    draggedSiteMoved = false;
+                },
+                0
+            );
+        }
+    );
+}
+
+
+// =========================================
+// ZONA GENERAL DE ARRASTRE DE TARJETAS
+// =========================================
+
+function setupSiteDragArea() {
+
+    const main =
+        document.querySelector("main");
+
+    if (!main) {
+        return;
+    }
+
+    if (
+        main.dataset.siteDragAreaConfigured ===
+        "true"
+    ) {
+        return;
+    }
+
+    main.dataset.siteDragAreaConfigured =
+        "true";
+
+    main.addEventListener(
+        "dragover",
+        (event) => {
+
+            if (!draggedSite) {
+                return;
+            }
+
+            event.preventDefault();
+
+            event.dataTransfer.dropEffect =
+                "move";
+
+            const targetSite =
+                getSiteUnderMouse(event);
+
+            if (targetSite) {
+
+                if (
+                    targetSite ===
+                    draggedSite
+                ) {
+                    return;
+                }
+
+                const targetGroup =
+                    targetSite.closest(
+                        ".site-group"
+                    );
+
+                const draggedGroupElement =
+                    draggedSite.closest(
+                        ".site-group"
+                    );
+
+                if (
+                    !targetGroup ||
+                    !draggedGroupElement
+                ) {
+                    return;
+                }
+
+                moveSiteAccordingToMouse(
+                    draggedSite,
+                    targetSite,
+                    event
+                );
+
+                draggedSiteMoved = true;
+                hoveredSite = targetSite;
+
+                document
+                    .querySelectorAll(
+                        ".site-card"
+                    )
+                    .forEach(
+                        (otherSite) => {
+                            otherSite.classList.remove(
+                                "site-drag-over"
+                            );
+                        }
+                    );
+
+                targetSite.classList.add(
+                    "site-drag-over"
+                );
+
+                return;
+            }
+
+
+            // ---------------------------------
+            // SI NO HAY TARJETA DEBAJO,
+            // BUSCAMOS EL GRUPO
+            // ---------------------------------
+
+            const element =
+                document.elementFromPoint(
+                    event.clientX,
+                    event.clientY
+                );
+
+            if (!element) {
+                return;
+            }
+
+            const targetGroup =
+                element.closest(
+                    ".site-group"
+                );
+
+            if (!targetGroup) {
+                return;
+            }
+
+            const sitesContainer =
+                targetGroup.querySelector(
+                    ".sites-container"
+                );
+
+            if (!sitesContainer) {
+                return;
+            }
+
+            const addSiteCard =
+                sitesContainer.querySelector(
+                    ".add-site-card"
+                );
+
+            if (
+                element.closest(
+                    ".group-header"
+                ) ||
+                element ===
+                sitesContainer
+            ) {
+
+                moveSiteToGroup(
+                    draggedSite,
+                    targetGroup
+                );
+
+                draggedSiteMoved = true;
+
+                document
+                    .querySelectorAll(
+                        ".site-card"
+                    )
+                    .forEach(
+                        (otherSite) => {
+                            otherSite.classList.remove(
+                                "site-drag-over"
+                            );
+                        }
+                    );
+
+                return;
+            }
+
+            if (
+                addSiteCard &&
+                element.closest(
+                    ".add-site-card"
+                )
+            ) {
+
+                moveSiteToGroup(
+                    draggedSite,
+                    targetGroup
+                );
+
+                draggedSiteMoved = true;
+
+                document
+                    .querySelectorAll(
+                        ".site-card"
+                    )
+                    .forEach(
+                        (otherSite) => {
+                            otherSite.classList.remove(
+                                "site-drag-over"
+                            );
+                        }
+                    );
+            }
+        }
+    );
+
+    main.addEventListener(
+        "drop",
+        (event) => {
+
+            if (!draggedSite) {
+                return;
+            }
+
+            event.preventDefault();
+
+            document
+                .querySelectorAll(
+                    ".site-card"
+                )
+                .forEach(
+                    (otherSite) => {
+                        otherSite.classList.remove(
+                            "site-drag-over"
+                        );
+                    }
+                );
+        }
+    );
+}
+
+
+// =========================================
+// MENÚ DE SITIOS
 // =========================================
 
 function setupSiteCard(site) {
 
     const menuButton =
-        site.querySelector(
-            ".site-menu-button"
-        );
-
+        site.querySelector(".site-menu-button");
 
     const menu =
-        site.querySelector(
-            ".site-menu"
-        );
-
+        site.querySelector(".site-menu");
 
     if (
         site.dataset.cardConfigured !==
@@ -616,85 +1426,61 @@ function setupSiteCard(site) {
         site.dataset.cardConfigured =
             "true";
 
-
         site.addEventListener(
             "click",
             () => {
 
-                openSite(
-                    site
-                );
+                if (draggedSiteMoved) {
+                    return;
+                }
 
+                openSite(site);
             }
         );
-
     }
 
-
-    if (
-        !menuButton ||
-        !menu
-    ) {
-
+    if (!menuButton || !menu) {
         return;
-
     }
 
-
     if (
-        menuButton.dataset
-            .menuConfigured ===
+        menuButton.dataset.menuConfigured ===
         "true"
     ) {
-
         return;
-
     }
 
-
-    menuButton.dataset
-        .menuConfigured =
+    menuButton.dataset.menuConfigured =
         "true";
-
 
     menuButton.addEventListener(
         "click",
         (event) => {
 
             event.preventDefault();
-
             event.stopPropagation();
 
-            toggleMenu(
-                menu
-            );
-
+            toggleMenu(menu);
         }
     );
-
 
     menu.addEventListener(
         "click",
         (event) => {
-
             event.stopPropagation();
-
         }
     );
-
 }
 
 
 // =========================================
-// CERRAR MENÚS AL HACER CLIC AFUERA
+// CERRAR MENÚS AL HACER CLICK AFUERA
 // =========================================
 
 document.addEventListener(
     "click",
     () => {
-
         closeAllMenus();
-
     }
 );
 
@@ -708,103 +1494,73 @@ const addSiteOverlay =
         "add-site-overlay"
     );
 
-
 const addSiteName =
     document.getElementById(
         "add-site-name"
     );
-
 
 const addSiteUrl =
     document.getElementById(
         "add-site-url"
     );
 
-
 const addSiteDescription =
     document.getElementById(
         "add-site-description"
     );
-
 
 const addSiteGroup =
     document.getElementById(
         "add-site-group"
     );
 
-
 const addSiteNameError =
     document.getElementById(
         "add-site-name-error"
     );
-
 
 const addSiteUrlError =
     document.getElementById(
         "add-site-url-error"
     );
 
-
 const closeAddSiteButton =
     document.getElementById(
         "close-add-site-button"
     );
-
 
 const cancelAddSiteButton =
     document.getElementById(
         "cancel-add-site-button"
     );
 
-
 const saveAddSiteButton =
     document.getElementById(
         "save-add-site-button"
     );
 
-
-let groupBeingAddedTo =
-    null;
+let groupBeingAddedTo = null;
 
 
 // =========================================
-// FORMULARIO AGREGAR SITIO
+// LIMPIAR FORMULARIO
 // =========================================
 
 function clearAddSiteErrors() {
-
-    addSiteNameError.textContent =
-        "";
-
-    addSiteUrlError.textContent =
-        "";
-
+    addSiteNameError.textContent = "";
+    addSiteUrlError.textContent = "";
 }
-
 
 function resetAddSiteForm() {
-
-    addSiteName.value =
-        "";
-
-    addSiteUrl.value =
-        "";
-
-    addSiteDescription.value =
-        "";
-
+    addSiteName.value = "";
+    addSiteUrl.value = "";
+    addSiteDescription.value = "";
     clearAddSiteErrors();
-
 }
 
-
 function resetAddSiteState() {
-
-    groupBeingAddedTo =
-        null;
-
+    groupBeingAddedTo = null;
     resetAddSiteForm();
-
 }
 
 
@@ -814,52 +1570,31 @@ function resetAddSiteState() {
 
 function loadSiteGroups() {
 
-    addSiteGroup.innerHTML =
-        "";
-
+    addSiteGroup.innerHTML = "";
 
     const groups =
         document.querySelectorAll(
             ".site-group"
         );
 
+    groups.forEach((group) => {
 
-    groups.forEach(
-        (group) => {
+        const groupTitle =
+            getGroupTitle(group);
 
-            const groupTitle =
-                getGroupTitle(
-                    group
-                );
+        const groupName =
+            groupTitle.textContent.trim();
 
-
-            const groupName =
-                groupTitle
-                    .textContent
-                    .trim();
-
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                groupName;
-
-
-            option.textContent =
-                groupName;
-
-
-            addSiteGroup.appendChild(
-                option
+        const option =
+            document.createElement(
+                "option"
             );
 
-        }
-    );
+        option.value = groupName;
+        option.textContent = groupName;
 
+        addSiteGroup.appendChild(option);
+    });
 }
 
 
@@ -871,12 +1606,9 @@ function openAddSite() {
 
     resetAddSiteForm();
 
-    openOverlay(
-        addSiteOverlay
-    );
+    openOverlay(addSiteOverlay);
 
     addSiteName.focus();
-
 }
 
 
@@ -886,26 +1618,20 @@ function openAddSite() {
 
 function closeAddSite() {
 
-    closeOverlay(
-        addSiteOverlay
-    );
+    closeOverlay(addSiteOverlay);
 
     resetAddSiteState();
-
 }
-
 
 closeAddSiteButton.addEventListener(
     "click",
     closeAddSite
 );
 
-
 cancelAddSiteButton.addEventListener(
     "click",
     closeAddSite
 );
-
 
 addSiteOverlay.addEventListener(
     "click",
@@ -915,54 +1641,37 @@ addSiteOverlay.addEventListener(
             event.target ===
             addSiteOverlay
         ) {
-
             closeAddSite();
-
         }
-
     }
 );
 
 
 // =========================================
-// OBTENER GRUPO POR NOMBRE
+// BUSCAR GRUPO
 // =========================================
 
-function findGroupByName(
-    groupName
-) {
+function findGroupByName(groupName) {
 
     const groups =
         document.querySelectorAll(
             ".site-group"
         );
 
-
-    for (
-        const group of groups
-    ) {
+    for (const group of groups) {
 
         const groupTitle =
-            getGroupTitle(
-                group
-            );
-
+            getGroupTitle(group);
 
         if (
-            groupTitle.textContent
-                .trim() ===
+            groupTitle.textContent.trim() ===
             groupName
         ) {
-
             return group;
-
         }
-
     }
 
-
     return null;
-
 }
 
 
@@ -975,65 +1684,38 @@ function setupSiteIcon(
     url
 ) {
 
-    // Limpiar completamente
-    // el contenido anterior.
-    siteIcon.innerHTML =
-        "";
-
-    // Mostrar inmediatamente
-    // el icono de respaldo.
-    siteIcon.textContent =
-        "🌐";
-
+    siteIcon.innerHTML = "";
+    siteIcon.textContent = "🌐";
 
     const siteIconImage =
-        document.createElement(
-            "img"
-        );
+        document.createElement("img");
 
+    siteIconImage.alt = "";
 
-    siteIconImage.alt =
-        "";
-
-
-    // Si carga el favicon,
-    // reemplazamos el 🌐.
     siteIconImage.addEventListener(
         "load",
         () => {
 
-            siteIcon.textContent =
-                "";
+            siteIcon.textContent = "";
 
             siteIcon.appendChild(
                 siteIconImage
             );
-
         }
     );
 
-
-    // Si falla, dejamos
-    // solamente el 🌐.
     siteIconImage.addEventListener(
         "error",
         () => {
-
             siteIconImage.remove();
-
         }
     );
 
-
-    // IMPORTANTE:
-    // la imagen se solicita DESPUÉS
-    // de colocar el respaldo.
     siteIconImage.src =
         new URL(
             "/favicon.ico",
             url
         ).href;
-
 }
 
 
@@ -1048,301 +1730,159 @@ function createSiteCard(
 ) {
 
     const site =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
-
-    site.className =
-        "site-card";
-
-
-    site.dataset.url =
-        url;
-
-
-    // =====================================
-    // ICONO
-    // =====================================
+    site.className = "site-card";
+    site.dataset.url = url;
 
     const siteIcon =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
-
-    siteIcon.className =
-        "site-icon";
-
+    siteIcon.className = "site-icon";
 
     setupSiteIcon(
         siteIcon,
         url
     );
 
-
-    // =====================================
-    // NOMBRE
-    // =====================================
-
     const siteName =
-        document.createElement(
-            "span"
-        );
+        document.createElement("span");
 
-
-    siteName.className =
-        "site-name";
-
-
-    siteName.textContent =
-        name;
-
-
-    // =====================================
-    // DESCRIPCIÓN
-    // =====================================
+    siteName.className = "site-name";
+    siteName.textContent = name;
 
     const siteDescription =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     siteDescription.className =
         "site-description";
 
-
     siteDescription.textContent =
         description;
 
-
-    // =====================================
-    // BOTÓN MENÚ
-    // =====================================
-
     const siteMenuButton =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
-
-    siteMenuButton.type =
-        "button";
-
-
+    siteMenuButton.type = "button";
     siteMenuButton.className =
         "site-menu-button";
 
-
-    siteMenuButton.textContent =
-        "⋮";
-
-
-    // =====================================
-    // MENÚ
-    // =====================================
+    siteMenuButton.textContent = "⋮";
 
     const siteMenu =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
-
-    siteMenu.className =
-        "site-menu";
-
+    siteMenu.className = "site-menu";
 
     const editSiteButton =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
-
-    editSiteButton.type =
-        "button";
-
-
+    editSiteButton.type = "button";
     editSiteButton.className =
         "edit-site-button";
-
 
     editSiteButton.innerHTML = `
         <span class="menu-icon">✏️</span>
         Editar sitio
     `;
 
-
     const deleteSiteButton =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
-
-    deleteSiteButton.type =
-        "button";
-
-
+    deleteSiteButton.type = "button";
     deleteSiteButton.className =
         "delete-site-button";
-
 
     deleteSiteButton.innerHTML = `
         <span class="menu-icon">🗑️</span>
         Eliminar sitio
     `;
 
-
     siteMenu.appendChild(
         editSiteButton
     );
-
 
     siteMenu.appendChild(
         deleteSiteButton
     );
 
+    site.appendChild(siteIcon);
+    site.appendChild(siteName);
+    site.appendChild(siteDescription);
+    site.appendChild(siteMenuButton);
+    site.appendChild(siteMenu);
 
-    // =====================================
-    // ARMAR TARJETA
-    // =====================================
-
-    site.appendChild(
-        siteIcon
-    );
-
-
-    site.appendChild(
-        siteName
-    );
-
-
-    site.appendChild(
-        siteDescription
-    );
-
-
-    site.appendChild(
-        siteMenuButton
-    );
-
-
-    site.appendChild(
-        siteMenu
-    );
-
-
-    // Configurar tarjeta
-    setupSiteCard(
-        site
-    );
-
-
-    // =====================================
-    // EDITAR
-    // =====================================
+    setupSiteCard(site);
+    setupSiteDrag(site);
 
     editSiteButton.addEventListener(
         "click",
         (event) => {
 
             event.preventDefault();
-
             event.stopPropagation();
 
-            openEditSite(
-                site
-            );
+            openEditSite(site);
 
-            closeMenu(
-                siteMenu
-            );
-
+            closeMenu(siteMenu);
         }
     );
-
-
-    // =====================================
-    // ELIMINAR
-    // =====================================
 
     deleteSiteButton.addEventListener(
         "click",
         async (event) => {
 
             event.preventDefault();
-
             event.stopPropagation();
 
             site.remove();
 
             await saveCurrentData();
 
-            closeMenu(
-                siteMenu
-            );
-
+            closeMenu(siteMenu);
         }
     );
 
-
     return site;
-
 }
 
 
 // =========================================
-// BOTONES "+ AGREGAR SITIO"
+// TARJETA AGREGAR SITIO
 // =========================================
 
-function setupAddSiteCard(
-    addSiteCard
-) {
+function setupAddSiteCard(addSiteCard) {
 
     if (
-        addSiteCard.dataset
-            .addConfigured ===
+        addSiteCard.dataset.addConfigured ===
         "true"
     ) {
-
         return;
-
     }
 
-
-    addSiteCard.dataset
-        .addConfigured =
+    addSiteCard.dataset.addConfigured =
         "true";
-
 
     addSiteCard.addEventListener(
         "click",
         (event) => {
 
             event.preventDefault();
-
             event.stopPropagation();
-
 
             const group =
                 addSiteCard.closest(
                     ".site-group"
                 );
 
-
-            groupBeingAddedTo =
-                group;
-
-
-            openAddSite();
-
+            groupBeingAddedTo = group;
 
             addSiteGroup.style.display =
                 "none";
 
+            openAddSite();
         }
     );
-
 }
 
 
@@ -1355,29 +1895,21 @@ const addSiteButton =
         "add-site-button"
     );
 
-
 addSiteButton.addEventListener(
     "click",
     (event) => {
 
         event.preventDefault();
-
         event.stopPropagation();
 
-
-        groupBeingAddedTo =
-            null;
-
+        groupBeingAddedTo = null;
 
         loadSiteGroups();
-
 
         addSiteGroup.style.display =
             "block";
 
-
         openAddSite();
-
     }
 );
 
@@ -1393,77 +1925,49 @@ saveAddSiteButton.addEventListener(
         const newName =
             addSiteName.value.trim();
 
-
         let newUrl =
             addSiteUrl.value.trim();
-
 
         const newDescription =
             addSiteDescription.value.trim();
 
-
         clearAddSiteErrors();
 
-
-        if (
-            newName === ""
-        ) {
+        if (newName === "") {
 
             addSiteNameError.textContent =
                 "Por favor, introduce un nombre.";
 
             return;
-
         }
 
-
-        if (
-            newUrl === ""
-        ) {
+        if (newUrl === "") {
 
             addSiteUrlError.textContent =
                 "Por favor, introduce una URL.";
 
             return;
-
         }
-
 
         if (
-            !newUrl.startsWith(
-                "http://"
-            ) &&
-            !newUrl.startsWith(
-                "https://"
-            )
+            !newUrl.startsWith("http://") &&
+            !newUrl.startsWith("https://")
         ) {
-
-            newUrl =
-                "https://" +
-                newUrl;
-
+            newUrl = "https://" + newUrl;
         }
-
 
         try {
 
-            const url =
-                new URL(
-                    newUrl
-                );
-
+            const url = new URL(newUrl);
 
             if (
-                !url.hostname.includes(
-                    "."
-                )
+                !url.hostname.includes(".")
             ) {
 
                 addSiteUrlError.textContent =
                     "Introduce una URL válida.";
 
                 return;
-
             }
 
         } catch {
@@ -1472,37 +1976,24 @@ saveAddSiteButton.addEventListener(
                 "Introduce una URL válida.";
 
             return;
-
         }
 
-
-        if (
-            groupBeingAddedTo ===
-            null
-        ) {
+        if (groupBeingAddedTo === null) {
 
             groupBeingAddedTo =
                 findGroupByName(
                     addSiteGroup.value
                 );
-
         }
 
-
-        if (
-            !groupBeingAddedTo
-        ) {
-
+        if (!groupBeingAddedTo) {
             return;
-
         }
-
 
         const sitesContainer =
             groupBeingAddedTo.querySelector(
                 ".sites-container"
             );
-
 
         const newSite =
             createSiteCard(
@@ -1511,30 +2002,24 @@ saveAddSiteButton.addEventListener(
                 newDescription
             );
 
-
         const addSiteCard =
             groupBeingAddedTo.querySelector(
                 ".add-site-card"
             );
-
 
         sitesContainer.insertBefore(
             newSite,
             addSiteCard
         );
 
-
         applyCardAppearance(
             cardColorInput.value,
             cardTransparencyInput.value
         );
 
-
         await saveCurrentData();
 
-
         closeAddSite();
-
     }
 );
 
@@ -1548,102 +2033,70 @@ const addGroupButton =
         "add-group-button"
     );
 
-
 const addGroupOverlay =
     document.getElementById(
         "add-group-overlay"
     );
-
 
 const addGroupName =
     document.getElementById(
         "add-group-name"
     );
 
-
 const addGroupNameError =
     document.getElementById(
         "add-group-name-error"
     );
-
 
 const closeAddGroupButton =
     document.getElementById(
         "close-add-group-button"
     );
 
-
 const cancelAddGroupButton =
     document.getElementById(
         "cancel-add-group-button"
     );
-
 
 const saveAddGroupButton =
     document.getElementById(
         "save-add-group-button"
     );
 
-
 function clearAddGroupErrors() {
-
-    addGroupNameError.textContent =
-        "";
-
+    addGroupNameError.textContent = "";
 }
-
 
 function resetAddGroupForm() {
-
-    addGroupName.value =
-        "";
-
+    addGroupName.value = "";
     clearAddGroupErrors();
-
 }
-
 
 function openAddGroup() {
-
     resetAddGroupForm();
-
-    openOverlay(
-        addGroupOverlay
-    );
-
+    openOverlay(addGroupOverlay);
     addGroupName.focus();
-
 }
-
 
 function closeAddGroup() {
-
-    closeOverlay(
-        addGroupOverlay
-    );
-
+    closeOverlay(addGroupOverlay);
     resetAddGroupForm();
-
 }
-
 
 addGroupButton.addEventListener(
     "click",
     openAddGroup
 );
 
-
 closeAddGroupButton.addEventListener(
     "click",
     closeAddGroup
 );
 
-
 cancelAddGroupButton.addEventListener(
     "click",
     closeAddGroup
 );
-
 
 addGroupOverlay.addEventListener(
     "click",
@@ -1653,11 +2106,8 @@ addGroupOverlay.addEventListener(
             event.target ===
             addGroupOverlay
         ) {
-
             closeAddGroup();
-
         }
-
     }
 );
 
@@ -1666,283 +2116,174 @@ addGroupOverlay.addEventListener(
 // CREAR GRUPO
 // =========================================
 
-function createGroup(
-    name
-) {
+function createGroup(name) {
 
     const group =
-        document.createElement(
-            "section"
-        );
+        document.createElement("section");
 
-
-    group.className =
-        "site-group";
-
+    group.className = "site-group";
 
     const groupHeader =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     groupHeader.className =
         "group-header";
 
-
     const groupTitleContainer =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     groupTitleContainer.className =
         "group-title-container";
 
-
     const groupTitle =
-        document.createElement(
-            "h2"
-        );
+        document.createElement("h2");
 
-
-    groupTitle.textContent =
-        name;
-
+    groupTitle.textContent = name;
 
     const groupMenuButton =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
-
-    groupMenuButton.type =
-        "button";
-
-
+    groupMenuButton.type = "button";
     groupMenuButton.className =
         "group-menu-button";
 
-
-    groupMenuButton.textContent =
-        "⋮";
-
+    groupMenuButton.textContent = "⋮";
 
     groupTitleContainer.appendChild(
         groupTitle
     );
 
-
     groupTitleContainer.appendChild(
         groupMenuButton
     );
-
 
     groupHeader.appendChild(
         groupTitleContainer
     );
 
-
     const groupMenu =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
-
-    groupMenu.className =
-        "group-menu";
-
+    groupMenu.className = "group-menu";
 
     const editGroupButton =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
-
-    editGroupButton.type =
-        "button";
-
-
+    editGroupButton.type = "button";
     editGroupButton.className =
         "edit-group-button";
-
 
     editGroupButton.innerHTML = `
         <span class="menu-icon">✏️</span>
         Editar grupo
     `;
 
-
     const deleteGroupButton =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
-
-    deleteGroupButton.type =
-        "button";
-
-
+    deleteGroupButton.type = "button";
     deleteGroupButton.className =
         "delete-group-button";
-
 
     deleteGroupButton.innerHTML = `
         <span class="menu-icon">🗑️</span>
         Eliminar grupo
     `;
 
-
     groupMenu.appendChild(
         editGroupButton
     );
-
 
     groupMenu.appendChild(
         deleteGroupButton
     );
 
-
     groupHeader.appendChild(
         groupMenu
     );
-
 
     group.appendChild(
         groupHeader
     );
 
-
     const sitesContainer =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     sitesContainer.className =
         "sites-container";
 
-
     const addSiteCard =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     addSiteCard.className =
         "add-site-card";
 
-
     const addSiteIcon =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     addSiteIcon.className =
         "add-site-icon";
 
-
-    addSiteIcon.textContent =
-        "+";
-
+    addSiteIcon.textContent = "+";
 
     const addSiteNameLabel =
-        document.createElement(
-            "span"
-        );
-
+        document.createElement("span");
 
     addSiteNameLabel.className =
         "add-site-name";
 
-
     addSiteNameLabel.textContent =
         "Agregar sitio";
-
 
     addSiteCard.appendChild(
         addSiteIcon
     );
 
-
     addSiteCard.appendChild(
         addSiteNameLabel
     );
-
 
     sitesContainer.appendChild(
         addSiteCard
     );
 
-
     group.appendChild(
         sitesContainer
     );
 
-
-    // Configurar menú
-    setupGroupMenu(
-        group
-    );
-
-
-    // Configurar agregar sitio
-    setupAddSiteCard(
-        addSiteCard
-    );
-
-
-    // =====================================
-    // EDITAR GRUPO
-    // =====================================
+    setupGroupMenu(group);
+    setupGroupDrag(group);
+    setupAddSiteCard(addSiteCard);
 
     editGroupButton.addEventListener(
         "click",
         (event) => {
 
             event.preventDefault();
-
             event.stopPropagation();
 
-            openEditGroup(
-                group
-            );
+            openEditGroup(group);
 
-            closeMenu(
-                groupMenu
-            );
-
+            closeMenu(groupMenu);
         }
     );
-
-
-    // =====================================
-    // ELIMINAR GRUPO
-    // =====================================
 
     deleteGroupButton.addEventListener(
         "click",
         async (event) => {
 
             event.preventDefault();
-
             event.stopPropagation();
 
             group.remove();
 
             await saveCurrentData();
 
-            closeMenu(
-                groupMenu
-            );
-
+            closeMenu(groupMenu);
         }
     );
 
-
     return group;
-
 }
 
 
@@ -1957,50 +2298,32 @@ saveAddGroupButton.addEventListener(
         const newName =
             addGroupName.value.trim();
 
-
         clearAddGroupErrors();
 
-
-        if (
-            newName === ""
-        ) {
+        if (newName === "") {
 
             addGroupNameError.textContent =
                 "Por favor, introduce un nombre.";
 
             return;
-
         }
 
-
         const newGroup =
-            createGroup(
-                newName
-            );
-
+            createGroup(newName);
 
         const main =
-            document.querySelector(
-                "main"
-            );
+            document.querySelector("main");
 
-
-        main.appendChild(
-            newGroup
-        );
-
+        main.appendChild(newGroup);
 
         applyGroupAppearance(
             groupColorInput.value,
             groupTransparencyInput.value
         );
 
-
         await saveCurrentData();
 
-
         closeAddGroup();
-
     }
 );
 
@@ -2014,161 +2337,105 @@ const editSiteOverlay =
         "edit-site-overlay"
     );
 
-
 const editSiteName =
     document.getElementById(
         "edit-site-name"
     );
-
 
 const editSiteUrl =
     document.getElementById(
         "edit-site-url"
     );
 
-
 const editSiteDescription =
     document.getElementById(
         "edit-site-description"
     );
-
 
 const editSiteUrlError =
     document.getElementById(
         "edit-site-url-error"
     );
 
-
 const editSiteNameError =
     document.getElementById(
         "edit-site-name-error"
     );
-
 
 const closeEditSiteButton =
     document.getElementById(
         "close-edit-site-button"
     );
 
-
 const cancelEditSiteButton =
     document.getElementById(
         "cancel-edit-site-button"
     );
-
 
 const saveEditSiteButton =
     document.getElementById(
         "save-edit-site-button"
     );
 
-
-let siteBeingEdited =
-    null;
-
+let siteBeingEdited = null;
 
 function clearEditSiteErrors() {
-
-    editSiteNameError.textContent =
-        "";
-
-    editSiteUrlError.textContent =
-        "";
-
+    editSiteNameError.textContent = "";
+    editSiteUrlError.textContent = "";
 }
-
 
 function resetEditSiteForm() {
-
-    editSiteName.value =
-        "";
-
-    editSiteUrl.value =
-        "";
-
-    editSiteDescription.value =
-        "";
-
+    editSiteName.value = "";
+    editSiteUrl.value = "";
+    editSiteDescription.value = "";
     clearEditSiteErrors();
-
 }
 
-
-function openEditSite(
-    site
-) {
+function openEditSite(site) {
 
     resetEditSiteForm();
 
-
     const siteName =
-        getSiteName(
-            site
-        );
-
+        getSiteName(site);
 
     const siteDescription =
-        getSiteDescription(
-            site
-        );
+        getSiteDescription(site);
 
-
-    siteBeingEdited =
-        site;
-
+    siteBeingEdited = site;
 
     editSiteName.value =
         siteName.textContent.trim();
 
-
     editSiteUrl.value =
-        site.dataset.url ||
-        "";
-
+        site.dataset.url || "";
 
     editSiteDescription.value =
         siteDescription.textContent.trim();
 
-
-    openOverlay(
-        editSiteOverlay
-    );
-
+    openOverlay(editSiteOverlay);
 
     editSiteName.focus();
-
     editSiteName.select();
-
 }
-
 
 function closeEditSite() {
 
-    closeOverlay(
-        editSiteOverlay
-    );
+    closeOverlay(editSiteOverlay);
 
-
-    siteBeingEdited =
-        null;
-
+    siteBeingEdited = null;
 
     resetEditSiteForm();
-
 }
-
 
 closeEditSiteButton.addEventListener(
     "click",
     closeEditSite
 );
 
-
 cancelEditSiteButton.addEventListener(
     "click",
     closeEditSite
 );
-
 
 editSiteOverlay.addEventListener(
     "click",
@@ -2178,76 +2445,54 @@ editSiteOverlay.addEventListener(
             event.target ===
             editSiteOverlay
         ) {
-
             closeEditSite();
-
         }
-
     }
 );
 
 
 // =========================================
-// EDITAR SITIOS EXISTENTES
+// BOTONES EDITAR SITIOS EXISTENTES
 // =========================================
 
 function setupExistingSiteEditButtons() {
 
     document
-        .querySelectorAll(
-            ".edit-site-button"
-        )
-        .forEach(
-            (button) => {
+        .querySelectorAll(".edit-site-button")
+        .forEach((button) => {
 
-                if (
-                    button.dataset
-                        .editConfigured ===
-                    "true"
-                ) {
-
-                    return;
-
-                }
-
-
-                button.dataset
-                    .editConfigured =
-                    "true";
-
-
-                button.addEventListener(
-                    "click",
-                    (event) => {
-
-                        event.preventDefault();
-
-                        event.stopPropagation();
-
-
-                        const site =
-                            button.closest(
-                                ".site-card"
-                            );
-
-
-                        openEditSite(
-                            site
-                        );
-
-
-                        closeMenu(
-                            site.querySelector(
-                                ".site-menu"
-                            )
-                        );
-
-                    }
-                );
-
+            if (
+                button.dataset.editConfigured ===
+                "true"
+            ) {
+                return;
             }
-        );
 
+            button.dataset.editConfigured =
+                "true";
+
+            button.addEventListener(
+                "click",
+                (event) => {
+
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const site =
+                        button.closest(
+                            ".site-card"
+                        );
+
+                    openEditSite(site);
+
+                    closeMenu(
+                        site.querySelector(
+                            ".site-menu"
+                        )
+                    );
+                }
+            );
+        });
 }
 
 
@@ -2262,77 +2507,52 @@ saveEditSiteButton.addEventListener(
         const newName =
             editSiteName.value.trim();
 
-
         let newUrl =
             editSiteUrl.value.trim();
-
 
         const newDescription =
             editSiteDescription.value.trim();
 
-
         clearEditSiteErrors();
 
-
-        if (
-            newName === ""
-        ) {
+        if (newName === "") {
 
             editSiteNameError.textContent =
                 "Por favor, introduce un nombre.";
 
             return;
-
         }
 
-
-        if (
-            newUrl === ""
-        ) {
+        if (newUrl === "") {
 
             editSiteUrlError.textContent =
                 "Por favor, introduce una URL.";
 
             return;
-
         }
 
-
         if (
-            !newUrl.startsWith(
-                "http://"
-            ) &&
-            !newUrl.startsWith(
-                "https://"
-            )
+            !newUrl.startsWith("http://") &&
+            !newUrl.startsWith("https://")
         ) {
-
             newUrl =
                 "https://" +
                 newUrl;
-
         }
-
 
         try {
 
             const url =
-                new URL(
-                    newUrl
-                );
-
+                new URL(newUrl);
 
             if (
-                !url.hostname.includes(
-                    "."
-                )
+                !url.hostname.includes(".")
             ) {
 
                 editSiteUrlError.textContent =
                     "Introduce una URL válida.";
 
                 return;
-
             }
 
         } catch {
@@ -2341,43 +2561,26 @@ saveEditSiteButton.addEventListener(
                 "Introduce una URL válida.";
 
             return;
-
         }
 
-
         const siteName =
-            getSiteName(
-                siteBeingEdited
-            );
-
+            getSiteName(siteBeingEdited);
 
         const siteDescription =
-            getSiteDescription(
-                siteBeingEdited
-            );
+            getSiteDescription(siteBeingEdited);
 
-
-        siteName.textContent =
-            newName;
-
+        siteName.textContent = newName;
 
         siteBeingEdited.dataset.url =
             newUrl;
 
-
         siteDescription.textContent =
             newDescription;
-
-
-        // =================================
-        // ACTUALIZAR ICONO
-        // =================================
 
         const siteIcon =
             siteBeingEdited.querySelector(
                 ".site-icon"
             );
-
 
         if (siteIcon) {
 
@@ -2385,15 +2588,11 @@ saveEditSiteButton.addEventListener(
                 siteIcon,
                 newUrl
             );
-
         }
-
 
         await saveCurrentData();
 
-
         closeEditSite();
-
     }
 );
 
@@ -2407,126 +2606,82 @@ const editGroupOverlay =
         "edit-group-overlay"
     );
 
-
 const editGroupName =
     document.getElementById(
         "edit-group-name"
     );
-
 
 const editGroupNameError =
     document.getElementById(
         "edit-group-name-error"
     );
 
-
 const closeEditGroupButton =
     document.getElementById(
         "close-edit-group-button"
     );
-
 
 const cancelEditGroupButton =
     document.getElementById(
         "cancel-edit-group-button"
     );
 
-
 const saveEditGroupButton =
     document.getElementById(
         "save-edit-group-button"
     );
 
-
-let groupBeingEdited =
-    null;
-
+let groupBeingEdited = null;
 
 function clearEditGroupErrors() {
-
-    editGroupNameError.textContent =
-        "";
-
+    editGroupNameError.textContent = "";
 }
-
 
 function resetEditGroupForm() {
-
-    editGroupName.value =
-        "";
-
+    editGroupName.value = "";
     clearEditGroupErrors();
-
 }
 
+function openEditGroup(group) {
 
-function openEditGroup(
-    group
-) {
-
-    groupBeingEdited =
-        group;
-
+    groupBeingEdited = group;
 
     const groupTitle =
-        getGroupTitle(
-            group
-        );
-
+        getGroupTitle(group);
 
     resetEditGroupForm();
-
 
     editGroupName.value =
         groupTitle.textContent.trim();
 
-
-    openOverlay(
-        editGroupOverlay
-    );
-
+    openOverlay(editGroupOverlay);
 
     closeMenu(
-        group.querySelector(
-            ".group-menu"
-        )
+        group.querySelector(".group-menu")
     );
 
-
     editGroupName.focus();
-
     editGroupName.select();
-
 }
-
 
 function closeEditGroup() {
 
-    closeOverlay(
-        editGroupOverlay
-    );
+    closeOverlay(editGroupOverlay);
 
-
-    groupBeingEdited =
-        null;
-
+    groupBeingEdited = null;
 
     resetEditGroupForm();
-
 }
-
 
 closeEditGroupButton.addEventListener(
     "click",
     closeEditGroup
 );
 
-
 cancelEditGroupButton.addEventListener(
     "click",
     closeEditGroup
 );
-
 
 editGroupOverlay.addEventListener(
     "click",
@@ -2536,69 +2691,48 @@ editGroupOverlay.addEventListener(
             event.target ===
             editGroupOverlay
         ) {
-
             closeEditGroup();
-
         }
-
     }
 );
 
 
 // =========================================
-// EDITAR GRUPOS EXISTENTES
+// BOTONES EDITAR GRUPOS
 // =========================================
 
 function setupExistingGroupEditButtons() {
 
     document
-        .querySelectorAll(
-            ".edit-group-button"
-        )
-        .forEach(
-            (button) => {
+        .querySelectorAll(".edit-group-button")
+        .forEach((button) => {
 
-                if (
-                    button.dataset
-                        .editConfigured ===
-                    "true"
-                ) {
+            if (
+                button.dataset.editConfigured ===
+                "true"
+            ) {
+                return;
+            }
 
-                    return;
+            button.dataset.editConfigured =
+                "true";
 
-                }
+            button.addEventListener(
+                "click",
+                (event) => {
 
+                    event.preventDefault();
+                    event.stopPropagation();
 
-                button.dataset
-                    .editConfigured =
-                    "true";
-
-
-                button.addEventListener(
-                    "click",
-                    (event) => {
-
-                        event.preventDefault();
-
-                        event.stopPropagation();
-
-
-                        const group =
-                            button.closest(
-                                ".site-group"
-                            );
-
-
-                        openEditGroup(
-                            group
+                    const group =
+                        button.closest(
+                            ".site-group"
                         );
 
-                    }
-                );
-
-            }
-        );
-
+                    openEditGroup(group);
+                }
+            );
+        });
 }
 
 
@@ -2613,111 +2747,81 @@ saveEditGroupButton.addEventListener(
         const newName =
             editGroupName.value.trim();
 
-
         clearEditGroupErrors();
 
-
-        if (
-            newName === ""
-        ) {
+        if (newName === "") {
 
             editGroupNameError.textContent =
                 "Por favor, introduce un nombre.";
 
             return;
-
         }
-
 
         const groupTitle =
             getGroupTitle(
                 groupBeingEdited
             );
 
-
         groupTitle.textContent =
             newName;
 
-
         await saveCurrentData();
 
-
         closeEditGroup();
-
     }
 );
 
 
 // =========================================
-// MOSTRAR GRUPOS Y SITIOS
+// MOSTRAR GRUPOS
 // =========================================
 
-function renderGroups(
-    groups
-) {
+function renderGroups(groups) {
 
     const main =
-        document.querySelector(
-            "main"
-        );
+        document.querySelector("main");
 
+    groups.forEach((groupData) => {
 
-    groups.forEach(
-        (groupData) => {
-
-            const group =
-                createGroup(
-                    groupData.name
-                );
-
-
-            const sitesContainer =
-                group.querySelector(
-                    ".sites-container"
-                );
-
-
-            const addSiteCard =
-                group.querySelector(
-                    ".add-site-card"
-                );
-
-
-            (
-                groupData.sites ||
-                []
-            ).forEach(
-                (siteData) => {
-
-                    const site =
-                        createSiteCard(
-                            siteData.name,
-                            siteData.url,
-                            siteData.description
-                        );
-
-
-                    sitesContainer.insertBefore(
-                        site,
-                        addSiteCard
-                    );
-
-                }
+        const group =
+            createGroup(
+                groupData.name
             );
 
-
-            main.appendChild(
-                group
+        const sitesContainer =
+            group.querySelector(
+                ".sites-container"
             );
 
-        }
-    );
+        const addSiteCard =
+            group.querySelector(
+                ".add-site-card"
+            );
 
+        (
+            groupData.sites || []
+        ).forEach((siteData) => {
+
+            const site =
+                createSiteCard(
+                    siteData.name,
+                    siteData.url,
+                    siteData.description
+                );
+
+            sitesContainer.insertBefore(
+                site,
+                addSiteCard
+            );
+        });
+
+        main.appendChild(group);
+    });
 }
 
 
 // =========================================
-// TAMAÑO DE LAS TARJETAS
+// TAMAÑO DE TARJETAS
 // =========================================
 
 const cardSizeInput =
@@ -2725,71 +2829,40 @@ const cardSizeInput =
         "card-size"
     );
 
-
-function applyCardSize(
-    size
-) {
+function applyCardSize(size) {
 
     let validSize =
-        Number(
-            size
-        );
+        Number(size);
 
-
-    if (
-        isNaN(
-            validSize
-        )
-    ) {
-
+    if (isNaN(validSize)) {
         validSize =
             defaultSettings.cardSize;
-
     }
 
-
-    if (
-        validSize < 95
-    ) {
-
-        validSize =
-            95;
-
+    if (validSize < 95) {
+        validSize = 95;
     }
 
-
-    if (
-        validSize > 140
-    ) {
-
-        validSize =
-            140;
-
+    if (validSize > 140) {
+        validSize = 140;
     }
-
 
     document
         .querySelectorAll(
             ".site-card, .add-site-card"
         )
-        .forEach(
-            (card) => {
+        .forEach((card) => {
 
-                card.style.width =
-                    `${validSize}px`;
+            card.style.width =
+                `${validSize}px`;
 
-                card.style.height =
-                    `${validSize}px`;
-
-            }
-        );
-
+            card.style.height =
+                `${validSize}px`;
+        });
 
     cardSizeInput.value =
         validSize;
-
 }
-
 
 cardSizeInput.addEventListener(
     "change",
@@ -2799,34 +2872,25 @@ cardSizeInput.addEventListener(
             cardSizeInput.value
         );
 
-
         const data =
             await loadData();
 
-
         await saveData({
-
             settings: {
-
                 ...defaultSettings,
-
                 ...data.settings,
-
                 cardSize:
                     Number(
                         cardSizeInput.value
                     )
-
             }
-
         });
-
     }
 );
 
 
 // =========================================
-// COLOR Y TRANSPARENCIA GRUPOS
+// APARIENCIA DE GRUPOS
 // =========================================
 
 const groupColorInput =
@@ -2834,18 +2898,15 @@ const groupColorInput =
         "group-color"
     );
 
-
 const groupTransparencyInput =
     document.getElementById(
         "group-transparency"
     );
 
-
 const groupTransparencyValue =
     document.getElementById(
         "group-transparency-value"
     );
-
 
 function applyGroupAppearance(
     color,
@@ -2858,34 +2919,25 @@ function applyGroupAppearance(
             transparency
         );
 
-
     document
         .querySelectorAll(
             ".site-group"
         )
-        .forEach(
-            (group) => {
+        .forEach((group) => {
 
-                group.style.backgroundColor =
-                    rgba;
-
-            }
-        );
-
+            group.style.backgroundColor =
+                rgba;
+        });
 
     groupColorInput.value =
         color;
 
-
     groupTransparencyInput.value =
         transparency;
 
-
     groupTransparencyValue.textContent =
         `${transparency}%`;
-
 }
-
 
 groupColorInput.addEventListener(
     "input",
@@ -2894,44 +2946,29 @@ groupColorInput.addEventListener(
         const color =
             groupColorInput.value;
 
-
         const transparency =
             groupTransparencyInput.value;
-
 
         applyGroupAppearance(
             color,
             transparency
         );
 
-
         const data =
             await loadData();
 
-
         await saveData({
-
             settings: {
-
                 ...defaultSettings,
-
                 ...data.settings,
-
                 groupColor:
                     color,
-
                 groupTransparency:
-                    Number(
-                        transparency
-                    )
-
+                    Number(transparency)
             }
-
         });
-
     }
 );
-
 
 groupTransparencyInput.addEventListener(
     "input",
@@ -2940,47 +2977,35 @@ groupTransparencyInput.addEventListener(
         const color =
             groupColorInput.value;
 
-
         const transparency =
             Number(
                 groupTransparencyInput.value
             );
-
 
         applyGroupAppearance(
             color,
             transparency
         );
 
-
         const data =
             await loadData();
 
-
         await saveData({
-
             settings: {
-
                 ...defaultSettings,
-
                 ...data.settings,
-
                 groupColor:
                     color,
-
                 groupTransparency:
                     transparency
-
             }
-
         });
-
     }
 );
 
 
 // =========================================
-// COLOR Y TRANSPARENCIA TARJETAS
+// APARIENCIA DE TARJETAS
 // =========================================
 
 const cardColorInput =
@@ -2988,18 +3013,15 @@ const cardColorInput =
         "card-color"
     );
 
-
 const cardTransparencyInput =
     document.getElementById(
         "card-transparency"
     );
 
-
 const cardTransparencyValue =
     document.getElementById(
         "card-transparency-value"
     );
-
 
 function applyCardAppearance(
     color,
@@ -3012,34 +3034,25 @@ function applyCardAppearance(
             transparency
         );
 
-
     document
         .querySelectorAll(
             ".site-card, .add-site-card"
         )
-        .forEach(
-            (card) => {
+        .forEach((card) => {
 
-                card.style.backgroundColor =
-                    rgba;
-
-            }
-        );
-
+            card.style.backgroundColor =
+                rgba;
+        });
 
     cardColorInput.value =
         color;
 
-
     cardTransparencyInput.value =
         transparency;
 
-
     cardTransparencyValue.textContent =
         `${transparency}%`;
-
 }
-
 
 cardColorInput.addEventListener(
     "input",
@@ -3048,44 +3061,29 @@ cardColorInput.addEventListener(
         const color =
             cardColorInput.value;
 
-
         const transparency =
             cardTransparencyInput.value;
-
 
         applyCardAppearance(
             color,
             transparency
         );
 
-
         const data =
             await loadData();
 
-
         await saveData({
-
             settings: {
-
                 ...defaultSettings,
-
                 ...data.settings,
-
                 cardColor:
                     color,
-
                 cardTransparency:
-                    Number(
-                        transparency
-                    )
-
+                    Number(transparency)
             }
-
         });
-
     }
 );
-
 
 cardTransparencyInput.addEventListener(
     "input",
@@ -3094,47 +3092,35 @@ cardTransparencyInput.addEventListener(
         const color =
             cardColorInput.value;
 
-
         const transparency =
             Number(
                 cardTransparencyInput.value
             );
-
 
         applyCardAppearance(
             color,
             transparency
         );
 
-
         const data =
             await loadData();
 
-
         await saveData({
-
             settings: {
-
                 ...defaultSettings,
-
                 ...data.settings,
-
                 cardColor:
                     color,
-
                 cardTransparency:
                     transparency
-
             }
-
         });
-
     }
 );
 
 
 // =========================================
-// COLOR DE FONDO
+// FONDO
 // =========================================
 
 const backgroundColorInput =
@@ -3142,11 +3128,8 @@ const backgroundColorInput =
         "background-color"
     );
 
-
 function applyBackgroundColor(color) {
 
-    // Quitamos el fondo inicial
-    // cargado por background-bootstrap.js.
     document.documentElement.classList.remove(
         "initial-background-image"
     );
@@ -3155,16 +3138,12 @@ function applyBackgroundColor(color) {
         "--initial-background-image"
     );
 
-
     document.body.style.backgroundColor =
         color;
 
     document.body.style.backgroundImage =
         "none";
 
-
-    // La copia rápida ahora representa
-    // un fondo sólido.
     localStorage.setItem(
         "newtabBackgroundType",
         "solid"
@@ -3173,9 +3152,7 @@ function applyBackgroundColor(color) {
     localStorage.removeItem(
         "newtabBackgroundImage"
     );
-
 }
-
 
 backgroundColorInput.addEventListener(
     "input",
@@ -3184,31 +3161,19 @@ backgroundColorInput.addEventListener(
         const color =
             backgroundColorInput.value;
 
-
-        applyBackgroundColor(
-            color
-        );
-
+        applyBackgroundColor(color);
 
         const data =
             await loadData();
 
-
         await saveData({
-
             settings: {
-
                 ...defaultSettings,
-
                 ...data.settings,
-
                 backgroundColor:
                     color
-
             }
-
         });
-
     }
 );
 
@@ -3222,14 +3187,9 @@ const backgroundImageInput =
         "background-image-file"
     );
 
+let pendingBackgroundImage = null;
 
-let pendingBackgroundImage =
-    null;
-
-
-function imageToDataURL(
-    file
-) {
+function imageToDataURL(file) {
 
     return new Promise(
         (resolve, reject) => {
@@ -3237,42 +3197,24 @@ function imageToDataURL(
             const reader =
                 new FileReader();
 
-
             reader.onload = () => {
-
                 resolve(
                     reader.result
                 );
-
             };
 
-
             reader.onerror = () => {
-
                 reject(
                     reader.error
                 );
-
             };
 
-
-            reader.readAsDataURL(
-                file
-            );
-
+            reader.readAsDataURL(file);
         }
     );
-
 }
 
-
-// =========================================
-// APLICAR IMAGEN DE FONDO
-// =========================================
-
-function applyBackgroundImage(
-    imageData
-) {
+function applyBackgroundImage(imageData) {
 
     return new Promise(
         (resolve) => {
@@ -3280,82 +3222,53 @@ function applyBackgroundImage(
             const image =
                 new Image();
 
-
             image.onload = () => {
 
                 document.documentElement.classList.add(
                     "initial-background-image"
                 );
 
-
                 document.documentElement.style.setProperty(
                     "--initial-background-image",
                     `url("${imageData}")`
                 );
 
-
                 document.body.style.backgroundImage =
                     `url("${imageData}")`;
-
 
                 document.body.style.backgroundColor =
                     "transparent";
 
-
                 document.body.style.backgroundSize =
                     "cover";
-
 
                 document.body.style.backgroundPosition =
                     "center";
 
-
                 document.body.style.backgroundRepeat =
                     "no-repeat";
 
-
-                // Guardamos la copia rápida
-                // para la próxima apertura.
                 localStorage.setItem(
                     "newtabBackgroundType",
                     "image"
                 );
-
 
                 localStorage.setItem(
                     "newtabBackgroundImage",
                     imageData
                 );
 
-
-                resolve(
-                    true
-                );
-
+                resolve(true);
             };
-
 
             image.onerror = () => {
-
-                resolve(
-                    false
-                );
-
+                resolve(false);
             };
 
-
-            image.src =
-                imageData;
-
+            image.src = imageData;
         }
     );
-
 }
-
-
-// =========================================
-// SELECCIONAR IMAGEN
-// =========================================
 
 backgroundImageInput.addEventListener(
     "change",
@@ -3364,76 +3277,49 @@ backgroundImageInput.addEventListener(
         const file =
             backgroundImageInput.files[0];
 
-
         if (!file) {
-
             return;
-
         }
 
-
         pendingBackgroundImage =
-            await imageToDataURL(
-                file
-            );
-
+            await imageToDataURL(file);
 
         const imageLoaded =
             await applyBackgroundImage(
                 pendingBackgroundImage
             );
 
-
         if (!imageLoaded) {
 
-            pendingBackgroundImage =
-                null;
+            pendingBackgroundImage = null;
 
             return;
-
         }
-
 
         document.getElementById(
             "background-image"
-        ).checked =
-            true;
-
+        ).checked = true;
 
         document.getElementById(
             "background-solid"
-        ).checked =
-            false;
-
+        ).checked = false;
 
         document.getElementById(
             "background-gradient"
-        ).checked =
-            false;
-
+        ).checked = false;
 
         const data =
             await loadData();
 
-
         await saveData({
-
             settings: {
-
                 ...defaultSettings,
-
                 ...data.settings,
-
-                backgroundType:
-                    "image",
-
+                backgroundType: "image",
                 backgroundImage:
                     pendingBackgroundImage
-
             }
-
         });
-
     }
 );
 
@@ -3447,18 +3333,15 @@ const gradientDirectionInput =
         "gradient-direction"
     );
 
-
 const gradientColorsContainer =
     document.getElementById(
         "gradient-colors"
     );
 
-
 const addGradientColorButton =
     document.getElementById(
         "add-gradient-color-button"
     );
-
 
 function getGradientColors() {
 
@@ -3467,27 +3350,20 @@ function getGradientColors() {
             'input[type="color"]'
         );
 
-
     return Array.from(
         colorInputs
-    )
-        .map(
-            (input) =>
-                input.value
-        );
-
+    ).map(
+        (input) =>
+            input.value
+    );
 }
-
 
 function createGradientCSS(
     direction,
     colors
 ) {
-
     return `linear-gradient(${direction}deg, ${colors.join(", ")})`;
-
 }
-
 
 function applyGradient(
     direction,
@@ -3498,14 +3374,9 @@ function applyGradient(
         !colors ||
         colors.length < 2
     ) {
-
         return;
-
     }
 
-
-    // Quitamos cualquier fondo inicial
-    // que haya puesto background-bootstrap.js.
     document.documentElement.classList.remove(
         "initial-background-image"
     );
@@ -3514,10 +3385,8 @@ function applyGradient(
         "--initial-background-image"
     );
 
-
     document.body.style.backgroundColor =
         "transparent";
-
 
     document.body.style.backgroundImage =
         createGradientCSS(
@@ -3525,13 +3394,9 @@ function applyGradient(
             colors
         );
 
-
     document.body.style.backgroundSize =
         "cover";
 
-
-    // La copia rápida ya no debe intentar
-    // cargar una imagen.
     localStorage.setItem(
         "newtabBackgroundType",
         "gradient"
@@ -3540,13 +3405,7 @@ function applyGradient(
     localStorage.removeItem(
         "newtabBackgroundImage"
     );
-
 }
-
-
-// =========================================
-// CREAR COLOR DEL GRADIENTE
-// =========================================
 
 function createGradientColor(
     color,
@@ -3554,60 +3413,35 @@ function createGradientColor(
 ) {
 
     const wrapper =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     wrapper.className =
         "gradient-color";
 
-
     const label =
-        document.createElement(
-            "span"
-        );
-
+        document.createElement("span");
 
     label.className =
         "gradient-color-label";
 
-
     label.textContent =
         `Color ${number}`;
 
-
     const input =
-        document.createElement(
-            "input"
-        );
+        document.createElement("input");
 
-
-    input.type =
-        "color";
-
-
-    input.value =
-        color;
-
+    input.type = "color";
+    input.value = color;
 
     const removeButton =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
-
-    removeButton.type =
-        "button";
-
+    removeButton.type = "button";
 
     removeButton.className =
         "remove-gradient-color-button";
 
-
-    removeButton.textContent =
-        "×";
-
+    removeButton.textContent = "×";
 
     removeButton.addEventListener(
         "click",
@@ -3616,27 +3450,18 @@ function createGradientColor(
             const colors =
                 getGradientColors();
 
-
-            if (
-                colors.length <= 2
-            ) {
-
+            if (colors.length <= 2) {
                 return;
-
             }
-
 
             wrapper.remove();
 
-
             updateGradientColorLabels();
-
 
             const backgroundGradient =
                 document.getElementById(
                     "background-gradient"
                 );
-
 
             if (
                 backgroundGradient.checked
@@ -3646,15 +3471,11 @@ function createGradientColor(
                     gradientDirectionInput.value,
                     getGradientColors()
                 );
-
             }
 
-
             await saveGradientSettings();
-
         }
     );
-
 
     input.addEventListener(
         "input",
@@ -3665,7 +3486,6 @@ function createGradientColor(
                     "background-gradient"
                 );
 
-
             if (
                 backgroundGradient.checked
             ) {
@@ -3674,39 +3494,18 @@ function createGradientColor(
                     gradientDirectionInput.value,
                     getGradientColors()
                 );
-
             }
 
-
             await saveGradientSettings();
-
         }
     );
 
-
-    wrapper.appendChild(
-        label
-    );
-
-
-    wrapper.appendChild(
-        input
-    );
-
-
-    wrapper.appendChild(
-        removeButton
-    );
-
+    wrapper.appendChild(label);
+    wrapper.appendChild(input);
+    wrapper.appendChild(removeButton);
 
     return wrapper;
-
 }
-
-
-// =========================================
-// ACTUALIZAR ETIQUETAS
-// =========================================
 
 function updateGradientColorLabels() {
 
@@ -3714,7 +3513,6 @@ function updateGradientColorLabels() {
         gradientColorsContainer.querySelectorAll(
             ".gradient-color"
         );
-
 
     colors.forEach(
         (colorElement, index) => {
@@ -3724,23 +3522,13 @@ function updateGradientColorLabels() {
                     ".gradient-color-label"
                 );
 
-
             if (label) {
-
                 label.textContent =
                     `Color ${index + 1}`;
-
             }
-
         }
     );
-
 }
-
-
-// =========================================
-// AGREGAR COLOR
-// =========================================
 
 addGradientColorButton.addEventListener(
     "click",
@@ -3749,7 +3537,6 @@ addGradientColorButton.addEventListener(
         const colors =
             getGradientColors();
 
-
         const newColor =
             colors[
                 colors.length - 1
@@ -3757,27 +3544,22 @@ addGradientColorButton.addEventListener(
             defaultSettings
                 .gradientColors[1];
 
-
         const gradientColor =
             createGradientColor(
                 newColor,
                 colors.length + 1
             );
 
-
         gradientColorsContainer.appendChild(
             gradientColor
         );
 
-
         updateGradientColorLabels();
-
 
         const backgroundGradient =
             document.getElementById(
                 "background-gradient"
             );
-
 
         if (
             backgroundGradient.checked
@@ -3787,19 +3569,11 @@ addGradientColorButton.addEventListener(
                 gradientDirectionInput.value,
                 getGradientColors()
             );
-
         }
 
-
         await saveGradientSettings();
-
     }
 );
-
-
-// =========================================
-// GUARDAR GRADIENTE
-// =========================================
 
 async function saveGradientSettings() {
 
@@ -3808,55 +3582,34 @@ async function saveGradientSettings() {
             gradientDirectionInput.value
         );
 
-
     const colors =
         getGradientColors();
-
 
     const data =
         await loadData();
 
-
     await saveData({
-
         settings: {
-
             ...defaultSettings,
-
             ...data.settings,
-
             gradientDirection:
                 direction,
-
             gradientColors:
                 colors
-
         }
-
     });
-
 }
 
-
-// =========================================
-// CARGAR COLORES DEL GRADIENTE
-// =========================================
-
-function loadGradientColors(
-    colors
-) {
+function loadGradientColors(colors) {
 
     gradientColorsContainer.innerHTML =
         "";
-
 
     const gradientColorList =
         colors &&
         colors.length >= 2
             ? colors
-            : defaultSettings
-                .gradientColors;
-
+            : defaultSettings.gradientColors;
 
     gradientColorList.forEach(
         (color, index) => {
@@ -3867,23 +3620,14 @@ function loadGradientColors(
                     index + 1
                 );
 
-
             gradientColorsContainer.appendChild(
                 gradientColor
             );
-
         }
     );
 
-
     updateGradientColorLabels();
-
 }
-
-
-// =========================================
-// EVENTO DIRECCIÓN
-// =========================================
 
 gradientDirectionInput.addEventListener(
     "input",
@@ -3894,7 +3638,6 @@ gradientDirectionInput.addEventListener(
                 "background-gradient"
             );
 
-
         if (
             backgroundGradient.checked
         ) {
@@ -3903,15 +3646,11 @@ gradientDirectionInput.addEventListener(
                 gradientDirectionInput.value,
                 getGradientColors()
             );
-
         }
 
-
         await saveGradientSettings();
-
     }
 );
-
 
 gradientDirectionInput.addEventListener(
     "change",
@@ -3922,7 +3661,6 @@ gradientDirectionInput.addEventListener(
                 "background-gradient"
             );
 
-
         if (
             backgroundGradient.checked
         ) {
@@ -3931,12 +3669,9 @@ gradientDirectionInput.addEventListener(
                 gradientDirectionInput.value,
                 getGradientColors()
             );
-
         }
 
-
         await saveGradientSettings();
-
     }
 );
 
@@ -3950,17 +3685,12 @@ const backgroundTypeInputs =
         'input[name="background-type"]'
     );
 
-
 backgroundTypeInputs.forEach(
     (radio) => {
 
         radio.addEventListener(
             "change",
             async () => {
-
-                // =========================
-                // COLOR SÓLIDO
-                // =========================
 
                 if (
                     radio.value ===
@@ -3970,53 +3700,33 @@ backgroundTypeInputs.forEach(
                     const data =
                         await loadData();
 
-
                     const backgroundColor =
                         data.settings?.backgroundColor ??
-                        defaultSettings
-                            .backgroundColor;
-
+                        defaultSettings.backgroundColor;
 
                     applyBackgroundColor(
                         backgroundColor
                     );
 
-
                     document.getElementById(
                         "background-solid"
-                    ).checked =
-                        true;
-
+                    ).checked = true;
 
                     backgroundColorInput.value =
                         backgroundColor;
 
-
                     pendingBackgroundImage =
                         null;
 
-
                     await saveData({
-
                         settings: {
-
                             ...defaultSettings,
-
                             ...data.settings,
-
                             backgroundType:
                                 "solid"
-
                         }
-
                     });
-
                 }
-
-
-                // =========================
-                // IMAGEN
-                // =========================
 
                 if (
                     radio.value ===
@@ -4026,16 +3736,11 @@ backgroundTypeInputs.forEach(
                     const data =
                         await loadData();
 
-
                     const backgroundImage =
                         pendingBackgroundImage ??
-                        data.settings
-                            ?.backgroundImage;
+                        data.settings?.backgroundImage;
 
-
-                    if (
-                        backgroundImage
-                    ) {
+                    if (backgroundImage) {
 
                         applyBackgroundImage(
                             backgroundImage
@@ -4048,94 +3753,21 @@ backgroundTypeInputs.forEach(
                                     if (
                                         imageLoaded
                                     ) {
-
                                         await saveData({
-
                                             settings: {
-
                                                 ...defaultSettings,
-
                                                 ...data.settings,
-
                                                 backgroundType:
                                                     "image",
-
                                                 backgroundImage:
                                                     backgroundImage
-
                                             }
-
                                         });
-
-                                    } else {
-
-                                        const backgroundColor =
-                                            data.settings
-                                                ?.backgroundColor ??
-                                            defaultSettings
-                                                .backgroundColor;
-
-
-                                        document.getElementById(
-                                            "background-solid"
-                                        ).checked =
-                                            true;
-
-
-                                        applyBackgroundColor(
-                                            backgroundColor
-                                        );
-
-
-                                        backgroundColorInput.value =
-                                            backgroundColor;
-
-
-                                        pendingBackgroundImage =
-                                            null;
-
-
-                                        await saveData({
-
-                                            settings: {
-
-                                                ...defaultSettings,
-
-                                                ...data.settings,
-
-                                                backgroundType:
-                                                    "solid"
-
-                                            }
-
-                                        });
-
                                     }
-
                                 }
                             );
-
-                    } else {
-
-                        document.getElementById(
-                            "background-solid"
-                        ).checked =
-                            true;
-
-
-                        applyBackgroundColor(
-                            defaultSettings
-                                .backgroundColor
-                        );
-
                     }
-
                 }
-
-
-                // =========================
-                // DEGRADADO
-                // =========================
 
                 if (
                     radio.value ===
@@ -4145,72 +3777,48 @@ backgroundTypeInputs.forEach(
                     const data =
                         await loadData();
 
-
                     const direction =
-                        data.settings
-                            ?.gradientDirection ??
-                        defaultSettings
-                            .gradientDirection;
-
+                        data.settings?.gradientDirection ??
+                        defaultSettings.gradientDirection;
 
                     const colors =
-                        data.settings
-                            ?.gradientColors ??
-                        defaultSettings
-                            .gradientColors;
-
+                        data.settings?.gradientColors ??
+                        defaultSettings.gradientColors;
 
                     gradientDirectionInput.value =
                         direction;
 
-
-                    loadGradientColors(
-                        colors
-                    );
-
+                    loadGradientColors(colors);
 
                     applyGradient(
                         direction,
                         colors
                     );
 
-
                     pendingBackgroundImage =
                         null;
 
-
                     await saveData({
-
                         settings: {
-
                             ...defaultSettings,
-
                             ...data.settings,
-
                             backgroundType:
                                 "gradient",
-
                             gradientDirection:
                                 direction,
-
                             gradientColors:
                                 colors
-
                         }
-
                     });
-
                 }
-
             }
         );
-
     }
 );
 
 
 // =========================================
-// REINICIAR CONFIGURACIÓN
+// REINICIAR
 // =========================================
 
 const resetBackgroundButton =
@@ -4218,97 +3826,53 @@ const resetBackgroundButton =
         "reset-background-button"
     );
 
-
 const resetConfirmationOverlay =
     document.getElementById(
         "reset-confirmation-overlay"
     );
-
 
 const closeResetConfirmationButton =
     document.getElementById(
         "close-reset-confirmation-button"
     );
 
-
 const cancelResetButton =
     document.getElementById(
         "cancel-reset-button"
     );
-
 
 const confirmResetButton =
     document.getElementById(
         "confirm-reset-button"
     );
 
-
 function openResetConfirmation() {
-
     openOverlay(
         resetConfirmationOverlay
     );
-
 }
 
-
 function closeResetConfirmation() {
-
     closeOverlay(
         resetConfirmationOverlay
     );
-
 }
-
 
 async function resetExtension() {
 
     closeAllMenus();
 
+    closeOverlay(addSiteOverlay);
+    closeOverlay(addGroupOverlay);
+    closeOverlay(editSiteOverlay);
+    closeOverlay(editGroupOverlay);
+    closeOverlay(resetConfirmationOverlay);
 
-    closeOverlay(
-        addSiteOverlay
-    );
+    groupBeingAddedTo = null;
+    siteBeingEdited = null;
+    groupBeingEdited = null;
+    pendingBackgroundImage = null;
 
-
-    closeOverlay(
-        addGroupOverlay
-    );
-
-
-    closeOverlay(
-        editSiteOverlay
-    );
-
-
-    closeOverlay(
-        editGroupOverlay
-    );
-
-
-    closeOverlay(
-        resetConfirmationOverlay
-    );
-
-
-    groupBeingAddedTo =
-        null;
-
-
-    siteBeingEdited =
-        null;
-
-
-    groupBeingEdited =
-        null;
-
-
-    pendingBackgroundImage =
-        null;
-
-
-    // Limpiar también la copia rápida
-    // utilizada por background-bootstrap.js.
     localStorage.removeItem(
         "newtabBackgroundType"
     );
@@ -4316,7 +3880,6 @@ async function resetExtension() {
     localStorage.removeItem(
         "newtabBackgroundImage"
     );
-
 
     document.documentElement.classList.remove(
         "initial-background-image"
@@ -4326,161 +3889,103 @@ async function resetExtension() {
         "--initial-background-image"
     );
 
-
     await chrome.storage.local.clear();
 
-
     const resetData = {
-
         groups: [
-
             {
-
-                name:
-                    "Mis sitios",
-
+                name: "Mis sitios",
                 sites: [
-
                     {
-
-                        name:
-                            "Google",
-
-                        url:
-                            "https://www.google.com",
-
+                        name: "Google",
+                        url: "https://www.google.com",
                         description:
                             "Motor de búsqueda"
-
                     }
-
                 ]
-
             }
-
         ],
 
         settings: {
-
             ...defaultSettings,
-
             gradientColors: [
                 ...defaultSettings.gradientColors
             ]
-
         }
-
     };
 
-
-    await saveData(
-        resetData
-    );
-
+    await saveData(resetData);
 
     const main =
-        document.querySelector(
-            "main"
-        );
+        document.querySelector("main");
 
-
-    main.innerHTML =
-        "";
-
+    main.innerHTML = "";
 
     renderGroups(
         resetData.groups
     );
 
-
     setupExistingElements();
-
 
     applyCardSize(
         defaultSettings.cardSize
     );
-
 
     applyGroupAppearance(
         defaultSettings.groupColor,
         defaultSettings.groupTransparency
     );
 
-
     applyCardAppearance(
         defaultSettings.cardColor,
         defaultSettings.cardTransparency
     );
 
-
     backgroundColorInput.value =
         defaultSettings.backgroundColor;
-
 
     applyBackgroundColor(
         defaultSettings.backgroundColor
     );
 
-
     document.getElementById(
         "background-solid"
-    ).checked =
-        true;
-
+    ).checked = true;
 
     document.getElementById(
         "background-image"
-    ).checked =
-        false;
-
+    ).checked = false;
 
     document.getElementById(
         "background-gradient"
-    ).checked =
-        false;
-
+    ).checked = false;
 
     gradientDirectionInput.value =
-        defaultSettings
-            .gradientDirection;
-
+        defaultSettings.gradientDirection;
 
     loadGradientColors(
-        defaultSettings
-            .gradientColors
+        defaultSettings.gradientColors
     );
 
-
-    backgroundImageInput.value =
-        "";
-
+    backgroundImageInput.value = "";
 
     closeSettings();
-
 }
-
-
-// =========================================
-// EVENTOS REINICIO
-// =========================================
 
 resetBackgroundButton.addEventListener(
     "click",
     openResetConfirmation
 );
 
-
 closeResetConfirmationButton.addEventListener(
     "click",
     closeResetConfirmation
 );
 
-
 cancelResetButton.addEventListener(
     "click",
     closeResetConfirmation
 );
-
 
 resetConfirmationOverlay.addEventListener(
     "click",
@@ -4490,14 +3995,10 @@ resetConfirmationOverlay.addEventListener(
             event.target ===
             resetConfirmationOverlay
         ) {
-
             closeResetConfirmation();
-
         }
-
     }
 );
-
 
 confirmResetButton.addEventListener(
     "click",
@@ -4506,7 +4007,6 @@ confirmResetButton.addEventListener(
         closeResetConfirmation();
 
         await resetExtension();
-
     }
 );
 
@@ -4518,168 +4018,115 @@ confirmResetButton.addEventListener(
 function setupExistingElements() {
 
     document
-        .querySelectorAll(
-            ".site-group"
-        )
-        .forEach(
-            (group) => {
+        .querySelectorAll(".site-group")
+        .forEach((group) => {
 
-                setupGroupMenu(
-                    group
-                );
-
-            }
-        );
-
+            setupGroupMenu(group);
+            setupGroupDrag(group);
+        });
 
     document
-        .querySelectorAll(
-            ".add-site-card"
-        )
-        .forEach(
-            (card) => {
+        .querySelectorAll(".add-site-card")
+        .forEach((card) => {
 
-                setupAddSiteCard(
-                    card
-                );
-
-            }
-        );
-
+            setupAddSiteCard(card);
+        });
 
     document
-        .querySelectorAll(
-            ".site-card"
-        )
-        .forEach(
-            (site) => {
+        .querySelectorAll(".site-card")
+        .forEach((site) => {
 
-                setupSiteCard(
-                    site
-                );
-
-            }
-        );
-
+            setupSiteCard(site);
+            setupSiteDrag(site);
+        });
 
     setupExistingSiteEditButtons();
-
-
     setupExistingGroupEditButtons();
 
 
     // =====================================
-    // ELIMINAR GRUPOS EXISTENTES
+    // ELIMINAR GRUPOS
     // =====================================
 
     document
         .querySelectorAll(
             ".delete-group-button"
         )
-        .forEach(
-            (button) => {
+        .forEach((button) => {
 
-                if (
-                    button.dataset
-                        .deleteConfigured ===
-                    "true"
-                ) {
-
-                    return;
-
-                }
-
-
-                button.dataset
-                    .deleteConfigured =
-                    "true";
-
-
-                button.addEventListener(
-                    "click",
-                    async (event) => {
-
-                        event.preventDefault();
-
-                        event.stopPropagation();
-
-
-                        const group =
-                            button.closest(
-                                ".site-group"
-                            );
-
-
-                        group.remove();
-
-
-                        await saveCurrentData();
-
-                    }
-                );
-
+            if (
+                button.dataset.deleteConfigured ===
+                "true"
+            ) {
+                return;
             }
-        );
+
+            button.dataset.deleteConfigured =
+                "true";
+
+            button.addEventListener(
+                "click",
+                async (event) => {
+
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const group =
+                        button.closest(
+                            ".site-group"
+                        );
+
+                    group.remove();
+
+                    await saveCurrentData();
+                }
+            );
+        });
 
 
     // =====================================
-    // ELIMINAR SITIOS EXISTENTES
+    // ELIMINAR SITIOS
     // =====================================
 
     document
         .querySelectorAll(
             ".delete-site-button"
         )
-        .forEach(
-            (button) => {
+        .forEach((button) => {
 
-                if (
-                    button.dataset
-                        .deleteConfigured ===
-                    "true"
-                ) {
-
-                    return;
-
-                }
-
-
-                button.dataset
-                    .deleteConfigured =
-                    "true";
-
-
-                button.addEventListener(
-                    "click",
-                    async (event) => {
-
-                        event.preventDefault();
-
-                        event.stopPropagation();
-
-
-                        const site =
-                            button.closest(
-                                ".site-card"
-                            );
-
-
-                        site.remove();
-
-
-                        await saveCurrentData();
-
-                    }
-                );
-
+            if (
+                button.dataset.deleteConfigured ===
+                "true"
+            ) {
+                return;
             }
-        );
 
+            button.dataset.deleteConfigured =
+                "true";
+
+            button.addEventListener(
+                "click",
+                async (event) => {
+
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const site =
+                        button.closest(
+                            ".site-card"
+                        );
+
+                    site.remove();
+
+                    await saveCurrentData();
+                }
+            );
+        });
 }
 
 
 // =========================================
-// INICIAR EXTENSIÓN
+// INICIAR
 // =========================================
 
 async function init() {
@@ -4687,126 +4134,69 @@ async function init() {
     let data =
         await loadData();
 
-
-    // =====================================
-    // PRIMERA EJECUCIÓN
-    // =====================================
-
-    if (
-        !data.groups
-    ) {
+    if (!data.groups) {
 
         const initialGroups =
             defaultData.groups;
 
-
         const initialSettings = {
-
             ...defaultSettings,
-
             ...data.settings,
-
             gradientColors: [
-
                 ...(
                     data.settings
                         ?.gradientColors ??
-                    defaultSettings
-                        .gradientColors
+                    defaultSettings.gradientColors
                 )
-
             ]
-
         };
-
 
         await saveData({
-
-            groups:
-                initialGroups,
-
-            settings:
-                initialSettings
-
+            groups: initialGroups,
+            settings: initialSettings
         });
 
-
         data = {
-
-            groups:
-                initialGroups,
-
-            settings:
-                initialSettings
-
+            groups: initialGroups,
+            settings: initialSettings
         };
-
     }
-
 
     console.log(
         "Datos cargados:",
         data
     );
 
-
-    // =====================================
-    // LIMPIAR HTML ESTÁTICO
-    // =====================================
-
     const main =
-        document.querySelector(
-            "main"
-        );
+        document.querySelector("main");
 
-
-    main.innerHTML =
-        "";
-
-
-    // =====================================
-    // DIBUJAR GRUPOS
-    // =====================================
+    main.innerHTML = "";
 
     renderGroups(
         data.groups || []
     );
 
-
-    // =====================================
-    // CONFIGURAR ELEMENTOS
-    // =====================================
-
     setupExistingElements();
 
+    setupGroupDragArea();
 
-    // =====================================
-    // TAMAÑO
-    // =====================================
+    setupSiteDragArea();
+
 
     const cardSize =
         data.settings?.cardSize ??
         defaultSettings.cardSize;
 
+    applyCardSize(cardSize);
 
-    applyCardSize(
-        cardSize
-    );
-
-
-    // =====================================
-    // APARIENCIA GRUPOS
-    // =====================================
 
     const groupColor =
         data.settings?.groupColor ??
         defaultSettings.groupColor;
 
-
     const groupTransparency =
         data.settings?.groupTransparency ??
         defaultSettings.groupTransparency;
-
 
     applyGroupAppearance(
         groupColor,
@@ -4814,19 +4204,13 @@ async function init() {
     );
 
 
-    // =====================================
-    // APARIENCIA TARJETAS
-    // =====================================
-
     const cardColor =
         data.settings?.cardColor ??
         defaultSettings.cardColor;
 
-
     const cardTransparency =
         data.settings?.cardTransparency ??
         defaultSettings.cardTransparency;
-
 
     applyCardAppearance(
         cardColor,
@@ -4834,14 +4218,9 @@ async function init() {
     );
 
 
-    // =====================================
-    // DATOS DEL FONDO
-    // =====================================
-
     const backgroundColor =
         data.settings?.backgroundColor ??
         defaultSettings.backgroundColor;
-
 
     backgroundColorInput.value =
         backgroundColor;
@@ -4852,44 +4231,22 @@ async function init() {
         "solid";
 
 
-    // =====================================
-    // IMAGEN
-    // =====================================
-
     if (
-        backgroundType ===
-            "image" &&
+        backgroundType === "image" &&
         data.settings?.backgroundImage
     ) {
 
-        // IMPORTANTE:
-        //
-        // NO aplicamos aquí el color sólido.
-        //
-        // background-bootstrap.js ya pudo
-        // mostrar inmediatamente la imagen
-        // guardada en localStorage.
-        //
-        // Ahora solamente sincronizamos
-        // la imagen con chrome.storage.local.
-
         document.getElementById(
             "background-image"
-        ).checked =
-            true;
-
+        ).checked = true;
 
         document.getElementById(
             "background-solid"
-        ).checked =
-            false;
-
+        ).checked = false;
 
         document.getElementById(
             "background-gradient"
-        ).checked =
-            false;
-
+        ).checked = false;
 
         applyBackgroundImage(
             data.settings.backgroundImage
@@ -4899,68 +4256,38 @@ async function init() {
                     imageLoaded
                 ) => {
 
-                    if (
-                        imageLoaded
-                    ) {
-
+                    if (imageLoaded) {
                         return;
-
                     }
-
-
-                    // Si la imagen guardada
-                    // ya no puede cargarse,
-                    // volvemos al color sólido.
 
                     applyBackgroundColor(
                         backgroundColor
                     );
 
-
                     document.getElementById(
                         "background-image"
-                    ).checked =
-                        false;
-
+                    ).checked = false;
 
                     document.getElementById(
                         "background-solid"
-                    ).checked =
-                        true;
-
+                    ).checked = true;
 
                     document.getElementById(
                         "background-gradient"
-                    ).checked =
-                        false;
-
+                    ).checked = false;
 
                     await saveData({
-
                         settings: {
-
                             ...defaultSettings,
-
                             ...data.settings,
-
                             backgroundType:
                                 "solid"
-
                         }
-
                     });
-
                 }
             );
 
-    }
-
-
-    // =====================================
-    // DEGRADADO
-    // =====================================
-
-    else if (
+    } else if (
         backgroundType ===
         "gradient"
     ) {
@@ -4971,84 +4298,59 @@ async function init() {
             defaultSettings
                 .gradientDirection;
 
-
         const gradientColors =
             data.settings
                 ?.gradientColors ??
             defaultSettings
                 .gradientColors;
 
-
         gradientDirectionInput.value =
             gradientDirection;
-
 
         loadGradientColors(
             gradientColors
         );
-
 
         applyGradient(
             gradientDirection,
             gradientColors
         );
 
-
         document.getElementById(
             "background-image"
-        ).checked =
-            false;
-
+        ).checked = false;
 
         document.getElementById(
             "background-solid"
-        ).checked =
-            false;
-
+        ).checked = false;
 
         document.getElementById(
             "background-gradient"
-        ).checked =
-            true;
+        ).checked = true;
 
-    }
-
-
-    // =====================================
-    // COLOR SÓLIDO
-    // =====================================
-
-    else {
+    } else {
 
         applyBackgroundColor(
             backgroundColor
         );
 
-
         document.getElementById(
             "background-image"
-        ).checked =
-            false;
-
+        ).checked = false;
 
         document.getElementById(
             "background-solid"
-        ).checked =
-            true;
-
+        ).checked = true;
 
         document.getElementById(
             "background-gradient"
-        ).checked =
-            false;
-
+        ).checked = false;
     }
-
 }
 
 
 // =========================================
-// INICIAR
+// INICIAR EXTENSIÓN
 // =========================================
 
 init();

@@ -2351,3 +2351,22 @@ main {
     }
 }
 
+/* ================================= */
+/* ARRASTRAR GRUPOS */
+/* ================================= */
+
+.group-header {
+    cursor: grab;
+}
+
+.group-header:active {
+    cursor: grabbing;
+}
+
+.site-group.group-dragging {
+    opacity: 0.5;
+}
+
+.site-group.group-drag-over {
+    border-top: 3px solid #6f9ef0;
+}
