@@ -108,7 +108,7 @@ header {
 /* ================================= */
 
 main {
-    width: min(1100px, 92%);
+    width: min(1500px, 92%);
 
     margin: 10px auto 30px;
 }
@@ -269,8 +269,8 @@ main {
 .site-card {
     position: relative;
 
-    width: 140px;
-    height: 140px;
+    width: 95px;
+    height: 95px;
 
     display: flex;
 
@@ -311,11 +311,19 @@ main {
 /* ================================= */
 
 .site-icon {
-    font-size: 42px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 36px;
+}
 
-    line-height: 1;
-
-    margin-bottom: 12px;
+.site-icon img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
 }
 
 
@@ -510,8 +518,8 @@ main {
 /* ================================= */
 
 .add-site-card {
-    width: 140px;
-    height: 140px;
+    width: 95px;
+    height: 95px;
 
     display: flex;
 
@@ -553,8 +561,8 @@ main {
 /* ================================= */
 
 .add-site-icon {
-    width: 45px;
-    height: 45px;
+    width: 30px;
+    height: 30px;
 
     display: flex;
 

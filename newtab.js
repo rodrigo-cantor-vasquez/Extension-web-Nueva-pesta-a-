@@ -478,15 +478,38 @@ function createSiteCard(
         url;
 
 
-    // Icono
-    const siteIcon =
-        document.createElement("div");
+// Icono
+const siteIcon =
+    document.createElement("div");
 
-    siteIcon.className =
-        "site-icon";
+siteIcon.className =
+    "site-icon";
+
+const siteIconImage =
+    document.createElement("img");
+
+siteIconImage.src =
+    new URL("/favicon.ico", url).href;
+
+siteIconImage.alt =
+    "";
+
+
+// Icono predeterminado
+siteIconImage.addEventListener("error", () => {
+
+    siteIconImage.remove();
 
     siteIcon.textContent =
         "🌐";
+
+});
+
+
+// Agregar imagen al contenedor
+siteIcon.appendChild(
+    siteIconImage
+);
 
 
     // Nombre
@@ -2023,3 +2046,4 @@ async function init() {
 
 // Iniciar
 init();
+
