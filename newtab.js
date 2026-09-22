@@ -71,6 +71,7 @@ function openSite(site) {
 
 const defaultSettings = {
     cardSize: 95,
+    containerWidth: 807,
     backgroundType: "solid",
     backgroundColor: "#eef4ff",
     gradientDirection: 90,
@@ -2985,6 +2986,67 @@ function renderGroups(groups) {
 
 
 // =========================================
+// TAMAÑO DEL CONTENEDOR
+// =========================================
+
+const containerWidthInput =
+    document.getElementById(
+        "container-width"
+    );
+
+function applyContainerWidth(width) {
+
+    let validWidth =
+        Number(width);
+
+    if (isNaN(validWidth)) {
+        validWidth =
+            defaultSettings.containerWidth;
+    }
+
+    if (validWidth < 475) {
+        validWidth = 475;
+    }
+
+    if (validWidth > 2000) {
+        validWidth = 2000;
+    }
+
+    document.documentElement.style.setProperty(
+        "--container-width",
+        `${validWidth}px`
+    );
+
+    containerWidthInput.value =
+        validWidth;
+}
+
+containerWidthInput.addEventListener(
+    "change",
+    async () => {
+
+        applyContainerWidth(
+            containerWidthInput.value
+        );
+
+        const data =
+            await loadData();
+
+        await saveData({
+            settings: {
+                ...defaultSettings,
+                ...data.settings,
+                containerWidth:
+                    Number(
+                        containerWidthInput.value
+                    )
+            }
+        });
+    }
+);
+
+
+// =========================================
 // TAMAÑO DE TARJETAS
 // =========================================
 
@@ -4200,6 +4262,10 @@ async function resetExtension() {
 
     setupExistingElements();
 
+    applyContainerWidth(
+        defaultSettings.containerWidth
+    );
+
     applyCardSize(
         defaultSettings.cardSize
     );
@@ -4654,6 +4720,15 @@ async function init() {
     setupGroupDragArea();
 
     setupSiteDragArea();
+
+
+    const containerWidth =
+        data.settings?.containerWidth ??
+        defaultSettings.containerWidth;
+
+    applyContainerWidth(
+        containerWidth
+    );
 
 
     const cardSize =

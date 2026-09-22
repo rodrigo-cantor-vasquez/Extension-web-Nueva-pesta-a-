@@ -138,7 +138,7 @@ header {
 /* ================================= */
 
 main {
-    width: min(1500px, 92%);
+    width: min(var(--container-width, 1500px), 92%);
 
     margin: 10px auto 30px;
 }
@@ -873,9 +873,10 @@ main {
 
 
 /* ================================= */
-/* TAMAÑO DE LAS TARJETAS */
+/* TAMAÑO DEL CONTENEDOR */
 /* ================================= */
 
+#container-width,
 #card-size {
     width: 80px;
 
@@ -891,6 +892,7 @@ main {
     font-size: 14px;
 }
 
+#container-width:focus,
 #card-size:focus {
     border-color: #6d9dfc;
 
