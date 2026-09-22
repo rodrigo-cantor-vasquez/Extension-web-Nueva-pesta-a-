@@ -5,8 +5,13 @@
     "description": "Página de nueva pestaña personalizada con accesos rápidos.",
     
     "permissions": [
-        "storage"
+        "storage",
+        "search"
     ],
+
+    "background": {
+        "service_worker": "background.js"
+    },
 
     "chrome_url_overrides": {
         "newtab": "newtab.html"

@@ -290,6 +290,149 @@ settingsOverlay.addEventListener(
 
 
 // =========================================
+// BUSCAR SITIOS
+// =========================================
+
+const sitesSearch =
+    document.getElementById(
+        "sites-search"
+    );
+
+function normalizeSearchText(text) {
+
+    return text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        );
+}
+
+function filterSiteCards() {
+
+    const searchText =
+        normalizeSearchText(
+            sitesSearch.value.trim()
+        );
+
+    const groups =
+        document.querySelectorAll(
+            ".site-group"
+        );
+
+    groups.forEach((group) => {
+
+        const sites =
+            group.querySelectorAll(
+                ".site-card"
+            );
+
+        let visibleSites = 0;
+
+        sites.forEach((site) => {
+
+            const name =
+                getSiteName(site)?.textContent || "";
+
+            const description =
+                getSiteDescription(site)?.textContent || "";
+
+            const url =
+                site.dataset.url || "";
+
+            const searchableText =
+                normalizeSearchText(
+                    `${name} ${description} ${url}`
+                );
+
+            const matches =
+                searchText === "" ||
+                searchableText.includes(
+                    searchText
+                );
+
+            if (matches) {
+
+                site.style.display =
+                    "";
+
+                visibleSites++;
+
+            } else {
+
+                site.style.display =
+                    "none";
+            }
+        });
+
+        if (
+            searchText !== "" &&
+            visibleSites === 0
+        ) {
+
+            group.style.display =
+                "none";
+
+        } else {
+
+            group.style.display =
+                "";
+        }
+    });
+}
+
+sitesSearch.addEventListener(
+    "input",
+    filterSiteCards
+);
+
+
+// =========================================
+// BUSCAR EN LA WEB
+// =========================================
+
+const webSearch =
+    document.getElementById(
+        "web-search"
+    );
+
+webSearch.value = "";
+
+window.addEventListener(
+    "pageshow",
+    () => {
+        webSearch.value = "";
+    }
+);
+
+webSearch.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (
+            event.key !== "Enter"
+        ) {
+            return;
+        }
+
+        const searchText =
+            webSearch.value.trim();
+
+        if (searchText === "") {
+            return;
+        }
+
+        chrome.runtime.sendMessage({
+            action: "searchWeb",
+            text: searchText
+        });
+
+    }
+);
+
+
+// =========================================
 // MENÚ DE LOS GRUPOS
 // =========================================
 
@@ -1839,6 +1982,8 @@ function createSiteCard(
 
             await saveCurrentData();
 
+            filterSiteCards();
+
             closeMenu(siteMenu);
         }
     );
@@ -2018,6 +2163,8 @@ saveAddSiteButton.addEventListener(
         );
 
         await saveCurrentData();
+
+        filterSiteCards();
 
         closeAddSite();
     }
@@ -2323,6 +2470,8 @@ saveAddGroupButton.addEventListener(
 
         await saveCurrentData();
 
+        filterSiteCards();
+
         closeAddGroup();
     }
 );
@@ -2591,6 +2740,8 @@ saveEditSiteButton.addEventListener(
         }
 
         await saveCurrentData();
+
+        filterSiteCards();
 
         closeEditSite();
     }
@@ -3969,6 +4120,8 @@ async function resetExtension() {
 
     backgroundImageInput.value = "";
 
+    filterSiteCards();
+
     closeSettings();
 }
 
@@ -4310,6 +4463,8 @@ function setupExistingElements() {
                     site.remove();
 
                     await saveCurrentData();
+
+                    filterSiteCards();
                 }
             );
         });
@@ -4537,6 +4692,8 @@ async function init() {
             "background-gradient"
         ).checked = false;
     }
+
+    filterSiteCards();
 }
 
 
