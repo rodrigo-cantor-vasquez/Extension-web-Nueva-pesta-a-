@@ -3,11 +3,15 @@
     "name": "Mi Nueva Pestaña",
     "version": "1.0.0",
     "description": "Página de nueva pestaña personalizada con accesos rápidos.",
-    
+
     "permissions": [
         "storage",
         "search"
     ],
+
+    "icons": {
+        "16": "Icons/icon1.png"
+    },
 
     "background": {
         "service_worker": "background.js"
