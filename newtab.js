@@ -3010,37 +3010,84 @@ const containerWidthInput =
 
 function applyContainerWidth(width) {
 
-    let validWidth =
+    // Este es el ancho que el usuario eligió.
+    // No se modifica cuando la ventana cambia.
+    let preferredWidth =
         Number(width);
 
-    if (isNaN(validWidth)) {
-        validWidth =
+    if (isNaN(preferredWidth)) {
+        preferredWidth =
             defaultSettings.containerWidth;
     }
 
-    if (validWidth < 475) {
-        validWidth = 475;
+    // Ancho mínimo
+    if (preferredWidth < 475) {
+        preferredWidth = 475;
     }
 
-    if (validWidth > 2000) {
-        validWidth = 2000;
-    }
+    // Máximo disponible actualmente en la ventana.
+    const maxWidth =
+        Math.floor(
+            window.innerWidth * 0.92
+        );
+
+    // El ancho visual se adapta a la ventana.
+    const appliedWidth =
+        Math.min(
+            preferredWidth,
+            maxWidth
+        );
 
     document.documentElement.style.setProperty(
         "--container-width",
-        `${validWidth}px`
+        `${appliedWidth}px`
     );
 
+    // El input conserva el valor que eligió
+    // el usuario.
     containerWidthInput.value =
-        validWidth;
+        preferredWidth;
 }
+
+
+// =========================================
+// GUARDAR CAMBIO DE ANCHO
+// =========================================
 
 containerWidthInput.addEventListener(
     "change",
     async () => {
 
+        let preferredWidth =
+            Number(
+                containerWidthInput.value
+            );
+
+        if (isNaN(preferredWidth)) {
+            preferredWidth =
+                defaultSettings.containerWidth;
+        }
+
+        // Ancho mínimo
+        if (preferredWidth < 475) {
+            preferredWidth = 475;
+        }
+
+        // Máximo que permite actualmente
+        // la ventana.
+        const maxWidth =
+            Math.floor(
+                window.innerWidth * 0.92
+            );
+
+        // Si el usuario escribe un valor mayor
+        // al espacio disponible, se limita.
+        if (preferredWidth > maxWidth) {
+            preferredWidth = maxWidth;
+        }
+
         applyContainerWidth(
-            containerWidthInput.value
+            preferredWidth
         );
 
         const data =
@@ -3051,11 +3098,29 @@ containerWidthInput.addEventListener(
                 ...defaultSettings,
                 ...data.settings,
                 containerWidth:
-                    Number(
-                        containerWidthInput.value
-                    )
+                    preferredWidth
             }
         });
+    }
+);
+
+
+// =========================================
+// ACTUALIZAR ANCHO AL REDIMENSIONAR
+// =========================================
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        // Aquí NO modificamos el valor elegido
+        // por el usuario.
+        //
+        // Solamente recalculamos cuánto puede
+        // mostrarse actualmente.
+        applyContainerWidth(
+            containerWidthInput.value
+        );
     }
 );
 
