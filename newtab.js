@@ -4012,6 +4012,197 @@ confirmResetButton.addEventListener(
 
 
 // =========================================
+// IMPORTAR / EXPORTAR DATOS
+// =========================================
+
+const importDataButton =
+    document.getElementById(
+        "import-data-button"
+    );
+
+const exportDataButton =
+    document.getElementById(
+        "export-data-button"
+    );
+
+const importDataFile =
+    document.getElementById(
+        "import-data-file"
+    );
+
+
+// =========================================
+// EXPORTAR DATOS
+// =========================================
+
+exportDataButton.addEventListener(
+    "click",
+    async () => {
+
+        try {
+
+            const data =
+                await chrome.storage.local.get(
+                    null
+                );
+
+            const json =
+                JSON.stringify(
+                    data,
+                    null,
+                    4
+                );
+
+            const blob =
+                new Blob(
+                    [json],
+                    {
+                        type:
+                            "application/json"
+                    }
+                );
+
+            const url =
+                URL.createObjectURL(
+                    blob
+                );
+
+            const link =
+                document.createElement("a");
+
+            link.href = url;
+
+            link.download =
+                "respaldo-nueva-pestana.json";
+
+            document.body.appendChild(
+                link
+            );
+
+            link.click();
+
+            link.remove();
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Error al exportar los datos:",
+                error
+            );
+
+            alert(
+                "No se pudieron exportar los datos."
+            );
+        }
+    }
+);
+
+
+// =========================================
+// IMPORTAR DATOS
+// =========================================
+
+importDataButton.addEventListener(
+    "click",
+    () => {
+
+        importDataFile.click();
+    }
+);
+
+importDataFile.addEventListener(
+    "change",
+    async () => {
+
+        const file =
+            importDataFile.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        try {
+
+            const text =
+                await file.text();
+
+            const importedData =
+                JSON.parse(text);
+
+            if (
+                !importedData ||
+                typeof importedData !== "object" ||
+                Array.isArray(importedData)
+            ) {
+
+                alert(
+                    "El archivo no contiene datos válidos."
+                );
+
+                importDataFile.value = "";
+
+                return;
+            }
+
+            if (
+                !Array.isArray(
+                    importedData.groups
+                ) ||
+                !importedData.settings ||
+                typeof importedData.settings !== "object"
+            ) {
+
+                alert(
+                    "El archivo no tiene el formato de una copia de seguridad de ReCodeVerse."
+                );
+
+                importDataFile.value = "";
+
+                return;
+            }
+
+            const confirmed =
+                confirm(
+                    "Importar estos datos reemplazará la configuración y los sitios actuales. ¿Quieres continuar?"
+                );
+
+            if (!confirmed) {
+
+                importDataFile.value = "";
+
+                return;
+            }
+
+            await chrome.storage.local.clear();
+
+            await chrome.storage.local.set(
+                importedData
+            );
+
+            location.reload();
+
+        } catch (error) {
+
+            console.error(
+                "Error al importar los datos:",
+                error
+            );
+
+            alert(
+                "No se pudo importar el archivo. Verifica que sea un archivo JSON válido."
+            );
+
+            importDataFile.value = "";
+        }
+    }
+);
+
+
+// =========================================
 // CONFIGURAR ELEMENTOS EXISTENTES
 // =========================================
 
