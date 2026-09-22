@@ -81,7 +81,10 @@ const defaultSettings = {
     groupColor: "#ffffff",
     groupTransparency: 0,
     cardColor: "#f8faff",
-    cardTransparency: 0
+    cardTransparency: 0,
+
+    cardTextColor: "#2f3f5f",
+    addSiteTextColor: "#2f3f5f"
 };
 
 const defaultData = {
@@ -2162,6 +2165,11 @@ saveAddSiteButton.addEventListener(
             cardTransparencyInput.value
         );
 
+        applyTextColors(
+            cardTextColorInput.value,
+            addSiteTextColorInput.value
+        );
+
         await saveCurrentData();
 
         filterSiteCards();
@@ -2466,6 +2474,11 @@ saveAddGroupButton.addEventListener(
         applyGroupAppearance(
             groupColorInput.value,
             groupTransparencyInput.value
+        );
+
+        applyTextColors(
+            cardTextColorInput.value,
+            addSiteTextColorInput.value
         );
 
         await saveCurrentData();
@@ -3264,6 +3277,115 @@ cardTransparencyInput.addEventListener(
                     color,
                 cardTransparency:
                     transparency
+            }
+        });
+    }
+);
+
+
+// =========================================
+// COLOR DEL TEXTO
+// =========================================
+
+const cardTextColorInput =
+    document.getElementById(
+        "card-text-color"
+    );
+
+const addSiteTextColorInput =
+    document.getElementById(
+        "add-site-text-color"
+    );
+
+function applyTextColors(
+    cardTextColor,
+    addSiteTextColor
+) {
+
+    document
+        .querySelectorAll(
+            ".site-name"
+        )
+        .forEach((siteName) => {
+
+            siteName.style.color =
+                cardTextColor;
+        });
+
+    document
+        .querySelectorAll(
+            ".add-site-name"
+        )
+        .forEach((addSiteName) => {
+
+            addSiteName.style.color =
+                addSiteTextColor;
+        });
+
+    cardTextColorInput.value =
+        cardTextColor;
+
+    addSiteTextColorInput.value =
+        addSiteTextColor;
+}
+
+cardTextColorInput.addEventListener(
+    "input",
+    async () => {
+
+        const cardTextColor =
+            cardTextColorInput.value;
+
+        const addSiteTextColor =
+            addSiteTextColorInput.value;
+
+        applyTextColors(
+            cardTextColor,
+            addSiteTextColor
+        );
+
+        const data =
+            await loadData();
+
+        await saveData({
+            settings: {
+                ...defaultSettings,
+                ...data.settings,
+                cardTextColor:
+                    cardTextColor,
+                addSiteTextColor:
+                    addSiteTextColor
+            }
+        });
+    }
+);
+
+addSiteTextColorInput.addEventListener(
+    "input",
+    async () => {
+
+        const cardTextColor =
+            cardTextColorInput.value;
+
+        const addSiteTextColor =
+            addSiteTextColorInput.value;
+
+        applyTextColors(
+            cardTextColor,
+            addSiteTextColor
+        );
+
+        const data =
+            await loadData();
+
+        await saveData({
+            settings: {
+                ...defaultSettings,
+                ...data.settings,
+                cardTextColor:
+                    cardTextColor,
+                addSiteTextColor:
+                    addSiteTextColor
             }
         });
     }
@@ -4092,6 +4214,11 @@ async function resetExtension() {
         defaultSettings.cardTransparency
     );
 
+    applyTextColors(
+        defaultSettings.cardTextColor,
+        defaultSettings.addSiteTextColor
+    );
+
     backgroundColorInput.value =
         defaultSettings.backgroundColor;
 
@@ -4561,6 +4688,24 @@ async function init() {
     applyCardAppearance(
         cardColor,
         cardTransparency
+    );
+
+
+    // =====================================
+    // CARGAR COLORES DEL TEXTO
+    // =====================================
+
+    const cardTextColor =
+        data.settings?.cardTextColor ??
+        defaultSettings.cardTextColor;
+
+    const addSiteTextColor =
+        data.settings?.addSiteTextColor ??
+        defaultSettings.addSiteTextColor;
+
+    applyTextColors(
+        cardTextColor,
+        addSiteTextColor
     );
 
 
