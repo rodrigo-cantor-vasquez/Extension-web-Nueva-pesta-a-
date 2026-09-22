@@ -1751,6 +1751,20 @@ function loadSiteGroups() {
 
 function openAddSite() {
 
+    const groups =
+        document.querySelectorAll(
+            ".site-group"
+        );
+
+    if (groups.length === 0) {
+
+        alert(
+            "Debes crear un grupo antes de agregar un sitio."
+        );
+
+        return;
+    }
+
     resetAddSiteForm();
 
     openOverlay(addSiteOverlay);
