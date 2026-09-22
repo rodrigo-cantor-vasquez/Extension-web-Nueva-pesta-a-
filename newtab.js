@@ -1845,38 +1845,113 @@ function setupSiteIcon(
     url
 ) {
 
+    // Limpiamos cualquier icono anterior.
     siteIcon.innerHTML = "";
+
+    // Fallback inicial.
+    // Se mostrará mientras intentamos cargar
+    // el favicon real.
     siteIcon.textContent = "🌐";
 
-    const siteIconImage =
-        document.createElement("img");
+    let parsedUrl;
 
-    siteIconImage.alt = "";
+    try {
 
-    siteIconImage.addEventListener(
-        "load",
-        () => {
+        parsedUrl =
+            new URL(url);
 
-            siteIcon.textContent = "";
+    } catch {
 
-            siteIcon.appendChild(
-                siteIconImage
-            );
-        }
-    );
+        // Si la URL no es válida,
+        // dejamos el planeta.
+        return;
+    }
 
-    siteIconImage.addEventListener(
-        "error",
-        () => {
-            siteIconImage.remove();
-        }
-    );
+    const hostname =
+        parsedUrl.hostname;
 
-    siteIconImage.src =
+    // -----------------------------------------
+    // LISTA DE FUENTES DE ICONOS
+    // -----------------------------------------
+
+    const iconSources = [
+
+        // 1. Favicon directamente desde el sitio.
         new URL(
             "/favicon.ico",
             url
-        ).href;
+        ).href,
+
+        // 2. Servicio de favicon de Google.
+        `https://www.google.com/s2/favicons?domain=${encodeURIComponent(
+            hostname
+        )}&sz=64`,
+
+        // 3. Servicio de favicon de DuckDuckGo.
+        `https://icons.duckduckgo.com/ip3/${encodeURIComponent(
+            hostname
+        )}.ico`
+
+    ];
+
+    let currentSource = 0;
+
+    // -----------------------------------------
+    // INTENTAR CARGAR EL SIGUIENTE ICONO
+    // -----------------------------------------
+
+    function tryNextIcon() {
+
+        // Si ya probamos todas las fuentes,
+        // dejamos el planeta.
+        if (
+            currentSource >=
+            iconSources.length
+        ) {
+
+            siteIcon.innerHTML = "";
+            siteIcon.textContent = "🌐";
+
+            return;
+        }
+
+        const siteIconImage =
+            document.createElement("img");
+
+        siteIconImage.alt = "";
+
+        siteIconImage.addEventListener(
+            "load",
+            () => {
+
+                // Si la imagen cargó correctamente,
+                // reemplazamos el planeta por ella.
+                siteIcon.innerHTML = "";
+
+                siteIcon.appendChild(
+                    siteIconImage
+                );
+            }
+        );
+
+        siteIconImage.addEventListener(
+            "error",
+            () => {
+
+                // Esta fuente no funcionó.
+                // Intentamos la siguiente.
+                currentSource++;
+
+                tryNextIcon();
+            }
+        );
+
+        siteIconImage.src =
+            iconSources[currentSource];
+    }
+
+    // Comenzamos con la primera fuente.
+    tryNextIcon();
 }
 
 
