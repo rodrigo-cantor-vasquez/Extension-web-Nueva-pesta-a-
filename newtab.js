@@ -25,6 +25,10 @@ function closeOverlay(overlay) {
 // Abrir / cerrar un menú
 function toggleMenu(menu) {
 
+    if (!menu) {
+        return;
+    }
+
     const wasOpen =
         menu.style.display === "block";
 
@@ -56,6 +60,10 @@ function closeAllMenus() {
 // Cerrar un menú específico
 function closeMenu(menu) {
 
+    if (!menu) {
+        return;
+    }
+
     menu.style.display = "none";
 
 }
@@ -65,7 +73,6 @@ function closeMenu(menu) {
 // FUNCIONES PARA OBTENER ELEMENTOS
 // =========================================
 
-// Obtener nombre de un sitio
 function getSiteName(site) {
 
     return site.querySelector(".site-name");
@@ -73,7 +80,6 @@ function getSiteName(site) {
 }
 
 
-// Obtener descripción de un sitio
 function getSiteDescription(site) {
 
     return site.querySelector(".site-description");
@@ -81,7 +87,6 @@ function getSiteDescription(site) {
 }
 
 
-// Obtener título de un grupo
 function getGroupTitle(group) {
 
     return group.querySelector("h2");
@@ -105,10 +110,263 @@ function openSite(site) {
 
 
 // =========================================
+// DATOS INICIALES
+// =========================================
+
+const defaultSettings = {
+
+    cardSize: 95,
+
+    backgroundType: "solid",
+    backgroundColor: "#eef4ff",
+
+    gradientDirection: 90,
+
+    gradientColors: [
+        "#eef4ff",
+        "#d6e3ff"
+    ],
+
+    groupColor: "#ffffff",
+    groupTransparency: 0,
+
+    cardColor: "#f8faff",
+    cardTransparency: 0
+
+};
+
+
+const defaultData = {
+
+    groups: [
+        {
+            name: "Mis sitios",
+
+            sites: [
+                {
+                    name: "Google",
+                    url: "https://www.google.com",
+                    description: "Motor de búsqueda"
+                }
+            ]
+        }
+    ],
+
+    settings: {
+
+        ...defaultSettings,
+
+        gradientColors: [
+            ...defaultSettings.gradientColors
+        ]
+
+    }
+
+};
+
+
+// =========================================
+// GUARDAR DATOS
+// =========================================
+
+function saveData(data) {
+
+    return chrome.storage.local.set(data);
+
+}
+
+
+// =========================================
+// CARGAR DATOS
+// =========================================
+
+function loadData() {
+
+    return chrome.storage.local.get([
+        "groups",
+        "settings"
+    ]);
+
+}
+
+
+// =========================================
+// OBTENER DATOS DEL HTML
+// =========================================
+
+function getGroupsData() {
+
+    const groups = [];
+
+
+    const groupElements =
+        document.querySelectorAll(".site-group");
+
+
+    groupElements.forEach((groupElement) => {
+
+        const group = {
+
+            name:
+                groupElement
+                    .querySelector("h2")
+                    .textContent
+                    .trim(),
+
+            sites: []
+
+        };
+
+
+        const siteElements =
+            groupElement.querySelectorAll(
+                ".site-card"
+            );
+
+
+        siteElements.forEach((siteElement) => {
+
+            const site = {
+
+                name:
+                    siteElement
+                        .querySelector(".site-name")
+                        .textContent
+                        .trim(),
+
+                url:
+                    siteElement.dataset.url,
+
+                description:
+                    siteElement
+                        .querySelector(".site-description")
+                        .textContent
+                        .trim()
+
+            };
+
+
+            group.sites.push(site);
+
+        });
+
+
+        groups.push(group);
+
+    });
+
+
+    return groups;
+
+}
+
+
+// =========================================
+// GUARDAR ESTADO ACTUAL
+// =========================================
+
+async function saveCurrentData() {
+
+    const groups =
+        getGroupsData();
+
+
+    const data =
+        await loadData();
+
+
+    const settings = {
+
+        ...defaultSettings,
+
+        ...data.settings
+
+    };
+
+
+    await saveData({
+
+        groups: groups,
+
+        settings: settings
+
+    });
+
+}
+
+
+// =========================================
+// CONVERTIR HEX A RGBA
+// =========================================
+
+function hexToRgba(
+    hex,
+    transparency
+) {
+
+    const cleanHex =
+        hex.replace("#", "");
+
+
+    const r =
+        parseInt(
+            cleanHex.substring(0, 2),
+            16
+        );
+
+
+    const g =
+        parseInt(
+            cleanHex.substring(2, 4),
+            16
+        );
+
+
+    const b =
+        parseInt(
+            cleanHex.substring(4, 6),
+            16
+        );
+
+
+    let validTransparency =
+        Number(transparency);
+
+
+    if (isNaN(validTransparency)) {
+
+        validTransparency = 0;
+
+    }
+
+
+    if (validTransparency < 0) {
+
+        validTransparency = 0;
+
+    }
+
+
+    if (validTransparency > 100) {
+
+        validTransparency = 100;
+
+    }
+
+
+    const alpha =
+        1 - (validTransparency / 100);
+
+
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+
+}
+
+
+// =========================================
 // PANEL DE CONFIGURACIÓN
 // =========================================
 
-// Elementos
 const settingsButton =
     document.getElementById("settings-button");
 
@@ -122,7 +380,6 @@ const settingsOverlay =
     document.getElementById("settings-overlay");
 
 
-// Abrir panel
 settingsButton.addEventListener("click", () => {
 
     settingsPanel.style.transform =
@@ -133,7 +390,6 @@ settingsButton.addEventListener("click", () => {
 });
 
 
-// Cerrar panel
 function closeSettings() {
 
     settingsPanel.style.transform =
@@ -160,7 +416,6 @@ settingsOverlay.addEventListener(
 // MENÚS DE LOS GRUPOS
 // =========================================
 
-// Configurar menú de un grupo
 function setupGroupMenu(group) {
 
     const menuButton =
@@ -177,20 +432,42 @@ function setupGroupMenu(group) {
     }
 
 
-    menuButton.addEventListener("click", (event) => {
+    // Evitar registrar el evento dos veces
+    if (
+        menuButton.dataset.menuConfigured === "true"
+    ) {
 
-        event.stopPropagation();
+        return;
 
-        toggleMenu(menu);
-
-    });
+    }
 
 
-    menu.addEventListener("click", (event) => {
+    menuButton.dataset.menuConfigured =
+        "true";
 
-        event.stopPropagation();
 
-    });
+    menuButton.addEventListener(
+        "click",
+        (event) => {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+            toggleMenu(menu);
+
+        }
+    );
+
+
+    menu.addEventListener(
+        "click",
+        (event) => {
+
+            event.stopPropagation();
+
+        }
+    );
 
 }
 
@@ -199,7 +476,6 @@ function setupGroupMenu(group) {
 // MENÚS DE LOS SITIOS
 // =========================================
 
-// Configurar comportamiento de un sitio
 function setupSiteCard(site) {
 
     const menuButton =
@@ -209,56 +485,90 @@ function setupSiteCard(site) {
         site.querySelector(".site-menu");
 
 
-    // Abrir sitio
-    site.addEventListener("click", () => {
+    // Evitar registrar el evento general
+    // de la tarjeta dos veces
+    if (
+        site.dataset.cardConfigured !== "true"
+    ) {
 
-        openSite(site);
+        site.dataset.cardConfigured =
+            "true";
 
-    });
 
-
-    // Si tiene menú, configurarlo
-    if (menuButton && menu) {
-
-        menuButton.addEventListener(
+        site.addEventListener(
             "click",
-            (event) => {
+            () => {
 
-                event.stopPropagation();
-
-                toggleMenu(menu);
-
-            }
-        );
-
-
-        menu.addEventListener(
-            "click",
-            (event) => {
-
-                event.stopPropagation();
+                openSite(site);
 
             }
         );
 
     }
 
+
+    if (!menuButton || !menu) {
+
+        return;
+
+    }
+
+
+    // Evitar registrar el menú dos veces
+    if (
+        menuButton.dataset.menuConfigured === "true"
+    ) {
+
+        return;
+
+    }
+
+
+    menuButton.dataset.menuConfigured =
+        "true";
+
+
+    menuButton.addEventListener(
+        "click",
+        (event) => {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+            toggleMenu(menu);
+
+        }
+    );
+
+
+    menu.addEventListener(
+        "click",
+        (event) => {
+
+            event.stopPropagation();
+
+        }
+    );
+
 }
 
 
 // Cerrar menús al hacer clic afuera
-document.addEventListener("click", () => {
+document.addEventListener(
+    "click",
+    () => {
 
-    closeAllMenus();
+        closeAllMenus();
 
-});
+    }
+);
 
 
 // =========================================
 // AGREGAR SITIO
 // =========================================
 
-// Elementos
 const addSiteOverlay =
     document.getElementById("add-site-overlay");
 
@@ -290,7 +600,6 @@ const saveAddSiteButton =
     document.getElementById("save-add-site-button");
 
 
-// Grupo al que se agregará el sitio
 let groupBeingAddedTo =
     null;
 
@@ -299,7 +608,6 @@ let groupBeingAddedTo =
 // FORMULARIO AGREGAR SITIO
 // =========================================
 
-// Limpiar errores
 function clearAddSiteErrors() {
 
     addSiteNameError.textContent = "";
@@ -308,7 +616,6 @@ function clearAddSiteErrors() {
 }
 
 
-// Limpiar formulario
 function resetAddSiteForm() {
 
     addSiteName.value = "";
@@ -320,7 +627,6 @@ function resetAddSiteForm() {
 }
 
 
-// Limpiar estado
 function resetAddSiteState() {
 
     groupBeingAddedTo =
@@ -478,41 +784,45 @@ function createSiteCard(
         url;
 
 
-// Icono
-const siteIcon =
-    document.createElement("div");
+    // ICONO
+    const siteIcon =
+        document.createElement("div");
 
-siteIcon.className =
-    "site-icon";
-
-const siteIconImage =
-    document.createElement("img");
-
-siteIconImage.src =
-    new URL("/favicon.ico", url).href;
-
-siteIconImage.alt =
-    "";
+    siteIcon.className =
+        "site-icon";
 
 
-// Icono predeterminado
-siteIconImage.addEventListener("error", () => {
-
-    siteIconImage.remove();
-
-    siteIcon.textContent =
-        "🌐";
-
-});
+    const siteIconImage =
+        document.createElement("img");
 
 
-// Agregar imagen al contenedor
-siteIcon.appendChild(
-    siteIconImage
-);
+    siteIconImage.src =
+        new URL("/favicon.ico", url).href;
 
 
-    // Nombre
+    siteIconImage.alt =
+        "";
+
+
+    siteIconImage.addEventListener(
+        "error",
+        () => {
+
+            siteIconImage.remove();
+
+            siteIcon.textContent =
+                "🌐";
+
+        }
+    );
+
+
+    siteIcon.appendChild(
+        siteIconImage
+    );
+
+
+    // NOMBRE
     const siteName =
         document.createElement("span");
 
@@ -523,7 +833,7 @@ siteIcon.appendChild(
         name;
 
 
-    // Descripción
+    // DESCRIPCIÓN
     const siteDescription =
         document.createElement("div");
 
@@ -534,9 +844,12 @@ siteIcon.appendChild(
         description;
 
 
-    // Botón menú
+    // BOTÓN MENÚ
     const siteMenuButton =
         document.createElement("button");
+
+    siteMenuButton.type =
+        "button";
 
     siteMenuButton.className =
         "site-menu-button";
@@ -545,7 +858,7 @@ siteIcon.appendChild(
         "⋮";
 
 
-    // Menú
+    // MENÚ
     const siteMenu =
         document.createElement("div");
 
@@ -553,9 +866,11 @@ siteIcon.appendChild(
         "site-menu";
 
 
-    // Editar
     const editSiteButton =
         document.createElement("button");
+
+    editSiteButton.type =
+        "button";
 
     editSiteButton.className =
         "edit-site-button";
@@ -566,9 +881,11 @@ siteIcon.appendChild(
     `;
 
 
-    // Eliminar
     const deleteSiteButton =
         document.createElement("button");
+
+    deleteSiteButton.type =
+        "button";
 
     deleteSiteButton.className =
         "delete-site-button";
@@ -579,7 +896,6 @@ siteIcon.appendChild(
     `;
 
 
-    // Agregar botones al menú
     siteMenu.appendChild(
         editSiteButton
     );
@@ -589,7 +905,6 @@ siteIcon.appendChild(
     );
 
 
-    // Agregar elementos a la tarjeta
     site.appendChild(siteIcon);
     site.appendChild(siteName);
     site.appendChild(siteDescription);
@@ -597,14 +912,16 @@ siteIcon.appendChild(
     site.appendChild(siteMenu);
 
 
-    // Configurar comportamiento
+    // Configurar tarjeta y menú
     setupSiteCard(site);
 
 
-    // Editar sitio
+    // EDITAR SITIO
     editSiteButton.addEventListener(
         "click",
         (event) => {
+
+            event.preventDefault();
 
             event.stopPropagation();
 
@@ -616,16 +933,20 @@ siteIcon.appendChild(
     );
 
 
-    // Eliminar sitio
+    // ELIMINAR SITIO
     deleteSiteButton.addEventListener(
         "click",
         async (event) => {
+
+            event.preventDefault();
 
             event.stopPropagation();
 
             site.remove();
 
             await saveCurrentData();
+
+            closeMenu(siteMenu);
 
         }
     );
@@ -642,9 +963,24 @@ siteIcon.appendChild(
 
 function setupAddSiteCard(addSiteCard) {
 
+    if (
+        addSiteCard.dataset.addConfigured === "true"
+    ) {
+
+        return;
+
+    }
+
+
+    addSiteCard.dataset.addConfigured =
+        "true";
+
+
     addSiteCard.addEventListener(
         "click",
         (event) => {
+
+            event.preventDefault();
 
             event.stopPropagation();
 
@@ -669,16 +1005,6 @@ function setupAddSiteCard(addSiteCard) {
 }
 
 
-// Configurar tarjetas existentes
-document
-    .querySelectorAll(".add-site-card")
-    .forEach((card) => {
-
-        setupAddSiteCard(card);
-
-    });
-
-
 // =========================================
 // BOTÓN GLOBAL AGREGAR SITIO
 // =========================================
@@ -690,6 +1016,8 @@ const addSiteButton =
 addSiteButton.addEventListener(
     "click",
     (event) => {
+
+        event.preventDefault();
 
         event.stopPropagation();
 
@@ -732,7 +1060,6 @@ saveAddSiteButton.addEventListener(
         clearAddSiteErrors();
 
 
-        // Validar nombre
         if (newName === "") {
 
             addSiteNameError.textContent =
@@ -743,7 +1070,6 @@ saveAddSiteButton.addEventListener(
         }
 
 
-        // Validar URL vacía
         if (newUrl === "") {
 
             addSiteUrlError.textContent =
@@ -754,7 +1080,6 @@ saveAddSiteButton.addEventListener(
         }
 
 
-        // Agregar https
         if (
             !newUrl.startsWith("http://") &&
             !newUrl.startsWith("https://")
@@ -766,7 +1091,6 @@ saveAddSiteButton.addEventListener(
         }
 
 
-        // Validar URL
         try {
 
             const url =
@@ -792,7 +1116,6 @@ saveAddSiteButton.addEventListener(
         }
 
 
-        // Obtener grupo si no fue seleccionado directamente
         if (groupBeingAddedTo === null) {
 
             groupBeingAddedTo =
@@ -803,7 +1126,6 @@ saveAddSiteButton.addEventListener(
         }
 
 
-        // Verificar grupo
         if (!groupBeingAddedTo) {
 
             return;
@@ -811,14 +1133,12 @@ saveAddSiteButton.addEventListener(
         }
 
 
-        // Obtener contenedor
         const sitesContainer =
             groupBeingAddedTo.querySelector(
                 ".sites-container"
             );
 
 
-        // Crear sitio
         const newSite =
             createSiteCard(
                 newName,
@@ -827,25 +1147,27 @@ saveAddSiteButton.addEventListener(
             );
 
 
-        // Obtener tarjeta "+ Agregar sitio"
         const addSiteCard =
             groupBeingAddedTo.querySelector(
                 ".add-site-card"
             );
 
 
-        // Insertar antes de "+ Agregar sitio"
         sitesContainer.insertBefore(
             newSite,
             addSiteCard
         );
 
 
-        // Guardar
+        applyCardAppearance(
+            cardColorInput.value,
+            cardTransparencyInput.value
+        );
+
+
         await saveCurrentData();
 
 
-        // Cerrar ventana
         closeAddSite();
 
     }
@@ -856,7 +1178,6 @@ saveAddSiteButton.addEventListener(
 // AGREGAR GRUPO
 // =========================================
 
-// Elementos
 const addGroupButton =
     document.getElementById("add-group-button");
 
@@ -879,11 +1200,6 @@ const saveAddGroupButton =
     document.getElementById("save-add-group-button");
 
 
-// =========================================
-// FORMULARIO AGREGAR GRUPO
-// =========================================
-
-// Limpiar errores
 function clearAddGroupErrors() {
 
     addGroupNameError.textContent = "";
@@ -891,7 +1207,6 @@ function clearAddGroupErrors() {
 }
 
 
-// Limpiar formulario
 function resetAddGroupForm() {
 
     addGroupName.value = "";
@@ -901,7 +1216,6 @@ function resetAddGroupForm() {
 }
 
 
-// Abrir modal
 function openAddGroup() {
 
     resetAddGroupForm();
@@ -913,7 +1227,6 @@ function openAddGroup() {
 }
 
 
-// Cerrar modal
 function closeAddGroup() {
 
     closeOverlay(addGroupOverlay);
@@ -968,10 +1281,6 @@ function createGroup(name) {
         "site-group";
 
 
-    // =========================================
-    // ENCABEZADO
-    // =========================================
-
     const groupHeader =
         document.createElement("div");
 
@@ -996,6 +1305,9 @@ function createGroup(name) {
     const groupMenuButton =
         document.createElement("button");
 
+    groupMenuButton.type =
+        "button";
+
     groupMenuButton.className =
         "group-menu-button";
 
@@ -1017,10 +1329,6 @@ function createGroup(name) {
     );
 
 
-    // =========================================
-    // MENÚ DEL GRUPO
-    // =========================================
-
     const groupMenu =
         document.createElement("div");
 
@@ -1030,6 +1338,9 @@ function createGroup(name) {
 
     const editGroupButton =
         document.createElement("button");
+
+    editGroupButton.type =
+        "button";
 
     editGroupButton.className =
         "edit-group-button";
@@ -1042,6 +1353,9 @@ function createGroup(name) {
 
     const deleteGroupButton =
         document.createElement("button");
+
+    deleteGroupButton.type =
+        "button";
 
     deleteGroupButton.className =
         "delete-group-button";
@@ -1071,10 +1385,6 @@ function createGroup(name) {
     );
 
 
-    // =========================================
-    // CONTENEDOR DE SITIOS
-    // =========================================
-
     const sitesContainer =
         document.createElement("div");
 
@@ -1082,7 +1392,6 @@ function createGroup(name) {
         "sites-container";
 
 
-    // Tarjeta "+ Agregar sitio"
     const addSiteCard =
         document.createElement("div");
 
@@ -1129,38 +1438,44 @@ function createGroup(name) {
     );
 
 
-    // =========================================
-    // EVENTOS
-    // =========================================
-
+    // Configurar menú del grupo
     setupGroupMenu(group);
 
+    // Configurar tarjeta para agregar sitio
     setupAddSiteCard(addSiteCard);
 
 
-    // Editar grupo
+    // EDITAR GRUPO
     editGroupButton.addEventListener(
         "click",
         (event) => {
+
+            event.preventDefault();
 
             event.stopPropagation();
 
             openEditGroup(group);
 
+            closeMenu(groupMenu);
+
         }
     );
 
 
-    // Eliminar grupo
+    // ELIMINAR GRUPO
     deleteGroupButton.addEventListener(
         "click",
         async (event) => {
+
+            event.preventDefault();
 
             event.stopPropagation();
 
             group.remove();
 
             await saveCurrentData();
+
+            closeMenu(groupMenu);
 
         }
     );
@@ -1186,7 +1501,6 @@ saveAddGroupButton.addEventListener(
         clearAddGroupErrors();
 
 
-        // Validar nombre
         if (newName === "") {
 
             addGroupNameError.textContent =
@@ -1197,12 +1511,10 @@ saveAddGroupButton.addEventListener(
         }
 
 
-        // Crear grupo
         const newGroup =
             createGroup(newName);
 
 
-        // Agregar a la página
         const main =
             document.querySelector("main");
 
@@ -1212,11 +1524,15 @@ saveAddGroupButton.addEventListener(
         );
 
 
-        // Guardar
+        applyGroupAppearance(
+            groupColorInput.value,
+            groupTransparencyInput.value
+        );
+
+
         await saveCurrentData();
 
 
-        // Cerrar ventana
         closeAddGroup();
 
     }
@@ -1224,93 +1540,9 @@ saveAddGroupButton.addEventListener(
 
 
 // =========================================
-// CONFIGURAR GRUPOS EXISTENTES
-// =========================================
-
-document
-    .querySelectorAll(".site-group")
-    .forEach((group) => {
-
-        setupGroupMenu(group);
-
-    });
-
-
-// Eliminar grupos existentes
-document
-    .querySelectorAll(".delete-group-button")
-    .forEach((button) => {
-
-        button.addEventListener(
-            "click",
-            async (event) => {
-
-                event.stopPropagation();
-
-
-                const group =
-                    button.closest(".site-group");
-
-
-                group.remove();
-
-
-                await saveCurrentData();
-
-            }
-        );
-
-    });
-
-
-// =========================================
-// ELIMINAR SITIOS EXISTENTES
-// =========================================
-
-document
-    .querySelectorAll(".delete-site-button")
-    .forEach((button) => {
-
-        button.addEventListener(
-            "click",
-            async (event) => {
-
-                event.stopPropagation();
-
-
-                const site =
-                    button.closest(".site-card");
-
-
-                site.remove();
-
-
-                await saveCurrentData();
-
-            }
-        );
-
-    });
-
-
-// =========================================
-// CONFIGURAR SITIOS EXISTENTES
-// =========================================
-
-document
-    .querySelectorAll(".site-card")
-    .forEach((site) => {
-
-        setupSiteCard(site);
-
-    });
-
-
-// =========================================
 // EDITAR SITIO
 // =========================================
 
-// Elementos
 const editSiteOverlay =
     document.getElementById("edit-site-overlay");
 
@@ -1339,16 +1571,10 @@ const saveEditSiteButton =
     document.getElementById("save-edit-site-button");
 
 
-// Sitio que se está editando
 let siteBeingEdited =
     null;
 
 
-// =========================================
-// FORMULARIO EDITAR SITIO
-// =========================================
-
-// Limpiar errores
 function clearEditSiteErrors() {
 
     editSiteNameError.textContent = "";
@@ -1357,7 +1583,6 @@ function clearEditSiteErrors() {
 }
 
 
-// Limpiar formulario
 function resetEditSiteForm() {
 
     editSiteName.value = "";
@@ -1368,10 +1593,6 @@ function resetEditSiteForm() {
 
 }
 
-
-// =========================================
-// ABRIR EDICIÓN DE SITIO
-// =========================================
 
 function openEditSite(site) {
 
@@ -1407,10 +1628,6 @@ function openEditSite(site) {
 
 }
 
-
-// =========================================
-// CERRAR EDICIÓN DE SITIO
-// =========================================
 
 function closeEditSite() {
 
@@ -1454,32 +1671,51 @@ editSiteOverlay.addEventListener(
 // EDITAR SITIOS EXISTENTES
 // =========================================
 
-document
-    .querySelectorAll(".edit-site-button")
-    .forEach((button) => {
+function setupExistingSiteEditButtons() {
 
-        button.addEventListener(
-            "click",
-            (event) => {
+    document
+        .querySelectorAll(".edit-site-button")
+        .forEach((button) => {
 
-                event.stopPropagation();
+            if (
+                button.dataset.editConfigured === "true"
+            ) {
 
-
-                const site =
-                    button.closest(".site-card");
-
-
-                openEditSite(site);
-
-
-                closeMenu(
-                    site.querySelector(".site-menu")
-                );
+                return;
 
             }
-        );
 
-    });
+
+            button.dataset.editConfigured =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                (event) => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    const site =
+                        button.closest(".site-card");
+
+
+                    openEditSite(site);
+
+
+                    closeMenu(
+                        site.querySelector(".site-menu")
+                    );
+
+                }
+            );
+
+        });
+
+}
 
 
 // =========================================
@@ -1503,7 +1739,6 @@ saveEditSiteButton.addEventListener(
         clearEditSiteErrors();
 
 
-        // Validar nombre
         if (newName === "") {
 
             editSiteNameError.textContent =
@@ -1514,7 +1749,6 @@ saveEditSiteButton.addEventListener(
         }
 
 
-        // Validar URL
         if (newUrl === "") {
 
             editSiteUrlError.textContent =
@@ -1525,7 +1759,6 @@ saveEditSiteButton.addEventListener(
         }
 
 
-        // Agregar https
         if (
             !newUrl.startsWith("http://") &&
             !newUrl.startsWith("https://")
@@ -1537,7 +1770,6 @@ saveEditSiteButton.addEventListener(
         }
 
 
-        // Validar URL
         try {
 
             const url =
@@ -1563,7 +1795,6 @@ saveEditSiteButton.addEventListener(
         }
 
 
-        // Obtener elementos
         const siteName =
             getSiteName(siteBeingEdited);
 
@@ -1571,7 +1802,6 @@ saveEditSiteButton.addEventListener(
             getSiteDescription(siteBeingEdited);
 
 
-        // Actualizar
         siteName.textContent =
             newName;
 
@@ -1582,7 +1812,23 @@ saveEditSiteButton.addEventListener(
             newDescription;
 
 
-        // Guardar
+        const siteIconImage =
+            siteBeingEdited.querySelector(
+                ".site-icon img"
+            );
+
+
+        if (siteIconImage) {
+
+            siteIconImage.src =
+                new URL(
+                    "/favicon.ico",
+                    newUrl
+                ).href;
+
+        }
+
+
         await saveCurrentData();
 
 
@@ -1596,7 +1842,6 @@ saveEditSiteButton.addEventListener(
 // EDITAR GRUPO
 // =========================================
 
-// Elementos
 const editGroupOverlay =
     document.getElementById("edit-group-overlay");
 
@@ -1616,16 +1861,10 @@ const saveEditGroupButton =
     document.getElementById("save-edit-group-button");
 
 
-// Grupo que se está editando
 let groupBeingEdited =
     null;
 
 
-// =========================================
-// FORMULARIO EDITAR GRUPO
-// =========================================
-
-// Limpiar errores
 function clearEditGroupErrors() {
 
     editGroupNameError.textContent = "";
@@ -1633,7 +1872,6 @@ function clearEditGroupErrors() {
 }
 
 
-// Limpiar formulario
 function resetEditGroupForm() {
 
     editGroupName.value = "";
@@ -1642,10 +1880,6 @@ function resetEditGroupForm() {
 
 }
 
-
-// =========================================
-// ABRIR EDICIÓN DE GRUPO
-// =========================================
 
 function openEditGroup(group) {
 
@@ -1677,10 +1911,6 @@ function openEditGroup(group) {
 
 }
 
-
-// =========================================
-// CERRAR EDICIÓN DE GRUPO
-// =========================================
 
 function closeEditGroup() {
 
@@ -1724,27 +1954,46 @@ editGroupOverlay.addEventListener(
 // EDITAR GRUPOS EXISTENTES
 // =========================================
 
-document
-    .querySelectorAll(".edit-group-button")
-    .forEach((button) => {
+function setupExistingGroupEditButtons() {
 
-        button.addEventListener(
-            "click",
-            (event) => {
+    document
+        .querySelectorAll(".edit-group-button")
+        .forEach((button) => {
 
-                event.stopPropagation();
+            if (
+                button.dataset.editConfigured === "true"
+            ) {
 
-
-                const group =
-                    button.closest(".site-group");
-
-
-                openEditGroup(group);
+                return;
 
             }
-        );
 
-    });
+
+            button.dataset.editConfigured =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                (event) => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    const group =
+                        button.closest(".site-group");
+
+
+                    openEditGroup(group);
+
+                }
+            );
+
+        });
+
+}
 
 
 // =========================================
@@ -1762,7 +2011,6 @@ saveEditGroupButton.addEventListener(
         clearEditGroupErrors();
 
 
-        // Validar nombre
         if (newName === "") {
 
             editGroupNameError.textContent =
@@ -1781,7 +2029,6 @@ saveEditGroupButton.addEventListener(
             newName;
 
 
-        // Guardar
         await saveCurrentData();
 
 
@@ -1789,137 +2036,6 @@ saveEditGroupButton.addEventListener(
 
     }
 );
-
-
-// =========================================
-// DATOS INICIALES
-// =========================================
-
-const defaultData = {
-
-    groups: []
-
-};
-
-
-// =========================================
-// GUARDAR DATOS
-// =========================================
-
-function saveData(data) {
-
-    return chrome.storage.local.set(
-        data
-    );
-
-}
-
-
-// =========================================
-// CARGAR DATOS
-// =========================================
-
-function loadData() {
-
-    return chrome.storage.local.get(
-        "groups"
-    );
-
-}
-
-
-// =========================================
-// OBTENER DATOS DEL HTML
-// =========================================
-
-function getGroupsData() {
-
-    const groups = [];
-
-
-    const groupElements =
-        document.querySelectorAll(".site-group");
-
-
-    groupElements.forEach(
-        (groupElement) => {
-
-            const group = {
-
-                name:
-                    groupElement
-                        .querySelector("h2")
-                        .textContent
-                        .trim(),
-
-                sites: []
-
-            };
-
-
-            const siteElements =
-                groupElement.querySelectorAll(
-                    ".site-card"
-                );
-
-
-            siteElements.forEach(
-                (siteElement) => {
-
-                    const site = {
-
-                        name:
-                            siteElement
-                                .querySelector(".site-name")
-                                .textContent
-                                .trim(),
-
-                        url:
-                            siteElement.dataset.url,
-
-                        description:
-                            siteElement
-                                .querySelector(".site-description")
-                                .textContent
-                                .trim()
-
-                    };
-
-
-                    group.sites.push(site);
-
-                }
-            );
-
-
-            groups.push(group);
-
-        }
-    );
-
-
-    return groups;
-
-}
-
-
-// =========================================
-// GUARDAR ESTADO ACTUAL
-// =========================================
-
-async function saveCurrentData() {
-
-    const groups =
-        getGroupsData();
-
-
-    await saveData({
-
-        groups: groups
-
-    });
-
-}
 
 
 // =========================================
@@ -1932,58 +2048,1819 @@ function renderGroups(groups) {
         document.querySelector("main");
 
 
-    groups.forEach(
-        (groupData) => {
+    groups.forEach((groupData) => {
 
-            // Crear grupo
-            const group =
-                createGroup(
-                    groupData.name
-                );
-
-
-            // Obtener contenedor de sitios
-            const sitesContainer =
-                group.querySelector(
-                    ".sites-container"
-                );
-
-
-            // Obtener tarjeta "+ Agregar sitio"
-            const addSiteCard =
-                group.querySelector(
-                    ".add-site-card"
-                );
-
-
-            // Crear sitios
-            groupData.sites.forEach(
-                (siteData) => {
-
-                    const site =
-                        createSiteCard(
-                            siteData.name,
-                            siteData.url,
-                            siteData.description
-                        );
-
-
-                    sitesContainer.insertBefore(
-                        site,
-                        addSiteCard
-                    );
-
-                }
+        const group =
+            createGroup(
+                groupData.name
             );
 
 
-            // Agregar grupo al HTML
-            main.appendChild(
-                group
+        const sitesContainer =
+            group.querySelector(
+                ".sites-container"
+            );
+
+
+        const addSiteCard =
+            group.querySelector(
+                ".add-site-card"
+            );
+
+
+        (groupData.sites || []).forEach(
+            (siteData) => {
+
+                const site =
+                    createSiteCard(
+                        siteData.name,
+                        siteData.url,
+                        siteData.description
+                    );
+
+
+                sitesContainer.insertBefore(
+                    site,
+                    addSiteCard
+                );
+
+            }
+        );
+
+
+        main.appendChild(
+            group
+        );
+
+    });
+
+}
+
+
+// =========================================
+// TAMAÑO DE LAS TARJETAS
+// =========================================
+
+const cardSizeInput =
+    document.getElementById("card-size");
+
+
+function applyCardSize(size) {
+
+    let validSize =
+        Number(size);
+
+
+    if (isNaN(validSize)) {
+
+        validSize =
+            defaultSettings.cardSize;
+
+    }
+
+
+    if (validSize < 95) {
+
+        validSize = 95;
+
+    }
+
+
+    if (validSize > 140) {
+
+        validSize = 140;
+
+    }
+
+
+    document
+        .querySelectorAll(
+            ".site-card, .add-site-card"
+        )
+        .forEach((card) => {
+
+            card.style.width =
+                `${validSize}px`;
+
+            card.style.height =
+                `${validSize}px`;
+
+        });
+
+
+    cardSizeInput.value =
+        validSize;
+
+}
+
+
+cardSizeInput.addEventListener(
+    "change",
+    async () => {
+
+        applyCardSize(
+            cardSizeInput.value
+        );
+
+
+        const data =
+            await loadData();
+
+
+        await saveData({
+
+            settings: {
+
+                ...defaultSettings,
+
+                ...data.settings,
+
+                cardSize:
+                    Number(
+                        cardSizeInput.value
+                    )
+
+            }
+
+        });
+
+    }
+);
+
+
+// =========================================
+// COLOR Y TRANSPARENCIA DE LOS GRUPOS
+// =========================================
+
+const groupColorInput =
+    document.getElementById("group-color");
+
+const groupTransparencyInput =
+    document.getElementById(
+        "group-transparency"
+    );
+
+const groupTransparencyValue =
+    document.getElementById(
+        "group-transparency-value"
+    );
+
+
+function applyGroupAppearance(
+    color,
+    transparency
+) {
+
+    const rgba =
+        hexToRgba(
+            color,
+            transparency
+        );
+
+
+    document
+        .querySelectorAll(".site-group")
+        .forEach((group) => {
+
+            group.style.backgroundColor =
+                rgba;
+
+        });
+
+
+    groupColorInput.value =
+        color;
+
+    groupTransparencyInput.value =
+        transparency;
+
+    groupTransparencyValue.textContent =
+        `${transparency}%`;
+
+}
+
+
+groupColorInput.addEventListener(
+    "input",
+    async () => {
+
+        const color =
+            groupColorInput.value;
+
+        const transparency =
+            groupTransparencyInput.value;
+
+
+        applyGroupAppearance(
+            color,
+            transparency
+        );
+
+
+        const data =
+            await loadData();
+
+
+        await saveData({
+
+            settings: {
+
+                ...defaultSettings,
+
+                ...data.settings,
+
+                groupColor:
+                    color,
+
+                groupTransparency:
+                    Number(transparency)
+
+            }
+
+        });
+
+    }
+);
+
+
+groupTransparencyInput.addEventListener(
+    "input",
+    async () => {
+
+        const color =
+            groupColorInput.value;
+
+        const transparency =
+            Number(
+                groupTransparencyInput.value
+            );
+
+
+        applyGroupAppearance(
+            color,
+            transparency
+        );
+
+
+        const data =
+            await loadData();
+
+
+        await saveData({
+
+            settings: {
+
+                ...defaultSettings,
+
+                ...data.settings,
+
+                groupColor:
+                    color,
+
+                groupTransparency:
+                    transparency
+
+            }
+
+        });
+
+    }
+);
+
+
+// =========================================
+// COLOR Y TRANSPARENCIA DE LAS TARJETAS
+// =========================================
+
+const cardColorInput =
+    document.getElementById("card-color");
+
+const cardTransparencyInput =
+    document.getElementById(
+        "card-transparency"
+    );
+
+const cardTransparencyValue =
+    document.getElementById(
+        "card-transparency-value"
+    );
+
+
+function applyCardAppearance(
+    color,
+    transparency
+) {
+
+    const rgba =
+        hexToRgba(
+            color,
+            transparency
+        );
+
+
+    document
+        .querySelectorAll(
+            ".site-card, .add-site-card"
+        )
+        .forEach((card) => {
+
+            card.style.backgroundColor =
+                rgba;
+
+        });
+
+
+    cardColorInput.value =
+        color;
+
+    cardTransparencyInput.value =
+        transparency;
+
+    cardTransparencyValue.textContent =
+        `${transparency}%`;
+
+}
+
+
+cardColorInput.addEventListener(
+    "input",
+    async () => {
+
+        const color =
+            cardColorInput.value;
+
+        const transparency =
+            cardTransparencyInput.value;
+
+
+        applyCardAppearance(
+            color,
+            transparency
+        );
+
+
+        const data =
+            await loadData();
+
+
+        await saveData({
+
+            settings: {
+
+                ...defaultSettings,
+
+                ...data.settings,
+
+                cardColor:
+                    color,
+
+                cardTransparency:
+                    Number(transparency)
+
+            }
+
+        });
+
+    }
+);
+
+
+cardTransparencyInput.addEventListener(
+    "input",
+    async () => {
+
+        const color =
+            cardColorInput.value;
+
+        const transparency =
+            Number(
+                cardTransparencyInput.value
+            );
+
+
+        applyCardAppearance(
+            color,
+            transparency
+        );
+
+
+        const data =
+            await loadData();
+
+
+        await saveData({
+
+            settings: {
+
+                ...defaultSettings,
+
+                ...data.settings,
+
+                cardColor:
+                    color,
+
+                cardTransparency:
+                    transparency
+
+            }
+
+        });
+
+    }
+);
+
+
+// =========================================
+// COLOR DE FONDO
+// =========================================
+
+const backgroundColorInput =
+    document.getElementById(
+        "background-color"
+    );
+
+
+function applyBackgroundColor(color) {
+
+    document.body.style.backgroundColor =
+        color;
+
+    document.body.style.backgroundImage =
+        "none";
+
+}
+
+
+backgroundColorInput.addEventListener(
+    "input",
+    async () => {
+
+        const color =
+            backgroundColorInput.value;
+
+
+        applyBackgroundColor(
+            color
+        );
+
+
+        const data =
+            await loadData();
+
+
+        await saveData({
+
+            settings: {
+
+                ...defaultSettings,
+
+                ...data.settings,
+
+                backgroundColor:
+                    color
+
+            }
+
+        });
+
+    }
+);
+
+
+// =========================================
+// IMAGEN DE FONDO
+// =========================================
+
+const backgroundImageInput =
+    document.getElementById(
+        "background-image-file"
+    );
+
+
+let pendingBackgroundImage =
+    null;
+
+
+function imageToDataURL(file) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload = () => {
+
+                resolve(
+                    reader.result
+                );
+
+            };
+
+
+            reader.onerror = () => {
+
+                reject(
+                    reader.error
+                );
+
+            };
+
+
+            reader.readAsDataURL(
+                file
             );
 
         }
     );
+
+}
+
+
+function applyBackgroundImage(imageData) {
+
+    return new Promise(
+        (resolve) => {
+
+            const image =
+                new Image();
+
+
+            image.onload = () => {
+
+                document.body.style.backgroundImage =
+                    `url("${imageData}")`;
+
+                document.body.style.backgroundColor =
+                    "transparent";
+
+                document.body.style.backgroundSize =
+                    "cover";
+
+                document.body.style.backgroundPosition =
+                    "center";
+
+                document.body.style.backgroundRepeat =
+                    "no-repeat";
+
+
+                resolve(true);
+
+            };
+
+
+            image.onerror = () => {
+
+                resolve(false);
+
+            };
+
+
+            image.src =
+                imageData;
+
+        }
+    );
+
+}
+
+
+backgroundImageInput.addEventListener(
+    "change",
+    async () => {
+
+        const file =
+            backgroundImageInput.files[0];
+
+
+        if (!file) {
+
+            return;
+
+        }
+
+
+        pendingBackgroundImage =
+            await imageToDataURL(file);
+
+
+        const imageLoaded =
+            await applyBackgroundImage(
+                pendingBackgroundImage
+            );
+
+
+        if (!imageLoaded) {
+
+            pendingBackgroundImage =
+                null;
+
+            return;
+
+        }
+
+
+        document.getElementById(
+            "background-image"
+        ).checked = true;
+
+
+        document.getElementById(
+            "background-solid"
+        ).checked = false;
+
+
+        document.getElementById(
+            "background-gradient"
+        ).checked = false;
+
+
+        const data =
+            await loadData();
+
+
+        await saveData({
+
+            settings: {
+
+                ...defaultSettings,
+
+                ...data.settings,
+
+                backgroundType:
+                    "image",
+
+                backgroundImage:
+                    pendingBackgroundImage
+
+            }
+
+        });
+
+    }
+);
+
+
+// =========================================
+// DEGRADADO
+// =========================================
+
+const gradientDirectionInput =
+    document.getElementById(
+        "gradient-direction"
+    );
+
+
+const gradientColorsContainer =
+    document.getElementById(
+        "gradient-colors"
+    );
+
+
+const addGradientColorButton =
+    document.getElementById(
+        "add-gradient-color-button"
+    );
+
+
+function getGradientColors() {
+
+    const colorInputs =
+        gradientColorsContainer.querySelectorAll(
+            'input[type="color"]'
+        );
+
+
+    return Array.from(colorInputs)
+        .map(
+            (input) => input.value
+        );
+
+}
+
+
+function createGradientCSS(
+    direction,
+    colors
+) {
+
+    return `linear-gradient(${direction}deg, ${colors.join(", ")})`;
+
+}
+
+
+function applyGradient(
+    direction,
+    colors
+) {
+
+    if (
+        !colors ||
+        colors.length < 2
+    ) {
+
+        return;
+
+    }
+
+
+    document.body.style.backgroundColor =
+        "transparent";
+
+
+    document.body.style.backgroundImage =
+        createGradientCSS(
+            direction,
+            colors
+        );
+
+
+    document.body.style.backgroundSize =
+        "cover";
+
+}
+
+
+async function saveGradientSettings() {
+
+    const direction =
+        Number(
+            gradientDirectionInput.value
+        );
+
+
+    const colors =
+        getGradientColors();
+
+
+    const data =
+        await loadData();
+
+
+    await saveData({
+
+        settings: {
+
+            ...defaultSettings,
+
+            ...data.settings,
+
+            backgroundType:
+                "gradient",
+
+            gradientDirection:
+                direction,
+
+            gradientColors:
+                colors
+
+        }
+
+    });
+
+}
+
+
+function createGradientColor(
+    color,
+    index
+) {
+
+    const gradientColor =
+        document.createElement("div");
+
+    gradientColor.className =
+        "gradient-color";
+
+
+    const label =
+        document.createElement("label");
+
+    label.textContent =
+        `Color ${index}`;
+
+
+    const controls =
+        document.createElement("div");
+
+    controls.className =
+        "gradient-color-controls";
+
+
+    const colorInput =
+        document.createElement("input");
+
+    colorInput.type =
+        "color";
+
+    colorInput.value =
+        color;
+
+
+    const removeButton =
+        document.createElement("button");
+
+    removeButton.type =
+        "button";
+
+    removeButton.className =
+        "remove-gradient-color-button";
+
+    removeButton.setAttribute(
+        "aria-label",
+        `Eliminar color ${index}`
+    );
+
+    removeButton.textContent =
+        "×";
+
+
+    colorInput.addEventListener(
+        "input",
+        async () => {
+
+            const backgroundGradient =
+                document.getElementById(
+                    "background-gradient"
+                );
+
+
+            if (
+                backgroundGradient.checked
+            ) {
+
+                applyGradient(
+                    gradientDirectionInput.value,
+                    getGradientColors()
+                );
+
+            }
+
+
+            await saveGradientSettings();
+
+        }
+    );
+
+
+    removeButton.addEventListener(
+        "click",
+        async () => {
+
+            const colorInputs =
+                gradientColorsContainer.querySelectorAll(
+                    'input[type="color"]'
+                );
+
+
+            if (
+                colorInputs.length <= 2
+            ) {
+
+                return;
+
+            }
+
+
+            gradientColor.remove();
+
+
+            updateGradientColorLabels();
+
+
+            const backgroundGradient =
+                document.getElementById(
+                    "background-gradient"
+                );
+
+
+            if (
+                backgroundGradient.checked
+            ) {
+
+                applyGradient(
+                    gradientDirectionInput.value,
+                    getGradientColors()
+                );
+
+            }
+
+
+            await saveGradientSettings();
+
+        }
+    );
+
+
+    controls.appendChild(
+        colorInput
+    );
+
+    controls.appendChild(
+        removeButton
+    );
+
+
+    gradientColor.appendChild(
+        label
+    );
+
+    gradientColor.appendChild(
+        controls
+    );
+
+
+    return gradientColor;
+
+}
+
+
+function updateGradientColorLabels() {
+
+    const gradientColors =
+        gradientColorsContainer.querySelectorAll(
+            ".gradient-color"
+        );
+
+
+    gradientColors.forEach(
+        (gradientColor, index) => {
+
+            const label =
+                gradientColor.querySelector(
+                    "label"
+                );
+
+            const removeButton =
+                gradientColor.querySelector(
+                    ".remove-gradient-color-button"
+                );
+
+
+            const number =
+                index + 1;
+
+
+            label.textContent =
+                `Color ${number}`;
+
+
+            removeButton.setAttribute(
+                "aria-label",
+                `Eliminar color ${number}`
+            );
+
+        }
+    );
+
+}
+
+
+addGradientColorButton.addEventListener(
+    "click",
+    async () => {
+
+        const colors =
+            getGradientColors();
+
+
+        const lastColor =
+            colors[
+                colors.length - 1
+            ] ??
+            "#ffffff";
+
+
+        const newColor =
+            createGradientColor(
+                lastColor,
+                colors.length + 1
+            );
+
+
+        gradientColorsContainer.appendChild(
+            newColor
+        );
+
+
+        updateGradientColorLabels();
+
+
+        const backgroundGradient =
+            document.getElementById(
+                "background-gradient"
+            );
+
+
+        if (
+            backgroundGradient.checked
+        ) {
+
+            applyGradient(
+                gradientDirectionInput.value,
+                getGradientColors()
+            );
+
+        }
+
+
+        await saveGradientSettings();
+
+    }
+);
+
+
+gradientDirectionInput.addEventListener(
+    "change",
+    async () => {
+
+        const backgroundGradient =
+            document.getElementById(
+                "background-gradient"
+            );
+
+
+        if (
+            backgroundGradient.checked
+        ) {
+
+            applyGradient(
+                gradientDirectionInput.value,
+                getGradientColors()
+            );
+
+        }
+
+
+        await saveGradientSettings();
+
+    }
+);
+
+
+function loadGradientColors(colors) {
+
+    gradientColorsContainer.innerHTML = "";
+
+
+    const gradientColorList =
+        colors &&
+        colors.length >= 2
+            ? colors
+            : defaultSettings.gradientColors;
+
+
+    gradientColorList.forEach(
+        (color, index) => {
+
+            const gradientColor =
+                createGradientColor(
+                    color,
+                    index + 1
+                );
+
+
+            gradientColorsContainer.appendChild(
+                gradientColor
+            );
+
+        }
+    );
+
+
+    updateGradientColorLabels();
+
+}
+
+
+// =========================================
+// TIPO DE FONDO
+// =========================================
+
+const backgroundTypeInputs =
+    document.querySelectorAll(
+        'input[name="background-type"]'
+    );
+
+
+backgroundTypeInputs.forEach(
+    (radio) => {
+
+        radio.addEventListener(
+            "change",
+            async () => {
+
+                // COLOR SÓLIDO
+                if (
+                    radio.value === "solid"
+                ) {
+
+                    const data =
+                        await loadData();
+
+
+                    const backgroundColor =
+                        data.settings?.backgroundColor ??
+                        defaultSettings.backgroundColor;
+
+
+                    applyBackgroundColor(
+                        backgroundColor
+                    );
+
+
+                    document.getElementById(
+                        "background-solid"
+                    ).checked = true;
+
+
+                    backgroundColorInput.value =
+                        backgroundColor;
+
+
+                    pendingBackgroundImage =
+                        null;
+
+
+                    await saveData({
+
+                        settings: {
+
+                            ...defaultSettings,
+
+                            ...data.settings,
+
+                            backgroundType:
+                                "solid"
+
+                        }
+
+                    });
+
+                }
+
+
+                // IMAGEN
+                if (
+                    radio.value === "image"
+                ) {
+
+                    const data =
+                        await loadData();
+
+
+                    const backgroundImage =
+                        pendingBackgroundImage ??
+                        data.settings?.backgroundImage;
+
+
+                    if (backgroundImage) {
+
+                        const imageLoaded =
+                            await applyBackgroundImage(
+                                backgroundImage
+                            );
+
+
+                        if (imageLoaded) {
+
+                            await saveData({
+
+                                settings: {
+
+                                    ...defaultSettings,
+
+                                    ...data.settings,
+
+                                    backgroundType:
+                                        "image",
+
+                                    backgroundImage:
+                                        backgroundImage
+
+                                }
+
+                            });
+
+                        }
+
+
+                        else {
+
+                            const backgroundColor =
+                                data.settings?.backgroundColor ??
+                                defaultSettings.backgroundColor;
+
+
+                            radio.checked =
+                                false;
+
+
+                            document.getElementById(
+                                "background-solid"
+                            ).checked = true;
+
+
+                            applyBackgroundColor(
+                                backgroundColor
+                            );
+
+
+                            backgroundColorInput.value =
+                                backgroundColor;
+
+
+                            pendingBackgroundImage =
+                                null;
+
+
+                            await saveData({
+
+                                settings: {
+
+                                    ...defaultSettings,
+
+                                    ...data.settings,
+
+                                    backgroundType:
+                                        "solid"
+
+                                }
+
+                            });
+
+                        }
+
+                    }
+
+
+                    else {
+
+                        radio.checked =
+                            false;
+
+
+                        document.getElementById(
+                            "background-solid"
+                        ).checked = true;
+
+
+                        const backgroundColor =
+                            data.settings?.backgroundColor ??
+                            defaultSettings.backgroundColor;
+
+
+                        applyBackgroundColor(
+                            backgroundColor
+                        );
+
+
+                        backgroundColorInput.value =
+                            backgroundColor;
+
+
+                        await saveData({
+
+                            settings: {
+
+                                ...defaultSettings,
+
+                                ...data.settings,
+
+                                backgroundType:
+                                    "solid"
+
+                            }
+
+                        });
+
+                    }
+
+                }
+
+
+                // DEGRADADO
+                if (
+                    radio.value === "gradient"
+                ) {
+
+                    const data =
+                        await loadData();
+
+
+                    const direction =
+                        data.settings?.gradientDirection ??
+                        defaultSettings.gradientDirection;
+
+
+                    const colors =
+                        data.settings?.gradientColors ??
+                        defaultSettings.gradientColors;
+
+
+                    gradientDirectionInput.value =
+                        direction;
+
+
+                    loadGradientColors(
+                        colors
+                    );
+
+
+                    applyGradient(
+                        direction,
+                        colors
+                    );
+
+
+                    pendingBackgroundImage =
+                        null;
+
+
+                    await saveData({
+
+                        settings: {
+
+                            ...defaultSettings,
+
+                            ...data.settings,
+
+                            backgroundType:
+                                "gradient",
+
+                            gradientDirection:
+                                direction,
+
+                            gradientColors:
+                                colors
+
+                        }
+
+                    });
+
+                }
+
+            }
+        );
+
+    }
+);
+
+
+// =========================================
+// REINICIAR CONFIGURACIÓN
+// =========================================
+
+const resetBackgroundButton =
+    document.getElementById(
+        "reset-background-button"
+    );
+
+
+// =========================================
+// MODAL DE CONFIRMACIÓN
+// =========================================
+
+const resetConfirmationOverlay =
+    document.getElementById(
+        "reset-confirmation-overlay"
+    );
+
+const closeResetConfirmationButton =
+    document.getElementById(
+        "close-reset-confirmation-button"
+    );
+
+const cancelResetButton =
+    document.getElementById(
+        "cancel-reset-button"
+    );
+
+const confirmResetButton =
+    document.getElementById(
+        "confirm-reset-button"
+    );
+
+
+// =========================================
+// ABRIR CONFIRMACIÓN
+// =========================================
+
+function openResetConfirmation() {
+
+    openOverlay(
+        resetConfirmationOverlay
+    );
+
+}
+
+
+// =========================================
+// CERRAR CONFIRMACIÓN
+// =========================================
+
+function closeResetConfirmation() {
+
+    closeOverlay(
+        resetConfirmationOverlay
+    );
+
+}
+
+
+async function resetExtension() {
+
+    // =====================================
+    // 1. CERRAR MENÚS
+    // =====================================
+
+    closeAllMenus();
+
+
+    // =====================================
+    // 2. CERRAR VENTANAS
+    // =====================================
+
+    closeOverlay(addSiteOverlay);
+    closeOverlay(addGroupOverlay);
+    closeOverlay(editSiteOverlay);
+    closeOverlay(editGroupOverlay);
+    closeOverlay(resetConfirmationOverlay);
+
+
+    // =====================================
+    // 3. REINICIAR ESTADOS INTERNOS
+    // =====================================
+
+    groupBeingAddedTo =
+        null;
+
+    siteBeingEdited =
+        null;
+
+    groupBeingEdited =
+        null;
+
+    pendingBackgroundImage =
+        null;
+
+
+    // =====================================
+    // 4. BORRAR TODO EL STORAGE
+    // =====================================
+
+    await chrome.storage.local.clear();
+
+
+    // =====================================
+    // 5. CREAR DATOS INICIALES
+    // =====================================
+
+    const resetData = {
+
+        groups: [
+            {
+                name: "Mis sitios",
+
+                sites: [
+                    {
+                        name: "Google",
+                        url: "https://www.google.com",
+                        description: "Motor de búsqueda"
+                    }
+                ]
+            }
+        ],
+
+        settings: {
+
+            ...defaultSettings,
+
+            gradientColors: [
+                ...defaultSettings.gradientColors
+            ]
+
+        }
+
+    };
+
+
+    // =====================================
+    // 6. GUARDAR DATOS INICIALES
+    // =====================================
+
+    await saveData(
+        resetData
+    );
+
+
+    // =====================================
+    // 7. LIMPIAR MAIN
+    // =====================================
+
+    const main =
+        document.querySelector("main");
+
+
+    main.innerHTML = "";
+
+
+    // =====================================
+    // 8. CREAR GRUPO Y TARJETA
+    // =====================================
+
+    renderGroups(
+        resetData.groups
+    );
+
+
+    // =====================================
+    // 9. CONFIGURAR EVENTOS
+    // =====================================
+
+    setupExistingElements();
+
+
+    // =====================================
+    // 10. RESTAURAR TAMAÑO
+    // =====================================
+
+    applyCardSize(
+        defaultSettings.cardSize
+    );
+
+
+    // =====================================
+    // 11. RESTAURAR GRUPO
+    // =====================================
+
+    applyGroupAppearance(
+        defaultSettings.groupColor,
+        defaultSettings.groupTransparency
+    );
+
+
+    // =====================================
+    // 12. RESTAURAR TARJETA
+    // =====================================
+
+    applyCardAppearance(
+        defaultSettings.cardColor,
+        defaultSettings.cardTransparency
+    );
+
+
+    // =====================================
+    // 13. RESTAURAR FONDO
+    // =====================================
+
+    backgroundColorInput.value =
+        defaultSettings.backgroundColor;
+
+
+    applyBackgroundColor(
+        defaultSettings.backgroundColor
+    );
+
+
+    // =====================================
+    // 14. RESTAURAR CONTROLES DEL FONDO
+    // =====================================
+
+    document.getElementById(
+        "background-solid"
+    ).checked = true;
+
+
+    document.getElementById(
+        "background-image"
+    ).checked = false;
+
+
+    document.getElementById(
+        "background-gradient"
+    ).checked = false;
+
+
+    // =====================================
+    // 15. RESTAURAR DEGRADADO
+    // =====================================
+
+    gradientDirectionInput.value =
+        defaultSettings.gradientDirection;
+
+
+    loadGradientColors(
+        defaultSettings.gradientColors
+    );
+
+
+    // =====================================
+    // 16. LIMPIAR INPUT DE IMAGEN
+    // =====================================
+
+    backgroundImageInput.value =
+        "";
+
+
+    // =====================================
+    // 17. CERRAR PANEL
+    // =====================================
+
+    closeSettings();
+
+}
+
+
+// =========================================
+// EVENTOS DEL MODAL DE CONFIRMACIÓN
+// =========================================
+
+// Abrir modal al pulsar "Reiniciar configuración"
+resetBackgroundButton.addEventListener(
+    "click",
+    openResetConfirmation
+);
+
+
+// Cerrar con la X
+closeResetConfirmationButton.addEventListener(
+    "click",
+    closeResetConfirmation
+);
+
+
+// Cancelar
+cancelResetButton.addEventListener(
+    "click",
+    closeResetConfirmation
+);
+
+
+// Cerrar al hacer clic fuera del modal
+resetConfirmationOverlay.addEventListener(
+    "click",
+    (event) => {
+
+        if (
+            event.target ===
+            resetConfirmationOverlay
+        ) {
+
+            closeResetConfirmation();
+
+        }
+
+    }
+);
+
+
+// Confirmar reinicio
+confirmResetButton.addEventListener(
+    "click",
+    async () => {
+
+        closeResetConfirmation();
+
+        await resetExtension();
+
+    }
+);
+
+
+// =========================================
+// CONFIGURAR ELEMENTOS EXISTENTES
+// =========================================
+
+function setupExistingElements() {
+
+    // Grupos
+    document
+        .querySelectorAll(".site-group")
+        .forEach((group) => {
+
+            setupGroupMenu(group);
+
+        });
+
+
+    // Tarjetas "+ Agregar sitio"
+    document
+        .querySelectorAll(".add-site-card")
+        .forEach((card) => {
+
+            setupAddSiteCard(card);
+
+        });
+
+
+    // Tarjetas de sitios
+    document
+        .querySelectorAll(".site-card")
+        .forEach((site) => {
+
+            setupSiteCard(site);
+
+        });
+
+
+    // Botones editar sitio
+    setupExistingSiteEditButtons();
+
+
+    // Botones editar grupo
+    setupExistingGroupEditButtons();
+
+
+    // =====================================
+    // ELIMINAR GRUPOS EXISTENTES
+    // =====================================
+
+    document
+        .querySelectorAll(".delete-group-button")
+        .forEach((button) => {
+
+            if (
+                button.dataset.deleteConfigured === "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.deleteConfigured =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                async (event) => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    const group =
+                        button.closest(".site-group");
+
+
+                    group.remove();
+
+
+                    await saveCurrentData();
+
+                }
+            );
+
+        });
+
+
+    // =====================================
+    // ELIMINAR SITIOS EXISTENTES
+    // =====================================
+
+    document
+        .querySelectorAll(".delete-site-button")
+        .forEach((button) => {
+
+            if (
+                button.dataset.deleteConfigured === "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.deleteConfigured =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                async (event) => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    const site =
+                        button.closest(".site-card");
+
+
+                    site.remove();
+
+
+                    await saveCurrentData();
+
+                }
+            );
+
+        });
 
 }
 
@@ -1998,23 +3875,48 @@ async function init() {
         await loadData();
 
 
-    // Primera ejecución
+    // =====================================
+    // PRIMERA EJECUCIÓN
+    // =====================================
+
     if (!data.groups) {
 
         const initialGroups =
-            getGroupsData();
+            defaultData.groups;
+
+
+        const initialSettings = {
+
+            ...defaultSettings,
+
+            ...data.settings,
+
+            gradientColors: [
+                ...(data.settings?.gradientColors ??
+                    defaultSettings.gradientColors)
+            ]
+
+        };
 
 
         await saveData({
 
-            groups: initialGroups
+            groups:
+                initialGroups,
+
+            settings:
+                initialSettings
 
         });
 
 
         data = {
 
-            groups: initialGroups
+            groups:
+                initialGroups,
+
+            settings:
+                initialSettings
 
         };
 
@@ -2027,8 +3929,10 @@ async function init() {
     );
 
 
-    // Eliminar los grupos escritos directamente
-    // en newtab.html
+    // =====================================
+    // LIMPIAR HTML ESTÁTICO
+    // =====================================
+
     const main =
         document.querySelector("main");
 
@@ -2036,14 +3940,252 @@ async function init() {
     main.innerHTML = "";
 
 
-    // Dibujar los grupos desde Storage
+    // =====================================
+    // DIBUJAR GRUPOS
+    // =====================================
+
     renderGroups(
-        data.groups
+        data.groups || []
     );
+
+
+    // =====================================
+    // CONFIGURAR ELEMENTOS
+    // =====================================
+
+    setupExistingElements();
+
+
+    // =====================================
+    // TAMAÑO
+    // =====================================
+
+    const cardSize =
+        data.settings?.cardSize ??
+        defaultSettings.cardSize;
+
+
+    applyCardSize(
+        cardSize
+    );
+
+
+    // =====================================
+    // APARIENCIA GRUPOS
+    // =====================================
+
+    const groupColor =
+        data.settings?.groupColor ??
+        defaultSettings.groupColor;
+
+
+    const groupTransparency =
+        data.settings?.groupTransparency ??
+        defaultSettings.groupTransparency;
+
+
+    applyGroupAppearance(
+        groupColor,
+        groupTransparency
+    );
+
+
+    // =====================================
+    // APARIENCIA TARJETAS
+    // =====================================
+
+    const cardColor =
+        data.settings?.cardColor ??
+        defaultSettings.cardColor;
+
+
+    const cardTransparency =
+        data.settings?.cardTransparency ??
+        defaultSettings.cardTransparency;
+
+
+    applyCardAppearance(
+        cardColor,
+        cardTransparency
+    );
+
+
+    // =====================================
+    // DATOS DEL FONDO
+    // =====================================
+
+    const backgroundColor =
+        data.settings?.backgroundColor ??
+        defaultSettings.backgroundColor;
+
+
+    backgroundColorInput.value =
+        backgroundColor;
+
+
+    const backgroundType =
+        data.settings?.backgroundType ??
+        "solid";
+
+
+    // =====================================
+    // IMAGEN
+    // =====================================
+
+    if (
+        backgroundType === "image" &&
+        data.settings?.backgroundImage
+    ) {
+
+        const imageLoaded =
+            await applyBackgroundImage(
+                data.settings.backgroundImage
+            );
+
+
+        if (imageLoaded) {
+
+            document.getElementById(
+                "background-image"
+            ).checked = true;
+
+
+            document.getElementById(
+                "background-solid"
+            ).checked = false;
+
+
+            document.getElementById(
+                "background-gradient"
+            ).checked = false;
+
+        }
+
+
+        else {
+
+            applyBackgroundColor(
+                backgroundColor
+            );
+
+
+            document.getElementById(
+                "background-image"
+            ).checked = false;
+
+
+            document.getElementById(
+                "background-solid"
+            ).checked = true;
+
+
+            document.getElementById(
+                "background-gradient"
+            ).checked = false;
+
+
+            await saveData({
+
+                settings: {
+
+                    ...defaultSettings,
+
+                    ...data.settings,
+
+                    backgroundType:
+                        "solid"
+
+                }
+
+            });
+
+        }
+
+    }
+
+
+    // =====================================
+    // DEGRADADO
+    // =====================================
+
+    else if (
+        backgroundType === "gradient"
+    ) {
+
+        const gradientDirection =
+            data.settings?.gradientDirection ??
+            defaultSettings.gradientDirection;
+
+
+        const gradientColors =
+            data.settings?.gradientColors ??
+            defaultSettings.gradientColors;
+
+
+        gradientDirectionInput.value =
+            gradientDirection;
+
+
+        loadGradientColors(
+            gradientColors
+        );
+
+
+        applyGradient(
+            gradientDirection,
+            gradientColors
+        );
+
+
+        document.getElementById(
+            "background-image"
+        ).checked = false;
+
+
+        document.getElementById(
+            "background-solid"
+        ).checked = false;
+
+
+        document.getElementById(
+            "background-gradient"
+        ).checked = true;
+
+    }
+
+
+    // =====================================
+    // COLOR SÓLIDO
+    // =====================================
+
+    else {
+
+        applyBackgroundColor(
+            backgroundColor
+        );
+
+
+        document.getElementById(
+            "background-image"
+        ).checked = false;
+
+
+        document.getElementById(
+            "background-solid"
+        ).checked = true;
+
+
+        document.getElementById(
+            "background-gradient"
+        ).checked = false;
+
+    }
 
 }
 
 
-// Iniciar
-init();
+// =========================================
+// INICIAR
+// =========================================
 
+init();

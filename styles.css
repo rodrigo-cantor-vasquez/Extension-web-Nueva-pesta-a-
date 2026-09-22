@@ -1957,3 +1957,28 @@ main {
     background-color: #527fd1;
     border-color: #527fd1;
 }
+
+/* =========================================
+   IMAGEN DE FONDO
+   ========================================= */
+
+#background-image-settings {
+    margin-top: 10px;
+    padding: 12px;
+
+    border: 1px solid #d9e2f2;
+    border-radius: 10px;
+
+    background-color: #f8faff;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+
+#background-image-file {
+    width: 100%;
+    font-size: 13px;
+    cursor: pointer;
+}

@@ -6,6 +6,125 @@
     <title>Nueva Pestaña</title>
 
     <link rel="stylesheet" href="styles.css">
+
+    <style>
+        /* =========================================
+           VENTANA CONFIRMAR REINICIO
+           ========================================= */
+
+        #reset-confirmation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+
+            background: rgba(0, 0, 0, 0.45);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+
+            transition:
+                opacity 0.2s ease,
+                visibility 0.2s ease;
+
+            z-index: 10000;
+        }
+
+
+        #reset-confirmation-modal {
+            width: 420px;
+            max-width: calc(100% - 40px);
+
+            background: #ffffff;
+            border-radius: 12px;
+
+            box-shadow:
+                0 10px 35px rgba(0, 0, 0, 0.25);
+
+            overflow: hidden;
+        }
+
+
+        .reset-confirmation-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 18px 20px;
+
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+
+        .reset-confirmation-header h2 {
+            margin: 0;
+
+            font-size: 20px;
+        }
+
+
+        #close-reset-confirmation-button {
+            border: none;
+            background: transparent;
+
+            font-size: 26px;
+            line-height: 1;
+
+            cursor: pointer;
+
+            padding: 2px 7px;
+        }
+
+
+        .reset-confirmation-content {
+            padding: 20px;
+        }
+
+
+        .reset-confirmation-content p {
+            margin-top: 0;
+            margin-bottom: 24px;
+
+            line-height: 1.5;
+        }
+
+
+        .reset-confirmation-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+
+        .reset-confirmation-actions button {
+            border: none;
+            border-radius: 7px;
+
+            padding: 9px 16px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+        }
+
+
+        #cancel-reset-button {
+            background: #e9e9e9;
+        }
+
+
+        #confirm-reset-button {
+            background: #d9534f;
+            color: white;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -308,12 +427,19 @@
                             Editar sitio
                         </button>
 
-                        <button class="delete-site-button">
-                            <span class="menu-icon">🗑️</span>
-                            Eliminar sitio
-                        </button>
+                        <div class="site-menu">
 
-                    </div>
+                            <button class="edit-site-button">
+                                <span class="menu-icon">✏️</span>
+                                Editar sitio
+                            </button>
+
+                            <button class="delete-site-button">
+                                <span class="menu-icon">🗑️</span>
+                                Eliminar sitio
+                            </button>
+
+                        </div>
 
                 </div>
 
@@ -440,7 +566,7 @@
             <section class="settings-section">
 
                 <h3>
-                    Tamaño de los iconos
+                    Tamaño de las tarjetas
                 </h3>
 
                 <label for="icon-size">
@@ -476,6 +602,12 @@
                     <label for="background-image">
                         Imagen
                     </label>
+
+                    <div id="background-image-settings">
+
+                        <input type="file" id="background-image-file" accept="image/*">
+
+                    </div>
 
                 </div>
 
@@ -688,10 +820,10 @@
                 </div>
 
 
-                <!-- Reiniciar configuración de colores -->
+                <!-- Reiniciar configuración -->
 
                 <button id="reset-background-button" type="button">
-                    ↺ Reiniciar
+                    ↺ Reiniciar configuración
                 </button>
 
 
@@ -928,6 +1060,54 @@
 
                     <button id="save-add-group-button">
                         Guardar
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- CONFIRMAR REINICIO -->
+    <!-- ================================= -->
+
+    <div id="reset-confirmation-overlay">
+
+        <div id="reset-confirmation-modal">
+
+            <div class="reset-confirmation-header">
+
+                <h2>
+                    ¿Reiniciar extensión?
+                </h2>
+
+                <button id="close-reset-confirmation-button">
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="reset-confirmation-content">
+
+                <p>
+                    Se eliminarán todos tus grupos, sitios y configuraciones
+                    y se restaurarán los valores iniciales.
+                </p>
+
+
+                <div class="reset-confirmation-actions">
+
+                    <button id="cancel-reset-button">
+                        Cancelar
+                    </button>
+
+                    <button id="confirm-reset-button">
+                        Reiniciar
                     </button>
 
                 </div>
