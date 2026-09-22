@@ -1,4 +1,3 @@
-
 /* ================================= */
 /* CONFIGURACIÓN GENERAL */
 /* ================================= */
@@ -7,16 +6,47 @@
     box-sizing: border-box;
 }
 
+html {
+    min-height: 100%;
+}
+
 body {
     margin: 0;
     padding: 0;
+
+    min-height: 100vh;
 
     font-family: Arial, sans-serif;
 
     background-color: #eef4ff;
     color: #222;
+}
 
-    min-height: 100vh;
+
+/* ================================= */
+/* FONDO INICIAL */
+/* ================================= */
+
+/*
+   Esta clase es utilizada por background-bootstrap.js
+   para mostrar inmediatamente la última imagen de fondo
+   guardada en localStorage.
+
+   Así evitamos que primero aparezca el color sólido
+   y unos milisegundos después aparezca la imagen.
+*/
+
+html.initial-background-image,
+html.initial-background-image body {
+    background-image: var(--initial-background-image) !important;
+
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+html.initial-background-image body {
+    background-color: transparent !important;
 }
 
 
@@ -313,16 +343,21 @@ main {
 .site-icon {
     width: 42px;
     height: 42px;
+
     display: flex;
+
     align-items: center;
     justify-content: center;
+
     flex-shrink: 0;
+
     font-size: 36px;
 }
 
 .site-icon img {
     width: 32px;
     height: 32px;
+
     object-fit: contain;
 }
 
@@ -674,8 +709,6 @@ main {
 
     z-index: 100;
 
-    /* Oculto fuera de la pantalla */
-
     transform: translateX(100%);
 
     transition: transform 0.3s ease;
@@ -790,16 +823,10 @@ main {
 
 
 /* ================================= */
-/* TAMAÑO DE ICONOS */
+/* TAMAÑO DE LAS TARJETAS */
 /* ================================= */
 
-.settings-section label {
-    font-size: 14px;
-
-    color: #52627d;
-}
-
-#icon-size {
+#card-size {
     width: 80px;
 
     margin-left: 10px;
@@ -814,7 +841,7 @@ main {
     font-size: 14px;
 }
 
-#icon-size:focus {
+#card-size:focus {
     border-color: #6d9dfc;
 
     box-shadow: 0 0 0 3px rgba(70, 120, 220, 0.12);
@@ -851,6 +878,36 @@ main {
     cursor: pointer;
 
     color: #34445f;
+}
+
+
+/* ================================= */
+/* CONFIGURACIÓN DE LA IMAGEN */
+/* ================================= */
+
+#background-image-settings {
+    margin-top: 10px;
+
+    padding: 12px;
+
+    border: 1px solid #d9e2f2;
+    border-radius: 10px;
+
+    background-color: #f8faff;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+#background-image-file {
+    width: 100%;
+
+    font-size: 13px;
+
+    cursor: pointer;
 }
 
 
@@ -893,7 +950,7 @@ main {
 
 
 /* ================================= */
-/* DIRECCIÓN */
+/* DIRECCIÓN DEL DEGRADADO */
 /* ================================= */
 
 #gradient-direction {
@@ -924,7 +981,6 @@ main {
     margin-top: 5px;
 }
 
-
 .gradient-color {
     display: flex;
 
@@ -935,7 +991,6 @@ main {
 
     margin-bottom: 12px;
 }
-
 
 .gradient-color label {
     font-size: 14px;
@@ -955,7 +1010,6 @@ main {
 
     gap: 6px;
 }
-
 
 .gradient-color input[type="color"] {
     width: 45px;
@@ -1001,7 +1055,6 @@ main {
         color 0.2s;
 }
 
-
 .remove-gradient-color-button:hover {
     background-color: #f1f4fa;
 
@@ -1039,7 +1092,6 @@ main {
         color 0.2s;
 }
 
-
 #add-gradient-color-button:hover {
     background-color: #eaf1ff;
 
@@ -1048,6 +1100,10 @@ main {
     color: #315ca8;
 }
 
+
+/* ================================= */
+/* SELECTOR DE COLOR DEL FONDO */
+/* ================================= */
 
 .background-option input[type="color"] {
     width: 45px;
@@ -1198,7 +1254,6 @@ main {
         color 0.2s;
 }
 
-
 #reset-background-button:hover {
     background-color: #eaf1ff;
 
@@ -1207,53 +1262,6 @@ main {
     color: #315ca8;
 }
 
-
-#reset-background-button:hover {
-    background-color: #eaf1ff;
-
-    border-color: #6f9ef0;
-
-    color: #315ca8;
-}
-
-
-/* ================================= */
-/* RESPONSIVE */
-/* ================================= */
-
-@media (max-width: 800px) {
-
-    header {
-        flex-wrap: wrap;
-    }
-
-    .search-container {
-        width: 100%;
-        max-width: 350px;
-    }
-
-}
-
-
-@media (max-width: 500px) {
-
-    main {
-        width: 94%;
-    }
-
-    .site-group {
-        padding: 16px;
-    }
-
-    .sites-container {
-        justify-content: center;
-    }
-
-    .global-actions {
-        flex-direction: column;
-    }
-
-}
 
 /* ================================= */
 /* VENTANA EDITAR GRUPO */
@@ -1290,7 +1298,7 @@ main {
 
 
 /* ================================= */
-/* VENTANA */
+/* MODAL EDITAR GRUPO */
 /* ================================= */
 
 #edit-group-modal {
@@ -1308,7 +1316,7 @@ main {
 
 
 /* ================================= */
-/* ENCABEZADO */
+/* ENCABEZADO EDITAR GRUPO */
 /* ================================= */
 
 .edit-group-header {
@@ -1328,7 +1336,6 @@ main {
     border-bottom: 1px solid #dce6fa;
 }
 
-
 .edit-group-header h2 {
     margin: 0;
 
@@ -1339,7 +1346,7 @@ main {
 
 
 /* ================================= */
-/* BOTÓN CERRAR */
+/* BOTÓN CERRAR EDITAR GRUPO */
 /* ================================= */
 
 #close-edit-group-button {
@@ -1364,7 +1371,6 @@ main {
         color 0.2s;
 }
 
-
 #close-edit-group-button:hover {
     background-color: #e8efff;
 
@@ -1373,13 +1379,12 @@ main {
 
 
 /* ================================= */
-/* CONTENIDO */
+/* CONTENIDO EDITAR GRUPO */
 /* ================================= */
 
 .edit-group-content {
     padding: 20px;
 }
-
 
 .edit-group-content label {
     display: block;
@@ -1391,16 +1396,14 @@ main {
     color: #52627d;
 }
 
-
 #edit-group-name {
     width: 100%;
 
     padding: 10px 12px;
 
-    border: 1px solid #cddcff;
-
     margin-bottom: 16px;
 
+    border: 1px solid #cddcff;
     border-radius: 7px;
 
     outline: none;
@@ -1414,7 +1417,6 @@ main {
         box-shadow 0.2s;
 }
 
-
 #edit-group-name:focus {
     border-color: #6d9dfc;
 
@@ -1423,7 +1425,7 @@ main {
 
 
 /* ================================= */
-/* BOTONES */
+/* BOTONES EDITAR GRUPO */
 /* ================================= */
 
 .edit-group-actions {
@@ -1435,7 +1437,6 @@ main {
 
     margin-top: 20px;
 }
-
 
 #cancel-edit-group-button,
 #save-edit-group-button {
@@ -1453,9 +1454,6 @@ main {
         color 0.2s;
 }
 
-
-/* Cancelar */
-
 #cancel-edit-group-button {
     border: 1px solid #cddcff;
 
@@ -1464,15 +1462,11 @@ main {
     color: #5270a5;
 }
 
-
 #cancel-edit-group-button:hover {
     background-color: #eaf1ff;
 
     border-color: #a9c3f5;
 }
-
-
-/* Guardar */
 
 #save-edit-group-button {
     border: 1px solid #6f9ef0;
@@ -1482,12 +1476,12 @@ main {
     color: white;
 }
 
-
 #save-edit-group-button:hover {
     background-color: #527fd1;
 
     border-color: #527fd1;
 }
+
 
 /* ================================= */
 /* VENTANA EDITAR SITIO */
@@ -1495,18 +1489,28 @@ main {
 
 #edit-site-overlay {
     position: fixed;
+
     top: 0;
     left: 0;
+
     width: 100%;
     height: 100vh;
+
     display: flex;
+
     align-items: center;
     justify-content: center;
+
     background-color: rgba(0, 0, 0, 0.45);
+
     z-index: 200;
+
     opacity: 0;
+
     visibility: hidden;
+
     pointer-events: none;
+
     transition:
         opacity 0.2s ease,
         visibility 0.2s ease;
@@ -1514,42 +1518,69 @@ main {
 
 #edit-site-modal {
     width: 360px;
+
     background-color: white;
+
     border: 1px solid #d6e3ff;
     border-radius: 12px;
+
     box-shadow: 0 8px 25px rgba(50, 90, 160, 0.2);
+
     overflow: hidden;
 }
 
+
+/* ================================= */
+/* ENCABEZADO EDITAR SITIO */
+/* ================================= */
+
 .edit-site-header {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
+
     padding: 16px 18px;
+
     background: linear-gradient(
         90deg,
         #f3f7ff,
         #ffffff
     );
+
     border-bottom: 1px solid #dce6fa;
 }
 
 .edit-site-header h2 {
     margin: 0;
+
     font-size: 18px;
+
     color: #263b63;
 }
+
+
+/* ================================= */
+/* BOTÓN CERRAR EDITAR SITIO */
+/* ================================= */
 
 #close-edit-site-button {
     width: 32px;
     height: 32px;
+
     border: none;
     border-radius: 7px;
+
     background-color: transparent;
+
     color: #5277b9;
+
     font-size: 24px;
+
     line-height: 1;
+
     cursor: pointer;
+
     transition:
         background-color 0.2s,
         color 0.2s;
@@ -1557,8 +1588,14 @@ main {
 
 #close-edit-site-button:hover {
     background-color: #e8efff;
+
     color: #315ca8;
 }
+
+
+/* ================================= */
+/* CONTENIDO EDITAR SITIO */
+/* ================================= */
 
 .edit-site-content {
     padding: 20px;
@@ -1566,8 +1603,11 @@ main {
 
 .edit-site-content label {
     display: block;
+
     margin-bottom: 8px;
+
     font-size: 14px;
+
     color: #52627d;
 }
 
@@ -1575,14 +1615,23 @@ main {
 #edit-site-url,
 #edit-site-description {
     width: 100%;
+
     padding: 10px 12px;
+
     margin-bottom: 16px;
+
     border: 1px solid #cddcff;
+
     border-radius: 7px;
+
     outline: none;
+
     font-size: 14px;
+
     color: #34445f;
+
     box-sizing: border-box;
+
     transition:
         border-color 0.2s,
         box-shadow 0.2s;
@@ -1592,28 +1641,43 @@ main {
 #edit-site-url:focus,
 #edit-site-description:focus {
     border-color: #6d9dfc;
+
     box-shadow: 0 0 0 3px rgba(70, 120, 220, 0.12);
 }
 
 #edit-site-description {
     resize: vertical;
+
     min-height: 75px;
+
     font-family: inherit;
 }
 
+
+/* ================================= */
+/* BOTONES EDITAR SITIO */
+/* ================================= */
+
 .edit-site-actions {
     display: flex;
+
     justify-content: flex-end;
+
     gap: 10px;
+
     margin-top: 4px;
 }
 
 #cancel-edit-site-button,
 #save-edit-site-button {
     padding: 9px 15px;
+
     border-radius: 7px;
+
     font-size: 14px;
+
     cursor: pointer;
+
     transition:
         background-color 0.2s,
         border-color 0.2s,
@@ -1622,25 +1686,36 @@ main {
 
 #cancel-edit-site-button {
     border: 1px solid #cddcff;
+
     background-color: white;
+
     color: #5270a5;
 }
 
 #cancel-edit-site-button:hover {
     background-color: #eaf1ff;
+
     border-color: #a9c3f5;
 }
 
 #save-edit-site-button {
     border: 1px solid #6f9ef0;
+
     background-color: #6f9ef0;
+
     color: white;
 }
 
 #save-edit-site-button:hover {
     background-color: #527fd1;
+
     border-color: #527fd1;
 }
+
+
+/* ================================= */
+/* ERRORES DE FORMULARIOS */
+/* ================================= */
 
 #edit-site-url-error,
 #edit-site-name-error,
@@ -1648,29 +1723,43 @@ main {
 #add-site-url-error,
 #add-site-name-error {
     margin: -8px 0 16px;
+
     text-align: center;
+
     color: #d14b4b;
+
     font-size: 13px;
 }
 
-/* =========================================
-   MODAL AGREGAR SITIO
-   ========================================= */
+
+/* ========================================= */
+/* MODAL AGREGAR SITIO */
+/* ========================================= */
 
 #add-site-overlay {
     position: fixed;
+
     top: 0;
     left: 0;
+
     width: 100%;
     height: 100vh;
+
     display: flex;
+
     align-items: center;
     justify-content: center;
+
     background-color: rgba(0, 0, 0, 0.45);
+
     z-index: 200;
+
     opacity: 0;
+
     visibility: hidden;
+
     pointer-events: none;
+
     transition:
         opacity 0.2s ease,
         visibility 0.2s ease;
@@ -1678,42 +1767,69 @@ main {
 
 #add-site-modal {
     width: 360px;
+
     background-color: white;
+
     border: 1px solid #d6e3ff;
     border-radius: 12px;
+
     box-shadow: 0 8px 25px rgba(50, 90, 160, 0.2);
+
     overflow: hidden;
 }
 
+
+/* ================================= */
+/* ENCABEZADO AGREGAR SITIO */
+/* ================================= */
+
 .add-site-header {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
+
     padding: 16px 18px;
+
     background: linear-gradient(
         90deg,
         #f3f7ff,
         #ffffff
     );
+
     border-bottom: 1px solid #dce6fa;
 }
 
 .add-site-header h2 {
     margin: 0;
+
     font-size: 18px;
+
     color: #263b63;
 }
+
+
+/* ================================= */
+/* BOTÓN CERRAR AGREGAR SITIO */
+/* ================================= */
 
 #close-add-site-button {
     width: 32px;
     height: 32px;
+
     border: none;
     border-radius: 7px;
+
     background-color: transparent;
+
     color: #5277b9;
+
     font-size: 24px;
+
     line-height: 1;
+
     cursor: pointer;
+
     transition:
         background-color 0.2s,
         color 0.2s;
@@ -1721,8 +1837,14 @@ main {
 
 #close-add-site-button:hover {
     background-color: #e8efff;
+
     color: #315ca8;
 }
+
+
+/* ================================= */
+/* CONTENIDO AGREGAR SITIO */
+/* ================================= */
 
 .add-site-content {
     padding: 20px;
@@ -1730,8 +1852,11 @@ main {
 
 .add-site-content label {
     display: block;
+
     margin-bottom: 8px;
+
     font-size: 14px;
+
     color: #52627d;
 }
 
@@ -1740,14 +1865,23 @@ main {
 #add-site-description,
 #add-site-group {
     width: 100%;
+
     padding: 10px 12px;
+
     margin-bottom: 16px;
+
     border: 1px solid #cddcff;
+
     border-radius: 7px;
+
     outline: none;
+
     font-size: 14px;
+
     color: #34445f;
+
     box-sizing: border-box;
+
     transition:
         border-color 0.2s,
         box-shadow 0.2s;
@@ -1758,28 +1892,43 @@ main {
 #add-site-description:focus,
 #add-site-group:focus {
     border-color: #6d9dfc;
+
     box-shadow: 0 0 0 3px rgba(70, 120, 220, 0.12);
 }
 
 #add-site-description {
     resize: vertical;
+
     min-height: 75px;
+
     font-family: inherit;
 }
 
+
+/* ================================= */
+/* BOTONES AGREGAR SITIO */
+/* ================================= */
+
 .add-site-actions {
     display: flex;
+
     justify-content: flex-end;
+
     gap: 10px;
+
     margin-top: 4px;
 }
 
 #cancel-add-site-button,
 #save-add-site-button {
     padding: 9px 15px;
+
     border-radius: 7px;
+
     font-size: 14px;
+
     cursor: pointer;
+
     transition:
         background-color 0.2s,
         border-color 0.2s,
@@ -1788,44 +1937,61 @@ main {
 
 #cancel-add-site-button {
     border: 1px solid #cddcff;
+
     background-color: white;
+
     color: #5270a5;
 }
 
 #cancel-add-site-button:hover {
     background-color: #eaf1ff;
+
     border-color: #a9c3f5;
 }
 
 #save-add-site-button {
     border: 1px solid #6f9ef0;
+
     background-color: #6f9ef0;
+
     color: white;
 }
 
 #save-add-site-button:hover {
     background-color: #527fd1;
+
     border-color: #527fd1;
 }
 
-/* =========================================
-   MODAL AGREGAR GRUPO
-   ========================================= */
+
+/* ========================================= */
+/* MODAL AGREGAR GRUPO */
+/* ========================================= */
 
 #add-group-overlay {
     position: fixed;
+
     top: 0;
     left: 0;
+
     width: 100%;
     height: 100vh;
+
     display: flex;
+
     align-items: center;
     justify-content: center;
+
     background-color: rgba(0, 0, 0, 0.45);
+
     z-index: 200;
+
     opacity: 0;
+
     visibility: hidden;
+
     pointer-events: none;
+
     transition:
         opacity 0.2s ease,
         visibility 0.2s ease;
@@ -1833,42 +1999,69 @@ main {
 
 #add-group-modal {
     width: 360px;
+
     background-color: white;
+
     border: 1px solid #d6e3ff;
     border-radius: 12px;
+
     box-shadow: 0 8px 25px rgba(50, 90, 160, 0.2);
+
     overflow: hidden;
 }
 
+
+/* ================================= */
+/* ENCABEZADO AGREGAR GRUPO */
+/* ================================= */
+
 .add-group-header {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
+
     padding: 16px 18px;
+
     background: linear-gradient(
         90deg,
         #f3f7ff,
         #ffffff
     );
+
     border-bottom: 1px solid #dce6fa;
 }
 
 .add-group-header h2 {
     margin: 0;
+
     font-size: 18px;
+
     color: #263b63;
 }
+
+
+/* ================================= */
+/* BOTÓN CERRAR AGREGAR GRUPO */
+/* ================================= */
 
 #close-add-group-button {
     width: 32px;
     height: 32px;
+
     border: none;
     border-radius: 7px;
+
     background-color: transparent;
+
     color: #5277b9;
+
     font-size: 24px;
+
     line-height: 1;
+
     cursor: pointer;
+
     transition:
         background-color 0.2s,
         color 0.2s;
@@ -1876,8 +2069,14 @@ main {
 
 #close-add-group-button:hover {
     background-color: #e8efff;
+
     color: #315ca8;
 }
+
+
+/* ================================= */
+/* CONTENIDO AGREGAR GRUPO */
+/* ================================= */
 
 .add-group-content {
     padding: 20px;
@@ -1885,21 +2084,33 @@ main {
 
 .add-group-content label {
     display: block;
+
     margin-bottom: 8px;
+
     font-size: 14px;
+
     color: #52627d;
 }
 
 #add-group-name {
     width: 100%;
+
     padding: 10px 12px;
+
     margin-bottom: 16px;
+
     border: 1px solid #cddcff;
+
     border-radius: 7px;
+
     outline: none;
+
     font-size: 14px;
+
     color: #34445f;
+
     box-sizing: border-box;
+
     transition:
         border-color 0.2s,
         box-shadow 0.2s;
@@ -1907,29 +2118,45 @@ main {
 
 #add-group-name:focus {
     border-color: #6d9dfc;
+
     box-shadow: 0 0 0 3px rgba(70, 120, 220, 0.12);
 }
 
 #add-group-name-error {
     margin: -8px 0 16px;
+
     text-align: center;
+
     color: #d14b4b;
+
     font-size: 13px;
 }
 
+
+/* ================================= */
+/* BOTONES AGREGAR GRUPO */
+/* ================================= */
+
 .add-group-actions {
     display: flex;
+
     justify-content: flex-end;
+
     gap: 10px;
+
     margin-top: 4px;
 }
 
 #cancel-add-group-button,
 #save-add-group-button {
     padding: 9px 15px;
+
     border-radius: 7px;
+
     font-size: 14px;
+
     cursor: pointer;
+
     transition:
         background-color 0.2s,
         border-color 0.2s,
@@ -1938,47 +2165,189 @@ main {
 
 #cancel-add-group-button {
     border: 1px solid #cddcff;
+
     background-color: white;
+
     color: #5270a5;
 }
 
 #cancel-add-group-button:hover {
     background-color: #eaf1ff;
+
     border-color: #a9c3f5;
 }
 
 #save-add-group-button {
     border: 1px solid #6f9ef0;
+
     background-color: #6f9ef0;
+
     color: white;
 }
 
 #save-add-group-button:hover {
     background-color: #527fd1;
+
     border-color: #527fd1;
 }
 
-/* =========================================
-   IMAGEN DE FONDO
-   ========================================= */
 
-#background-image-settings {
-    margin-top: 10px;
-    padding: 12px;
+/* ================================= */
+/* VENTANA CONFIRMAR REINICIO */
+/* ================================= */
 
-    border: 1px solid #d9e2f2;
-    border-radius: 10px;
+#reset-confirmation-overlay {
+    position: fixed;
 
-    background-color: #f8faff;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
 
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+
+    z-index: 10000;
 }
 
+#reset-confirmation-modal {
+    width: 420px;
 
-#background-image-file {
-    width: 100%;
-    font-size: 13px;
+    max-width: calc(100% - 40px);
+
+    background: #ffffff;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.25);
+
+    overflow: hidden;
+}
+
+.reset-confirmation-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.reset-confirmation-header h2 {
+    margin: 0;
+
+    font-size: 20px;
+}
+
+#close-reset-confirmation-button {
+    border: none;
+
+    background: transparent;
+
+    font-size: 26px;
+
+    line-height: 1;
+
     cursor: pointer;
+
+    padding: 2px 7px;
 }
+
+.reset-confirmation-content {
+    padding: 20px;
+}
+
+.reset-confirmation-content p {
+    margin-top: 0;
+
+    margin-bottom: 24px;
+
+    line-height: 1.5;
+}
+
+.reset-confirmation-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+}
+
+.reset-confirmation-actions button {
+    border: none;
+
+    border-radius: 7px;
+
+    padding: 9px 16px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+#cancel-reset-button {
+    background: #e9e9e9;
+}
+
+#confirm-reset-button {
+    background: #d9534f;
+
+    color: white;
+}
+
+
+/* ================================= */
+/* RESPONSIVE */
+/* ================================= */
+
+@media (max-width: 800px) {
+
+    header {
+        flex-wrap: wrap;
+    }
+
+    .search-container {
+        width: 100%;
+
+        max-width: 350px;
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    main {
+        width: 94%;
+    }
+
+    .site-group {
+        padding: 16px;
+    }
+
+    .sites-container {
+        justify-content: center;
+    }
+
+    .global-actions {
+        flex-direction: column;
+    }
+}
+

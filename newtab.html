@@ -2,132 +2,25 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
+
     <title>Nueva Pestaña</title>
 
+    <!-- Hoja de estilos principal -->
     <link rel="stylesheet" href="styles.css">
 
-    <style>
-        /* =========================================
-           VENTANA CONFIRMAR REINICIO
-           ========================================= */
-
-        #reset-confirmation-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-
-            background: rgba(0, 0, 0, 0.45);
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-
-            transition:
-                opacity 0.2s ease,
-                visibility 0.2s ease;
-
-            z-index: 10000;
-        }
-
-
-        #reset-confirmation-modal {
-            width: 420px;
-            max-width: calc(100% - 40px);
-
-            background: #ffffff;
-            border-radius: 12px;
-
-            box-shadow:
-                0 10px 35px rgba(0, 0, 0, 0.25);
-
-            overflow: hidden;
-        }
-
-
-        .reset-confirmation-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            padding: 18px 20px;
-
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-
-        .reset-confirmation-header h2 {
-            margin: 0;
-
-            font-size: 20px;
-        }
-
-
-        #close-reset-confirmation-button {
-            border: none;
-            background: transparent;
-
-            font-size: 26px;
-            line-height: 1;
-
-            cursor: pointer;
-
-            padding: 2px 7px;
-        }
-
-
-        .reset-confirmation-content {
-            padding: 20px;
-        }
-
-
-        .reset-confirmation-content p {
-            margin-top: 0;
-            margin-bottom: 24px;
-
-            line-height: 1.5;
-        }
-
-
-        .reset-confirmation-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-
-        .reset-confirmation-actions button {
-            border: none;
-            border-radius: 7px;
-
-            padding: 9px 16px;
-
-            cursor: pointer;
-
-            font-size: 14px;
-        }
-
-
-        #cancel-reset-button {
-            background: #e9e9e9;
-        }
-
-
-        #confirm-reset-button {
-            background: #d9534f;
-            color: white;
-        }
-    </style>
+    <!--
+        Carga el último fondo guardado inmediatamente,
+        antes de que se muestre el contenido de la página.
+    -->
+    <script src="background-bootstrap.js"></script>
 
 </head>
 
+
 <body>
+
 
     <!-- ================================= -->
     <!-- ENCABEZADO -->
@@ -137,14 +30,22 @@
 
         <div class="search-container">
 
-            <input type="text" id="google-search" placeholder="Buscar en Google...">
+            <input
+                type="text"
+                id="google-search"
+                placeholder="Buscar en Google..."
+            >
 
         </div>
 
 
         <div class="search-container">
 
-            <input type="text" id="sites-search" placeholder="Buscar mis sitios...">
+            <input
+                type="text"
+                id="sites-search"
+                placeholder="Buscar mis sitios..."
+            >
 
         </div>
 
@@ -154,6 +55,7 @@
         </button>
 
     </header>
+
 
 
     <!-- ================================= -->
@@ -168,9 +70,21 @@
         GRUPO: MIS SITIOS
         =================================
 
+        Estos grupos son ejemplos.
+
+        Actualmente los grupos reales se
+        generan dinámicamente mediante JavaScript
+        utilizando los datos guardados.
+        -->
+
+
+        <!--
+
         <section class="site-group">
 
+
             <div class="group-header">
+
 
                 <div class="group-title-container">
 
@@ -178,133 +92,217 @@
                         Mis sitios
                     </h2>
 
+
                     <button class="group-menu-button">
                         ⋮
                     </button>
 
                 </div>
 
+
                 <div class="group-menu">
 
+
                     <button class="edit-group-button">
-                        <span class="menu-icon">✏️</span>
+
+                        <span class="menu-icon">
+                            ✏️
+                        </span>
+
                         Editar grupo
+
                     </button>
 
+
                     <button class="delete-group-button">
-                        <span class="menu-icon">🗑️</span>
+
+                        <span class="menu-icon">
+                            🗑️
+                        </span>
+
                         Eliminar grupo
+
                     </button>
+
 
                 </div>
 
+
             </div>
+
 
             <div class="sites-container">
 
-                <div class="site-card" data-url="https://www.google.com">
+
+                <div
+                    class="site-card"
+                    data-url="https://www.google.com"
+                >
 
                     <div class="site-icon">
                         🌐
                     </div>
 
+
                     <span class="site-name">
                         Google
                     </span>
+
 
                     <div class="site-description">
                         Motor de búsqueda para encontrar información en Internet.
                     </div>
 
+
                     <button class="site-menu-button">
                         ⋮
                     </button>
 
+
                     <div class="site-menu">
 
+
                         <button class="edit-site-button">
-                            <span class="menu-icon">✏️</span>
+
+                            <span class="menu-icon">
+                                ✏️
+                            </span>
+
                             Editar sitio
+
                         </button>
+
 
                         <button class="delete-site-button">
-                            <span class="menu-icon">🗑️</span>
+
+                            <span class="menu-icon">
+                                🗑️
+                            </span>
+
                             Eliminar sitio
+
                         </button>
 
+
                     </div>
+
 
                 </div>
 
 
-                <div class="site-card" data-url="https://www.youtube.com">
+
+                <div
+                    class="site-card"
+                    data-url="https://www.youtube.com"
+                >
 
                     <div class="site-icon">
                         ▶️
                     </div>
 
+
                     <span class="site-name">
                         YouTube
                     </span>
+
 
                     <div class="site-description">
                         Plataforma para ver y compartir videos.
                     </div>
 
+
                     <button class="site-menu-button">
                         ⋮
                     </button>
 
+
                     <div class="site-menu">
 
+
                         <button class="edit-site-button">
-                            <span class="menu-icon">✏️</span>
+
+                            <span class="menu-icon">
+                                ✏️
+                            </span>
+
                             Editar sitio
+
                         </button>
+
 
                         <button class="delete-site-button">
-                            <span class="menu-icon">🗑️</span>
+
+                            <span class="menu-icon">
+                                🗑️
+                            </span>
+
                             Eliminar sitio
+
                         </button>
 
+
                     </div>
+
 
                 </div>
 
 
-                <div class="site-card" data-url="https://github.com">
+
+                <div
+                    class="site-card"
+                    data-url="https://github.com"
+                >
 
                     <div class="site-icon">
                         💻
                     </div>
 
+
                     <span class="site-name">
                         GitHub
                     </span>
+
 
                     <div class="site-description">
                         Plataforma para alojar y gestionar proyectos de código.
                     </div>
 
+
                     <button class="site-menu-button">
                         ⋮
                     </button>
 
+
                     <div class="site-menu">
 
+
                         <button class="edit-site-button">
-                            <span class="menu-icon">✏️</span>
+
+                            <span class="menu-icon">
+                                ✏️
+                            </span>
+
                             Editar sitio
+
                         </button>
 
+
                         <button class="delete-site-button">
-                            <span class="menu-icon">🗑️</span>
+
+                            <span class="menu-icon">
+                                🗑️
+                            </span>
+
                             Eliminar sitio
+
                         </button>
+
 
                     </div>
 
+
                 </div>
+
 
 
                 <div class="add-site-card">
@@ -322,18 +320,27 @@
 
             </div>
 
+
         </section>
+
         -->
+
 
 
         <!--
         =================================
         GRUPO: INTELIGENCIA ARTIFICIAL
         =================================
+        -->
+
+
+        <!--
 
         <section class="site-group">
 
+
             <div class="group-header">
+
 
                 <div class="group-title-container">
 
@@ -341,142 +348,220 @@
                         Inteligencia Artificial
                     </h2>
 
+
                     <button class="group-menu-button">
                         ⋮
                     </button>
 
+
                 </div>
+
 
                 <div class="group-menu">
 
+
                     <button class="edit-group-button">
-                        <span class="menu-icon">✏️</span>
+
+                        <span class="menu-icon">
+                            ✏️
+                        </span>
+
                         Editar grupo
+
                     </button>
 
+
                     <button class="delete-group-button">
-                        <span class="menu-icon">🗑️</span>
+
+                        <span class="menu-icon">
+                            🗑️
+                        </span>
+
                         Eliminar grupo
+
                     </button>
+
 
                 </div>
 
+
             </div>
+
 
 
             <div class="sites-container">
 
 
-                <div class="site-card" data-url="https://chatgpt.com">
+                <div
+                    class="site-card"
+                    data-url="https://chatgpt.com"
+                >
 
                     <div class="site-icon">
                         🤖
                     </div>
 
+
                     <span class="site-name">
                         ChatGPT
                     </span>
+
 
                     <div class="site-description">
                         Asistente de inteligencia artificial para conversar y realizar diferentes tareas.
                     </div>
 
+
                     <button class="site-menu-button">
                         ⋮
                     </button>
 
+
                     <div class="site-menu">
 
+
                         <button class="edit-site-button">
-                            <span class="menu-icon">✏️</span>
+
+                            <span class="menu-icon">
+                                ✏️
+                            </span>
+
                             Editar sitio
+
                         </button>
+
 
                         <button class="delete-site-button">
-                            <span class="menu-icon">🗑️</span>
+
+                            <span class="menu-icon">
+                                🗑️
+                            </span>
+
                             Eliminar sitio
+
                         </button>
 
+
                     </div>
+
 
                 </div>
 
 
-                <div class="site-card" data-url="https://gemini.google.com">
+
+                <div
+                    class="site-card"
+                    data-url="https://gemini.google.com"
+                >
 
                     <div class="site-icon">
                         ✨
                     </div>
 
+
                     <span class="site-name">
                         Gemini
                     </span>
+
 
                     <div class="site-description">
                         Asistente de inteligencia artificial desarrollado por Google.
                     </div>
 
+
                     <button class="site-menu-button">
                         ⋮
                     </button>
 
+
                     <div class="site-menu">
 
+
                         <button class="edit-site-button">
-                            <span class="menu-icon">✏️</span>
+
+                            <span class="menu-icon">
+                                ✏️
+                            </span>
+
                             Editar sitio
+
                         </button>
 
-                        <div class="site-menu">
 
-                            <button class="edit-site-button">
-                                <span class="menu-icon">✏️</span>
-                                Editar sitio
-                            </button>
+                        <button class="delete-site-button">
 
-                            <button class="delete-site-button">
-                                <span class="menu-icon">🗑️</span>
-                                Eliminar sitio
-                            </button>
+                            <span class="menu-icon">
+                                🗑️
+                            </span>
 
-                        </div>
+                            Eliminar sitio
+
+                        </button>
+
+
+                    </div>
+
 
                 </div>
 
 
-                <div class="site-card" data-url="https://chat.deepseek.com">
+
+                <div
+                    class="site-card"
+                    data-url="https://chat.deepseek.com"
+                >
 
                     <div class="site-icon">
                         🧠
                     </div>
 
+
                     <span class="site-name">
                         DeepSeek
                     </span>
+
 
                     <div class="site-description">
                         Herramienta de inteligencia artificial para conversación y generación de contenido.
                     </div>
 
+
                     <button class="site-menu-button">
                         ⋮
                     </button>
 
+
                     <div class="site-menu">
 
+
                         <button class="edit-site-button">
-                            <span class="menu-icon">✏️</span>
+
+                            <span class="menu-icon">
+                                ✏️
+                            </span>
+
                             Editar sitio
+
                         </button>
 
+
                         <button class="delete-site-button">
-                            <span class="menu-icon">🗑️</span>
+
+                            <span class="menu-icon">
+                                🗑️
+                            </span>
+
                             Eliminar sitio
+
+
                         </button>
+
 
                     </div>
 
+
                 </div>
+
 
 
                 <div class="add-site-card">
@@ -494,7 +579,9 @@
 
             </div>
 
+
         </section>
+
         -->
 
 
@@ -509,14 +596,10 @@
     <div class="global-actions">
 
 
-        <!-- Agregar sitio general -->
-
         <button id="add-site-button">
             + Agregar sitio
         </button>
 
-
-        <!-- Agregar grupo -->
 
         <button id="add-group-button">
             + Agregar grupo
@@ -526,11 +609,13 @@
     </div>
 
 
+
     <!-- ================================= -->
     <!-- CAPA TRANSPARENTE -->
     <!-- ================================= -->
 
     <div id="settings-overlay"></div>
+
 
 
     <!-- ================================= -->
@@ -539,47 +624,64 @@
 
     <aside id="settings-panel">
 
-        <!-- Encabezado del panel -->
+
+        <!-- ENCABEZADO DEL PANEL -->
 
         <div class="settings-header">
+
 
             <h2>
                 Configuración
             </h2>
 
+
             <button id="close-settings-button">
                 ×
             </button>
 
+
         </div>
 
 
-        <!-- Contenido del panel -->
+
+        <!-- CONTENIDO DEL PANEL -->
 
         <div class="settings-content">
 
 
             <!-- ================================= -->
-            <!-- TAMAÑO DE LOS ICONOS -->
+            <!-- TAMAÑO DE LAS TARJETAS -->
             <!-- ================================= -->
 
             <section class="settings-section">
+
 
                 <h3>
                     Tamaño de las tarjetas
                 </h3>
 
-                <label for="icon-size">
+
+                <label for="card-size">
                     Tamaño
                 </label>
 
-                <input type="number" id="card-size" min="95" max="140" value="95">
+
+                <input
+                    type="number"
+                    id="card-size"
+                    min="95"
+                    max="140"
+                    value="95"
+                >
+
 
                 <span>
                     px
                 </span>
 
+
             </section>
+
 
 
             <!-- ================================= -->
@@ -588,147 +690,227 @@
 
             <section class="settings-section">
 
+
                 <h3>
                     Fondo
                 </h3>
 
 
-                <!-- Imagen -->
+
+                <!-- IMAGEN -->
 
                 <div class="background-option">
 
-                    <input type="radio" id="background-image" name="background-type" value="image">
+
+                    <input
+                        type="radio"
+                        id="background-image"
+                        name="background-type"
+                        value="image"
+                    >
+
 
                     <label for="background-image">
                         Imagen
                     </label>
 
+
                     <div id="background-image-settings">
 
-                        <input type="file" id="background-image-file" accept="image/*">
+
+                        <input
+                            type="file"
+                            id="background-image-file"
+                            accept="image/*"
+                        >
+
 
                     </div>
+
 
                 </div>
 
 
-                <!-- Color sólido -->
+
+                <!-- COLOR SÓLIDO -->
 
                 <div class="background-option">
 
-                    <input type="radio" id="background-solid" name="background-type" value="solid" checked>
+
+                    <input
+                        type="radio"
+                        id="background-solid"
+                        name="background-type"
+                        value="solid"
+                        checked
+                    >
+
 
                     <label for="background-solid">
                         Color sólido
                     </label>
 
-                    <input type="color" id="background-color" value="#eef4ff">
+
+                    <input
+                        type="color"
+                        id="background-color"
+                        value="#eef4ff"
+                    >
+
 
                 </div>
 
 
-                <!-- Degradado -->
+
+                <!-- DEGRADADO -->
 
                 <div class="background-option">
 
-                    <input type="radio" id="background-gradient" name="background-type" value="gradient">
+
+                    <input
+                        type="radio"
+                        id="background-gradient"
+                        name="background-type"
+                        value="gradient"
+                    >
+
 
                     <label for="background-gradient">
                         Degradado
                     </label>
 
+
                 </div>
 
 
-                <!-- Configuración del degradado -->
+
+                <!-- CONFIGURACIÓN DEL DEGRADADO -->
 
                 <div id="gradient-settings">
 
 
-                    <!-- Dirección -->
+                    <!-- DIRECCIÓN -->
 
                     <div class="gradient-setting">
+
 
                         <label for="gradient-direction">
                             Dirección
                         </label>
 
+
                         <select id="gradient-direction">
+
 
                             <option value="90">
                                 Horizontal
                             </option>
 
+
                             <option value="180">
                                 Vertical
                             </option>
+
 
                             <option value="135">
                                 Diagonal ↘
                             </option>
 
+
                             <option value="45">
                                 Diagonal ↗
                             </option>
+
 
                             <option value="225">
                                 Diagonal ↙
                             </option>
 
+
                             <option value="315">
                                 Diagonal ↖
                             </option>
 
+
                         </select>
+
 
                     </div>
 
 
-                    <!-- Colores -->
+
+                    <!-- COLORES -->
 
                     <div id="gradient-colors">
 
 
-                        <!-- Color 1 -->
+                        <!-- COLOR 1 -->
 
                         <div class="gradient-color">
+
 
                             <label for="gradient-color-1">
                                 Color 1
                             </label>
 
+
                             <div class="gradient-color-controls">
 
-                                <input type="color" id="gradient-color-1" value="#eef4ff">
 
-                                <button type="button" class="remove-gradient-color-button"
-                                    aria-label="Eliminar color 1">
+                                <input
+                                    type="color"
+                                    id="gradient-color-1"
+                                    value="#eef4ff"
+                                >
+
+
+                                <button
+                                    type="button"
+                                    class="remove-gradient-color-button"
+                                    aria-label="Eliminar color 1"
+                                >
                                     ×
                                 </button>
 
+
                             </div>
+
 
                         </div>
 
 
-                        <!-- Color 2 -->
+
+                        <!-- COLOR 2 -->
 
                         <div class="gradient-color">
+
 
                             <label for="gradient-color-2">
                                 Color 2
                             </label>
 
+
                             <div class="gradient-color-controls">
 
-                                <input type="color" id="gradient-color-2" value="#d6e3ff">
 
-                                <button type="button" class="remove-gradient-color-button"
-                                    aria-label="Eliminar color 2">
+                                <input
+                                    type="color"
+                                    id="gradient-color-2"
+                                    value="#d6e3ff"
+                                >
+
+
+                                <button
+                                    type="button"
+                                    class="remove-gradient-color-button"
+                                    aria-label="Eliminar color 2"
+                                >
                                     ×
                                 </button>
 
+
                             </div>
+
 
                         </div>
 
@@ -736,14 +918,19 @@
                     </div>
 
 
-                    <!-- Agregar color -->
 
-                    <button id="add-gradient-color-button" type="button">
+                    <!-- AGREGAR COLOR -->
+
+                    <button
+                        id="add-gradient-color-button"
+                        type="button"
+                    >
                         + Agregar color
                     </button>
 
 
                 </div>
+
 
             </section>
 
@@ -755,74 +942,117 @@
 
             <section class="settings-section">
 
+
                 <h3>
                     Colores de grupos
                 </h3>
 
 
-                <!-- Color de los grupos -->
+
+                <!-- COLOR DE LOS GRUPOS -->
 
                 <div class="color-setting">
+
 
                     <label for="group-color">
                         Color de los grupos
                     </label>
 
-                    <input type="color" id="group-color" value="#ffffff">
+
+                    <input
+                        type="color"
+                        id="group-color"
+                        value="#ffffff"
+                    >
+
 
                 </div>
 
 
-                <!-- Transparencia de los grupos -->
+
+                <!-- TRANSPARENCIA DE LOS GRUPOS -->
 
                 <div class="transparency-setting">
+
 
                     <label for="group-transparency">
                         Transparencia
                     </label>
 
-                    <input type="range" id="group-transparency" min="0" max="100" value="0">
+
+                    <input
+                        type="range"
+                        id="group-transparency"
+                        min="0"
+                        max="100"
+                        value="0"
+                    >
+
 
                     <span id="group-transparency-value">
                         0%
                     </span>
 
+
                 </div>
 
 
-                <!-- Color de las tarjetas -->
+
+                <!-- COLOR DE LAS TARJETAS -->
 
                 <div class="color-setting">
+
 
                     <label for="card-color">
                         Color de las tarjetas
                     </label>
 
-                    <input type="color" id="card-color" value="#f8faff">
+
+                    <input
+                        type="color"
+                        id="card-color"
+                        value="#f8faff"
+                    >
+
 
                 </div>
 
 
-                <!-- Transparencia de las tarjetas -->
+
+                <!-- TRANSPARENCIA DE LAS TARJETAS -->
 
                 <div class="transparency-setting">
+
 
                     <label for="card-transparency">
                         Transparencia
                     </label>
 
-                    <input type="range" id="card-transparency" min="0" max="100" value="0">
+
+                    <input
+                        type="range"
+                        id="card-transparency"
+                        min="0"
+                        max="100"
+                        value="0"
+                    >
+
 
                     <span id="card-transparency-value">
                         0%
                     </span>
 
+
                 </div>
 
 
-                <!-- Reiniciar configuración -->
 
-                <button id="reset-background-button" type="button">
+                <!-- REINICIAR CONFIGURACIÓN -->
+
+                <button
+                    id="reset-background-button"
+                    type="button"
+                >
                     ↺ Reiniciar configuración
                 </button>
 
@@ -830,10 +1060,11 @@
             </section>
 
 
-
         </div>
 
+
     </aside>
+
 
 
     <!-- ================================= -->
@@ -842,48 +1073,67 @@
 
     <div id="edit-group-overlay">
 
+
         <div id="edit-group-modal">
 
+
             <div class="edit-group-header">
+
 
                 <h2>
                     Editar grupo
                 </h2>
 
+
                 <button id="close-edit-group-button">
                     ×
                 </button>
+
 
             </div>
 
 
             <div class="edit-group-content">
 
+
                 <label for="edit-group-name">
                     Nombre del grupo
                 </label>
 
-                <input type="text" id="edit-group-name">
+
+                <input
+                    type="text"
+                    id="edit-group-name"
+                >
+
 
                 <p id="edit-group-name-error"></p>
 
+
                 <div class="edit-group-actions">
+
 
                     <button id="cancel-edit-group-button">
                         Cancelar
                     </button>
 
+
                     <button id="save-edit-group-button">
                         Guardar
                     </button>
 
+
                 </div>
+
 
             </div>
 
+
         </div>
 
+
     </div>
+
 
 
     <!-- ================================= -->
@@ -892,183 +1142,263 @@
 
     <div id="edit-site-overlay">
 
+
         <div id="edit-site-modal">
 
+
             <div class="edit-site-header">
+
 
                 <h2>
                     Editar sitio
                 </h2>
 
+
                 <button id="close-edit-site-button">
                     ×
                 </button>
+
 
             </div>
 
 
             <div class="edit-site-content">
 
+
                 <label for="edit-site-name">
                     Nombre del sitio
                 </label>
 
-                <input type="text" id="edit-site-name">
+
+                <input
+                    type="text"
+                    id="edit-site-name"
+                >
+
 
                 <p id="edit-site-name-error"></p>
+
 
                 <label for="edit-site-url">
                     URL
                 </label>
 
-                <input type="url" id="edit-site-url">
+
+                <input
+                    type="url"
+                    id="edit-site-url"
+                >
+
 
                 <p id="edit-site-url-error"></p>
+
 
                 <label for="edit-site-description">
                     Descripción
                 </label>
 
-                <textarea id="edit-site-description" rows="3"></textarea>
+
+                <textarea
+                    id="edit-site-description"
+                    rows="3"
+                ></textarea>
 
 
                 <div class="edit-site-actions">
+
 
                     <button id="cancel-edit-site-button">
                         Cancelar
                     </button>
 
+
                     <button id="save-edit-site-button">
                         Guardar
                     </button>
 
+
                 </div>
+
 
             </div>
 
+
         </div>
+
 
     </div>
 
 
+
     <!-- =========================================
-     MODAL AGREGAR SITIO
-     ========================================= -->
+         MODAL AGREGAR SITIO
+         ========================================= -->
 
     <div id="add-site-overlay">
 
+
         <div id="add-site-modal">
 
+
             <div class="add-site-header">
+
 
                 <h2>
                     Agregar sitio
                 </h2>
 
+
                 <button id="close-add-site-button">
                     ×
                 </button>
 
+
             </div>
 
+
             <div class="add-site-content">
+
 
                 <label for="add-site-name">
                     Nombre del sitio
                 </label>
 
-                <input type="text" id="add-site-name">
+
+                <input
+                    type="text"
+                    id="add-site-name"
+                >
+
 
                 <p id="add-site-name-error"></p>
+
 
                 <label for="add-site-url">
                     URL
                 </label>
 
-                <input type="url" id="add-site-url">
+
+                <input
+                    type="url"
+                    id="add-site-url"
+                >
+
 
                 <p id="add-site-url-error"></p>
+
 
                 <label for="add-site-description">
                     Descripción
                 </label>
 
-                <textarea id="add-site-description" rows="3"></textarea>
+
+                <textarea
+                    id="add-site-description"
+                    rows="3"
+                ></textarea>
+
 
                 <label for="add-site-group">
                     Grupo
                 </label>
 
+
                 <select id="add-site-group"></select>
 
+
                 <div class="add-site-actions">
+
 
                     <button id="cancel-add-site-button">
                         Cancelar
                     </button>
 
+
                     <button id="save-add-site-button">
                         Guardar
                     </button>
 
+
                 </div>
+
 
             </div>
 
+
         </div>
+
 
     </div>
 
 
+
     <!-- =========================================
-     MODAL AGREGAR GRUPO
-     ========================================= -->
+         MODAL AGREGAR GRUPO
+         ========================================= -->
 
     <div id="add-group-overlay">
 
+
         <div id="add-group-modal">
 
+
             <div class="add-group-header">
+
 
                 <h2>
                     Agregar grupo
                 </h2>
 
+
                 <button id="close-add-group-button">
                     ×
                 </button>
+
 
             </div>
 
 
             <div class="add-group-content">
 
+
                 <label for="add-group-name">
                     Nombre del grupo
                 </label>
 
-                <input type="text" id="add-group-name">
+
+                <input
+                    type="text"
+                    id="add-group-name"
+                >
+
 
                 <p id="add-group-name-error"></p>
 
 
                 <div class="add-group-actions">
 
+
                     <button id="cancel-add-group-button">
                         Cancelar
                     </button>
+
 
                     <button id="save-add-group-button">
                         Guardar
                     </button>
 
+
                 </div>
+
 
             </div>
 
+
         </div>
 
+
     </div>
+
 
 
     <!-- ================================= -->
@@ -1077,49 +1407,68 @@
 
     <div id="reset-confirmation-overlay">
 
+
         <div id="reset-confirmation-modal">
 
+
             <div class="reset-confirmation-header">
+
 
                 <h2>
                     ¿Reiniciar extensión?
                 </h2>
 
+
                 <button id="close-reset-confirmation-button">
                     ×
                 </button>
+
 
             </div>
 
 
             <div class="reset-confirmation-content">
 
+
                 <p>
-                    Se eliminarán todos tus grupos, sitios y configuraciones
-                    y se restaurarán los valores iniciales.
+                    Se eliminarán todos tus grupos,
+                    sitios y configuraciones y se
+                    restaurarán los valores iniciales.
                 </p>
 
 
                 <div class="reset-confirmation-actions">
 
+
                     <button id="cancel-reset-button">
                         Cancelar
                     </button>
+
 
                     <button id="confirm-reset-button">
                         Reiniciar
                     </button>
 
+
                 </div>
+
 
             </div>
 
+
         </div>
+
 
     </div>
 
 
+
+    <!-- ================================= -->
+    <!-- JAVASCRIPT PRINCIPAL -->
+    <!-- ================================= -->
+
     <script src="newtab.js"></script>
+
 
 </body>
 
