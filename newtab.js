@@ -5077,7 +5077,6 @@ async function init() {
 
 init();
 
-
 // =========================================
 // MARCADORES DE CHROME
 // =========================================
@@ -5094,9 +5093,10 @@ let selectedBookmarkNode = null;
 let selectedBookmarkType = null;
 
 
-// =========================================
-// CREAR MENÚ CONTEXTUAL
-// =========================================
+// Nodo real de la Barra de marcadores de Chrome.
+// Normalmente su ID es "1".
+let bookmarksBarNode = null;
+
 
 // =========================================
 // CREAR MENÚ CONTEXTUAL
@@ -5104,19 +5104,38 @@ let selectedBookmarkType = null;
 
 function createBookmarkContextMenu() {
 
+    // Si ya existe, no crear otro.
     if (bookmarkContextMenu) {
+
+        // Asegurarnos de que esté directamente
+        // dentro del BODY.
+        if (
+            bookmarkContextMenu.parentElement !==
+            document.body
+        ) {
+
+            document.body.appendChild(
+                bookmarkContextMenu
+            );
+
+        }
+
         return;
+
     }
 
 
+    // Crear elemento.
     bookmarkContextMenu =
         document.createElement("div");
 
 
+    // Clase CSS.
     bookmarkContextMenu.className =
         "bookmark-context-menu";
 
 
+    // Oculto inicialmente.
     bookmarkContextMenu.style.display =
         "none";
 
@@ -5124,11 +5143,15 @@ function createBookmarkContextMenu() {
     // =====================================
     // IMPORTANTE
     // =====================================
-    // El menú contextual pertenece al BODY,
-    // no al bookmarks-wrapper.
+    // El menú contextual SIEMPRE pertenece
+    // al BODY.
     //
-    // Así no queda limitado por el contenedor
-    // de la barra de marcadores.
+    // De esta manera no queda limitado por:
+    //
+    // #bookmarks-wrapper
+    // #bookmarks-bar
+    //
+    // ni por sus overflow.
 
     document.body.appendChild(
         bookmarkContextMenu
@@ -5136,8 +5159,7 @@ function createBookmarkContextMenu() {
 
 
     // =====================================
-    // EVITAR CERRAR EL MENÚ AL HACER CLICK
-    // DENTRO DE ÉL
+    // EVITAR CERRAR AL HACER CLICK DENTRO
     // =====================================
 
     bookmarkContextMenu.addEventListener(
@@ -5166,6 +5188,8 @@ function openBookmarkContextMenu(
 
     event.stopPropagation();
 
+
+    // Crear menú si todavía no existe.
     createBookmarkContextMenu();
 
 
@@ -5177,7 +5201,7 @@ function openBookmarkContextMenu(
 
 
     // =====================================
-    // GUARDAR SELECCIÓN
+    // GUARDAR ELEMENTO SELECCIONADO
     // =====================================
 
     selectedBookmarkNode =
@@ -5196,68 +5220,158 @@ function openBookmarkContextMenu(
 
 
     // =====================================
-    // EDITAR / RENOMBRAR
+    // MARCADOR
     // =====================================
 
-    const editButton =
-        document.createElement("button");
-
-    editButton.textContent =
+    if (
         type === "bookmark"
-            ? "✏️ Editar"
-            : "✏️ Renombrar";
+    ) {
+
+        // =================================
+        // EDITAR MARCADOR
+        // =================================
+
+        const editButton =
+            document.createElement("button");
+
+        editButton.textContent =
+            "✏️ Editar";
 
 
-    editButton.addEventListener(
-        "click",
-        function (event) {
+        editButton.addEventListener(
+            "click",
+            function (event) {
 
-            event.stopPropagation();
-
-
-            const nodeToEdit =
-                selectedBookmarkNode;
-
-            const typeToEdit =
-                selectedBookmarkType;
+                event.stopPropagation();
 
 
-            closeBookmarkContextMenu();
+                const nodeToEdit =
+                    selectedBookmarkNode;
 
 
-            if (!nodeToEdit) {
-                return;
-            }
+                closeBookmarkContextMenu();
 
 
-            if (typeToEdit === "bookmark") {
+                if (!nodeToEdit) {
+                    return;
+                }
+
 
                 openEditBookmarkModal(
                     nodeToEdit
                 );
 
-            } else {
+            }
+        );
+
+
+        bookmarkContextMenu.appendChild(
+            editButton
+        );
+
+
+        // =================================
+        // ELIMINAR MARCADOR
+        // =================================
+
+        const deleteButton =
+            document.createElement("button");
+
+        deleteButton.textContent =
+            "🗑️ Eliminar";
+
+        deleteButton.className =
+            "bookmark-context-delete";
+
+
+        deleteButton.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+
+                const nodeToDelete =
+                    selectedBookmarkNode;
+
+
+                closeBookmarkContextMenu();
+
+
+                if (!nodeToDelete) {
+                    return;
+                }
+
+
+                openDeleteBookmarkModal(
+                    nodeToDelete
+                );
+
+            }
+        );
+
+
+        bookmarkContextMenu.appendChild(
+            deleteButton
+        );
+
+    }
+
+
+    // =====================================
+    // CARPETA
+    // =====================================
+
+    else if (
+        type === "folder"
+    ) {
+
+        // =================================
+        // RENOMBRAR
+        // =================================
+
+        const editButton =
+            document.createElement("button");
+
+        editButton.textContent =
+            "✏️ Renombrar";
+
+
+        editButton.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+
+                const nodeToEdit =
+                    selectedBookmarkNode;
+
+
+                closeBookmarkContextMenu();
+
+
+                if (!nodeToEdit) {
+                    return;
+                }
+
 
                 openRenameBookmarkFolderModal(
                     nodeToEdit
                 );
 
             }
-
-        }
-    );
+        );
 
 
-    bookmarkContextMenu.appendChild(
-        editButton
-    );
+        bookmarkContextMenu.appendChild(
+            editButton
+        );
 
 
-    // =====================================
-    // NUEVA CARPETA
-    // =====================================
-
-    if (type === "folder") {
+        // =================================
+        // NUEVA CARPETA
+        // =================================
 
         const newFolderButton =
             document.createElement("button");
@@ -5280,13 +5394,113 @@ function openBookmarkContextMenu(
                 closeBookmarkContextMenu();
 
 
-                if (parentFolder) {
-
-                    openNewBookmarkFolderModal(
-                        parentFolder
-                    );
-
+                if (!parentFolder) {
+                    return;
                 }
+
+
+                openNewBookmarkFolderModal(
+                    parentFolder
+                );
+
+            }
+        );
+
+
+        bookmarkContextMenu.appendChild(
+            newFolderButton
+        );
+
+
+        // =================================
+        // ELIMINAR CARPETA
+        // =================================
+
+        const deleteButton =
+            document.createElement("button");
+
+        deleteButton.textContent =
+            "🗑️ Eliminar";
+
+        deleteButton.className =
+            "bookmark-context-delete";
+
+
+        deleteButton.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+
+                const nodeToDelete =
+                    selectedBookmarkNode;
+
+
+                closeBookmarkContextMenu();
+
+
+                if (!nodeToDelete) {
+                    return;
+                }
+
+
+                openDeleteBookmarkFolderModal(
+                    nodeToDelete
+                );
+
+            }
+        );
+
+
+        bookmarkContextMenu.appendChild(
+            deleteButton
+        );
+
+    }
+
+
+    // =====================================
+    // ESPACIO VACÍO DE LA BARRA
+    // =====================================
+
+    else if (
+        type === "bar"
+    ) {
+
+        // =================================
+        // NUEVA CARPETA
+        // =================================
+
+        const newFolderButton =
+            document.createElement("button");
+
+        newFolderButton.textContent =
+            "📁 Nueva carpeta";
+
+
+        newFolderButton.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+
+                const parentNode =
+                    selectedBookmarkNode;
+
+
+                closeBookmarkContextMenu();
+
+
+                if (!parentNode) {
+                    return;
+                }
+
+
+                openNewBookmarkFolderModal(
+                    parentNode
+                );
 
             }
         );
@@ -5300,65 +5514,6 @@ function openBookmarkContextMenu(
 
 
     // =====================================
-    // ELIMINAR
-    // =====================================
-
-    const deleteButton =
-        document.createElement("button");
-
-    deleteButton.textContent =
-        "🗑️ Eliminar";
-
-    deleteButton.className =
-        "bookmark-context-delete";
-
-
-    deleteButton.addEventListener(
-        "click",
-        function (event) {
-
-            event.stopPropagation();
-
-
-            const nodeToDelete =
-                selectedBookmarkNode;
-
-            const typeToDelete =
-                selectedBookmarkType;
-
-
-            closeBookmarkContextMenu();
-
-
-            if (!nodeToDelete) {
-                return;
-            }
-
-
-            if (typeToDelete === "bookmark") {
-
-                openDeleteBookmarkModal(
-                    nodeToDelete
-                );
-
-            } else {
-
-                openDeleteBookmarkFolderModal(
-                    nodeToDelete
-                );
-
-            }
-
-        }
-    );
-
-
-    bookmarkContextMenu.appendChild(
-        deleteButton
-    );
-
-
-    // =====================================
     // MOSTRAR MENÚ
     // =====================================
 
@@ -5367,7 +5522,7 @@ function openBookmarkContextMenu(
 
 
     // =====================================
-    // OBTENER TAMAÑO DEL MENÚ
+    // OBTENER TAMAÑO
     // =====================================
 
     const menuRect =
@@ -5428,6 +5583,7 @@ function openBookmarkContextMenu(
             8,
             left
         ) + "px";
+
 
     bookmarkContextMenu.style.top =
         Math.max(
@@ -5518,6 +5674,22 @@ function loadBookmarks() {
                 return;
 
             }
+
+
+            // =================================
+            // GUARDAR NODO DE LA BARRA
+            // =================================
+            //
+            // Este nodo será utilizado cuando
+            // hagamos clic derecho en un espacio
+            // vacío de la barra.
+            //
+            // Así podemos crear una carpeta
+            // directamente dentro de la Barra
+            // de marcadores.
+
+            bookmarksBarNode =
+                bookmarksBar;
 
 
             renderBookmarksBar(
@@ -5876,169 +6048,132 @@ function createBookmarkFolder(
     );
 
 
-// =====================================
-// CLICK IZQUIERDO EN CARPETA
-// =====================================
+    // =====================================
+    // CLICK IZQUIERDO EN CARPETA
+    // =====================================
 
-button.addEventListener(
-    "click",
-    function (event) {
+    button.addEventListener(
+        "click",
+        function (event) {
 
-        event.stopPropagation();
-
-        // =================================
-        // COMPROBAR SI YA ESTABA ABIERTO
-        // =================================
-
-        const wasOpen =
-            menu.style.display === "block";
+            event.stopPropagation();
 
 
-        // =================================
-        // CERRAR OTROS MENÚS
-        // =================================
-
-        closeBookmarkMenus();
-
-        // Cerrar menú contextual
-        closeBookmarkContextMenu();
+            const wasOpen =
+                menu.style.display === "block";
 
 
-        // =================================
-        // SI YA ESTABA ABIERTO, TERMINAR
-        // =================================
+            // Cerrar otros menús.
+            closeBookmarkMenus();
 
-        if (wasOpen) {
-
-            return;
-
-        }
+            // Cerrar menú contextual.
+            closeBookmarkContextMenu();
 
 
-        // =================================
-        // MOSTRAR EL MENÚ
-        // =================================
+            // Si ya estaba abierto,
+            // simplemente dejarlo cerrado.
+            if (wasOpen) {
 
-        menu.style.display =
-            "block";
+                return;
 
-
-        // =================================
-        // IMPORTANTE
-        // =================================
-        // Usamos position: fixed para que el
-        // menú NO sea recortado por:
-        //
-        // #bookmarks-bar
-        //
-        // que tiene overflow-x: auto.
-        //
-        // Visualmente seguirá apareciendo
-        // debajo de la carpeta.
-
-        menu.style.position =
-            "fixed";
+            }
 
 
-        // =================================
-        // OBTENER POSICIÓN DE LA CARPETA
-        // =================================
-
-        const buttonRect =
-            button.getBoundingClientRect();
+            // Mostrar menú.
+            menu.style.display =
+                "block";
 
 
-        // =================================
-        // OBTENER TAMAÑO DEL MENÚ
-        // =================================
+            // =================================
+            // USAR POSITION FIXED
+            // =================================
 
-        const menuRect =
-            menu.getBoundingClientRect();
-
-
-        // =================================
-        // POSICIÓN HORIZONTAL
-        // =================================
-
-        let left =
-            buttonRect.left;
+            menu.style.position =
+                "fixed";
 
 
-        // =================================
-        // POSICIÓN VERTICAL
-        // =================================
-
-        let top =
-            buttonRect.bottom + 4;
+            const buttonRect =
+                button.getBoundingClientRect();
 
 
-        // =================================
-        // EVITAR SALIR POR LA DERECHA
-        // =================================
-
-        if (
-            left + menuRect.width >
-            window.innerWidth - 8
-        ) {
-
-            left =
-                window.innerWidth -
-                menuRect.width -
-                8;
-
-        }
+            const menuRect =
+                menu.getBoundingClientRect();
 
 
-        // =================================
-        // EVITAR SALIR POR ABAJO
-        // =================================
+            let left =
+                buttonRect.left;
 
-        if (
-            top + menuRect.height >
-            window.innerHeight - 8
-        ) {
 
-            // Intentar abrir hacia arriba
-            top =
-                buttonRect.top -
-                menuRect.height -
-                4;
+            let top =
+                buttonRect.bottom + 4;
+
+
+            // =================================
+            // EVITAR SALIR POR LA DERECHA
+            // =================================
+
+            if (
+                left + menuRect.width >
+                window.innerWidth - 8
+            ) {
+
+                left =
+                    window.innerWidth -
+                    menuRect.width -
+                    8;
+
+            }
+
+
+            // =================================
+            // EVITAR SALIR POR ABAJO
+            // =================================
+
+            if (
+                top + menuRect.height >
+                window.innerHeight - 8
+            ) {
+
+                top =
+                    buttonRect.top -
+                    menuRect.height -
+                    4;
+
+            }
+
+
+            // =================================
+            // EVITAR SALIR POR ARRIBA
+            // =================================
+
+            if (
+                top < 8
+            ) {
+
+                top = 8;
+
+            }
+
+
+            // =================================
+            // APLICAR POSICIÓN
+            // =================================
+
+            menu.style.left =
+                Math.max(
+                    8,
+                    left
+                ) + "px";
+
+
+            menu.style.top =
+                Math.max(
+                    8,
+                    top
+                ) + "px";
 
         }
-
-
-        // =================================
-        // EVITAR SALIR POR ARRIBA
-        // =================================
-
-        if (
-            top < 8
-        ) {
-
-            top = 8;
-
-        }
-
-
-        // =================================
-        // APLICAR POSICIÓN
-        // =================================
-
-        menu.style.left =
-            Math.max(
-                8,
-                left
-            ) + "px";
-
-
-        menu.style.top =
-            Math.max(
-                8,
-                top
-            ) + "px";
-
-    }
-);
+    );
 
 
     // =====================================
@@ -6376,10 +6511,6 @@ function createBookmarkSubfolder(
                 "block";
 
 
-            // =================================
-            // OBTENER POSICIÓN
-            // =================================
-
             const rect =
                 button.getBoundingClientRect();
 
@@ -6390,10 +6521,6 @@ function createBookmarkSubfolder(
             let top =
                 rect.top - 6;
 
-
-            // =================================
-            // OBTENER TAMAÑO
-            // =================================
 
             const menuRect =
                 subMenu.getBoundingClientRect();
@@ -6452,6 +6579,7 @@ function createBookmarkSubfolder(
 
             subMenu.style.left =
                 left + "px";
+
 
             subMenu.style.top =
                 top + "px";
@@ -6629,14 +6757,18 @@ function openEditBookmarkModal(
 
 
     if (nameError) {
+
         nameError.textContent =
             "";
+
     }
 
 
     if (urlError) {
+
         urlError.textContent =
             "";
+
     }
 
 
@@ -7289,6 +7421,10 @@ function saveNewBookmarkFolder() {
             : "";
 
 
+    // =====================================
+    // VALIDAR NOMBRE
+    // =====================================
+
     if (name === "") {
 
         if (nameError) {
@@ -7308,6 +7444,10 @@ function saveNewBookmarkFolder() {
 
     }
 
+
+    // =====================================
+    // CREAR CARPETA
+    // =====================================
 
     chrome.bookmarks.create(
         {
@@ -8036,12 +8176,17 @@ document.addEventListener(
 
 
 // =========================================
-// CLIC DERECHO FUERA
+// CLIC DERECHO EN LA BARRA DE MARCADORES
 // =========================================
 
 document.addEventListener(
     "contextmenu",
     function (event) {
+
+        // =====================================
+        // COMPROBAR SI EL CLICK FUE SOBRE
+        // UN ELEMENTO DE MARCADORES
+        // =====================================
 
         const bookmarkElement =
             event.target.closest(
@@ -8053,11 +8198,101 @@ document.addEventListener(
             );
 
 
-        if (!bookmarkElement) {
+        // =====================================
+        // SI FUE SOBRE UN MARCADOR, CARPETA
+        // O MENÚ CONTEXTUAL
+        //
+        // El evento ya será manejado por
+        // su propio listener.
+        // =====================================
 
-            closeBookmarkContextMenu();
+        if (bookmarkElement) {
+
+            return;
 
         }
+
+
+        // =====================================
+        // OBTENER BARRA
+        // =====================================
+
+        const bookmarksBar =
+            document.getElementById(
+                "bookmarks-bar"
+            );
+
+
+        if (
+            !bookmarksBar
+        ) {
+
+            return;
+
+        }
+
+
+        // =====================================
+        // COMPROBAR SI EL CLICK FUE DENTRO
+        // DE LA BARRA
+        // =====================================
+
+        if (
+            !bookmarksBar.contains(
+                event.target
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        // =====================================
+        // EVITAR MENÚ NATIVO
+        // =====================================
+
+        event.preventDefault();
+
+        event.stopPropagation();
+
+
+        // =====================================
+        // ASEGURARNOS DE TENER EL NODO REAL
+        // DE LA BARRA DE MARCADORES
+        // =====================================
+
+        if (
+            !bookmarksBarNode
+        ) {
+
+            console.warn(
+                "No se encontró el nodo de la Barra de marcadores."
+            );
+
+            return;
+
+        }
+
+
+        // =====================================
+        // ABRIR MENÚ CONTEXTUAL DE LA BARRA
+        // =====================================
+        //
+        // type = "bar"
+        //
+        // Esto hará que el menú muestre:
+        //
+        // 📁 Nueva carpeta
+        //
+        // y la carpeta será creada dentro
+        // de la Barra de marcadores.
+
+        openBookmarkContextMenu(
+            event,
+            bookmarksBarNode,
+            "bar"
+        );
 
     }
 );
@@ -8353,6 +8588,7 @@ function setupBookmarkScroll() {
 // =========================================
 // INICIALIZAR MARCADORES
 // =========================================
+
 
 // Ocultar cualquier modal que pudiera
 // aparecer al cargar la página.
