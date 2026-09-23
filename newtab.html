@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="es">
 
 <head>
@@ -7,15 +8,31 @@
 
     <title>Nueva Pestaña</title>
 
-    <link rel="icon" type="image/png" href="Icons/icon1.png">
+    <link
+        rel="icon"
+        type="image/png"
+        href="Icons/icon1.png"
+    >
 
-    <!-- Hoja de estilos principal -->
-    <link rel="stylesheet" href="styles.css">
+    <!-- ================================= -->
+    <!-- HOJA DE ESTILOS PRINCIPAL -->
+    <!-- ================================= -->
+
+    <link
+        rel="stylesheet"
+        href="styles.css"
+    >
+
+
+    <!-- ================================= -->
+    <!-- CARGA INICIAL DEL FONDO -->
+    <!-- ================================= -->
 
     <!--
         Carga el último fondo guardado inmediatamente,
         antes de que se muestre el contenido de la página.
     -->
+
     <script src="background-bootstrap.js"></script>
 
 </head>
@@ -25,10 +42,68 @@
 
 
     <!-- ================================= -->
-    <!-- ENCABEZADO -->
+    <!-- BARRA DE MARCADORES
+         ================================= -->
+
+    <div id="bookmarks-wrapper">
+
+
+        <!-- ================================= -->
+        <!-- BOTÓN IZQUIERDO
+             ================================= -->
+
+        <button
+            id="bookmarks-scroll-left"
+            class="bookmarks-scroll-button"
+            type="button"
+            aria-label="Desplazar marcadores hacia la izquierda"
+        >
+            ◀
+        </button>
+
+
+        <!-- ================================= -->
+        <!-- MARCADORES
+             ================================= -->
+
+        <nav id="bookmarks-bar">
+
+            <!--
+                Los marcadores reales de Chrome
+                se cargarán dinámicamente mediante JavaScript.
+            -->
+
+        </nav>
+
+
+        <!-- ================================= -->
+        <!-- BOTÓN DERECHO
+             ================================= -->
+
+        <button
+            id="bookmarks-scroll-right"
+            class="bookmarks-scroll-button"
+            type="button"
+            aria-label="Desplazar marcadores hacia la derecha"
+        >
+            ▶
+        </button>
+
+
+    </div>
+
+
+
     <!-- ================================= -->
+    <!-- ENCABEZADO
+         ================================= -->
 
     <header>
+
+
+        <!-- ================================= -->
+        <!-- BUSCAR EN INTERNET
+             ================================= -->
 
         <div class="search-container">
 
@@ -41,6 +116,11 @@
         </div>
 
 
+
+        <!-- ================================= -->
+        <!-- BUSCAR MIS SITIOS
+             ================================= -->
+
         <div class="search-container">
 
             <input
@@ -52,558 +132,60 @@
         </div>
 
 
-        <button id="settings-button">
+
+        <!-- ================================= -->
+        <!-- CONFIGURACIÓN
+             ================================= -->
+
+        <button
+            id="settings-button"
+            type="button"
+        >
             ⚙️
         </button>
+
 
     </header>
 
 
 
     <!-- ================================= -->
-    <!-- CONTENIDO PRINCIPAL -->
-    <!-- ================================= -->
+    <!-- CONTENIDO PRINCIPAL
+         ================================= -->
 
     <main>
 
-
         <!--
-        =================================
-        GRUPO: MIS SITIOS
-        =================================
+            Los grupos y sitios reales se generan
+            dinámicamente mediante JavaScript.
 
-        Estos grupos son ejemplos.
-
-        Actualmente los grupos reales se
-        generan dinámicamente mediante JavaScript
-        utilizando los datos guardados.
+            Los ejemplos antiguos se eliminaron
+            del HTML porque ya no son necesarios.
         -->
-
-
-        <!--
-
-        <section class="site-group">
-
-
-            <div class="group-header">
-
-
-                <div class="group-title-container">
-
-                    <h2>
-                        Mis sitios
-                    </h2>
-
-
-                    <button class="group-menu-button">
-                        ⋮
-                    </button>
-
-                </div>
-
-
-                <div class="group-menu">
-
-
-                    <button class="edit-group-button">
-
-                        <span class="menu-icon">
-                            ✏️
-                        </span>
-
-                        Editar grupo
-
-                    </button>
-
-
-                    <button class="delete-group-button">
-
-                        <span class="menu-icon">
-                            🗑️
-                        </span>
-
-                        Eliminar grupo
-
-                    </button>
-
-
-                </div>
-
-
-            </div>
-
-
-            <div class="sites-container">
-
-
-                <div
-                    class="site-card"
-                    data-url="https://www.google.com"
-                >
-
-                    <div class="site-icon">
-                        🌐
-                    </div>
-
-
-                    <span class="site-name">
-                        Google
-                    </span>
-
-
-                    <div class="site-description">
-                        Motor de búsqueda para encontrar información en Internet.
-                    </div>
-
-
-                    <button class="site-menu-button">
-                        ⋮
-                    </button>
-
-
-                    <div class="site-menu">
-
-
-                        <button class="edit-site-button">
-
-                            <span class="menu-icon">
-                                ✏️
-                            </span>
-
-                            Editar sitio
-
-                        </button>
-
-
-                        <button class="delete-site-button">
-
-                            <span class="menu-icon">
-                                🗑️
-                            </span>
-
-                            Eliminar sitio
-
-                        </button>
-
-
-                    </div>
-
-
-                </div>
-
-
-
-                <div
-                    class="site-card"
-                    data-url="https://www.youtube.com"
-                >
-
-                    <div class="site-icon">
-                        ▶️
-                    </div>
-
-
-                    <span class="site-name">
-                        YouTube
-                    </span>
-
-
-                    <div class="site-description">
-                        Plataforma para ver y compartir videos.
-                    </div>
-
-
-                    <button class="site-menu-button">
-                        ⋮
-                    </button>
-
-
-                    <div class="site-menu">
-
-
-                        <button class="edit-site-button">
-
-                            <span class="menu-icon">
-                                ✏️
-                            </span>
-
-                            Editar sitio
-
-                        </button>
-
-
-                        <button class="delete-site-button">
-
-                            <span class="menu-icon">
-                                🗑️
-                            </span>
-
-                            Eliminar sitio
-
-                        </button>
-
-
-                    </div>
-
-
-                </div>
-
-
-
-                <div
-                    class="site-card"
-                    data-url="https://github.com"
-                >
-
-                    <div class="site-icon">
-                        💻
-                    </div>
-
-
-                    <span class="site-name">
-                        GitHub
-                    </span>
-
-
-                    <div class="site-description">
-                        Plataforma para alojar y gestionar proyectos de código.
-                    </div>
-
-
-                    <button class="site-menu-button">
-                        ⋮
-                    </button>
-
-
-                    <div class="site-menu">
-
-
-                        <button class="edit-site-button">
-
-                            <span class="menu-icon">
-                                ✏️
-                            </span>
-
-                            Editar sitio
-
-                        </button>
-
-
-                        <button class="delete-site-button">
-
-                            <span class="menu-icon">
-                                🗑️
-                            </span>
-
-                            Eliminar sitio
-
-                        </button>
-
-
-                    </div>
-
-
-                </div>
-
-
-
-                <div class="add-site-card">
-
-                    <div class="add-site-icon">
-                        +
-                    </div>
-
-                    <span class="add-site-name">
-                        Agregar sitio
-                    </span>
-
-                </div>
-
-
-            </div>
-
-
-        </section>
-
-        -->
-
-
-
-        <!--
-        =================================
-        GRUPO: INTELIGENCIA ARTIFICIAL
-        =================================
-        -->
-
-
-        <!--
-
-        <section class="site-group">
-
-
-            <div class="group-header">
-
-
-                <div class="group-title-container">
-
-                    <h2>
-                        Inteligencia Artificial
-                    </h2>
-
-
-                    <button class="group-menu-button">
-                        ⋮
-                    </button>
-
-
-                </div>
-
-
-                <div class="group-menu">
-
-
-                    <button class="edit-group-button">
-
-                        <span class="menu-icon">
-                            ✏️
-                        </span>
-
-                        Editar grupo
-
-                    </button>
-
-
-                    <button class="delete-group-button">
-
-                        <span class="menu-icon">
-                            🗑️
-                        </span>
-
-                        Eliminar grupo
-
-                    </button>
-
-
-                </div>
-
-
-            </div>
-
-
-
-            <div class="sites-container">
-
-
-                <div
-                    class="site-card"
-                    data-url="https://chatgpt.com"
-                >
-
-                    <div class="site-icon">
-                        🤖
-                    </div>
-
-
-                    <span class="site-name">
-                        ChatGPT
-                    </span>
-
-
-                    <div class="site-description">
-                        Asistente de inteligencia artificial para conversar y realizar diferentes tareas.
-                    </div>
-
-
-                    <button class="site-menu-button">
-                        ⋮
-                    </button>
-
-
-                    <div class="site-menu">
-
-
-                        <button class="edit-site-button">
-
-                            <span class="menu-icon">
-                                ✏️
-                            </span>
-
-                            Editar sitio
-
-                        </button>
-
-
-                        <button class="delete-site-button">
-
-                            <span class="menu-icon">
-                                🗑️
-                            </span>
-
-                            Eliminar sitio
-
-                        </button>
-
-
-                    </div>
-
-
-                </div>
-
-
-
-                <div
-                    class="site-card"
-                    data-url="https://gemini.google.com"
-                >
-
-                    <div class="site-icon">
-                        ✨
-                    </div>
-
-
-                    <span class="site-name">
-                        Gemini
-                    </span>
-
-
-                    <div class="site-description">
-                        Asistente de inteligencia artificial desarrollado por Google.
-                    </div>
-
-
-                    <button class="site-menu-button">
-                        ⋮
-                    </button>
-
-
-                    <div class="site-menu">
-
-
-                        <button class="edit-site-button">
-
-                            <span class="menu-icon">
-                                ✏️
-                            </span>
-
-                            Editar sitio
-
-                        </button>
-
-
-                        <button class="delete-site-button">
-
-                            <span class="menu-icon">
-                                🗑️
-                            </span>
-
-                            Eliminar sitio
-
-                        </button>
-
-
-                    </div>
-
-
-                </div>
-
-
-
-                <div
-                    class="site-card"
-                    data-url="https://chat.deepseek.com"
-                >
-
-                    <div class="site-icon">
-                        🧠
-                    </div>
-
-
-                    <span class="site-name">
-                        DeepSeek
-                    </span>
-
-
-                    <div class="site-description">
-                        Herramienta de inteligencia artificial para conversación y generación de contenido.
-                    </div>
-
-
-                    <button class="site-menu-button">
-                        ⋮
-                    </button>
-
-
-                    <div class="site-menu">
-
-
-                        <button class="edit-site-button">
-
-                            <span class="menu-icon">
-                                ✏️
-                            </span>
-
-                            Editar sitio
-
-                        </button>
-
-
-                        <button class="delete-site-button">
-
-                            <span class="menu-icon">
-                                🗑️
-                            </span>
-
-                            Eliminar sitio
-
-
-                        </button>
-
-
-                    </div>
-
-
-                </div>
-
-
-
-                <div class="add-site-card">
-
-                    <div class="add-site-icon">
-                        +
-                    </div>
-
-                    <span class="add-site-name">
-                        Agregar sitio
-                    </span>
-
-                </div>
-
-
-            </div>
-
-
-        </section>
-
-        -->
-
 
     </main>
 
 
 
     <!-- ================================= -->
-    <!-- ACCIONES GENERALES -->
-    <!-- ================================= -->
+    <!-- ACCIONES GENERALES
+         ================================= -->
 
     <div class="global-actions">
 
 
-        <button id="add-site-button">
+        <button
+            id="add-site-button"
+            type="button"
+        >
             + Agregar sitio
         </button>
 
 
-        <button id="add-group-button">
+        <button
+            id="add-group-button"
+            type="button"
+        >
             + Agregar grupo
         </button>
 
@@ -613,21 +195,23 @@
 
 
     <!-- ================================= -->
-    <!-- CAPA TRANSPARENTE -->
-    <!-- ================================= -->
+    <!-- CAPA TRANSPARENTE
+         ================================= -->
 
     <div id="settings-overlay"></div>
 
 
 
     <!-- ================================= -->
-    <!-- PANEL DE CONFIGURACIÓN -->
-    <!-- ================================= -->
+    <!-- PANEL DE CONFIGURACIÓN
+         ================================= -->
 
     <aside id="settings-panel">
 
 
-        <!-- ENCABEZADO DEL PANEL -->
+        <!-- ================================= -->
+        <!-- ENCABEZADO DEL PANEL
+             ================================= -->
 
         <div class="settings-header">
 
@@ -637,7 +221,10 @@
             </h2>
 
 
-            <button id="close-settings-button">
+            <button
+                id="close-settings-button"
+                type="button"
+            >
                 ×
             </button>
 
@@ -646,14 +233,16 @@
 
 
 
-        <!-- CONTENIDO DEL PANEL -->
+        <!-- ================================= -->
+        <!-- CONTENIDO DEL PANEL
+             ================================= -->
 
         <div class="settings-content">
 
 
             <!-- ================================= -->
-            <!-- IMPORTAR / EXPORTAR -->
-            <!-- ================================= -->
+            <!-- IMPORTAR / EXPORTAR
+                 ================================= -->
 
             <section class="settings-section">
 
@@ -698,8 +287,8 @@
 
 
             <!-- ================================= -->
-            <!-- TAMAÑO DEL CONTENEDOR -->
-            <!-- ================================= -->
+            <!-- TAMAÑO DEL CONTENEDOR
+                 ================================= -->
 
             <section class="settings-section">
 
@@ -732,8 +321,8 @@
 
 
             <!-- ================================= -->
-            <!-- TAMAÑO DE LAS TARJETAS -->
-            <!-- ================================= -->
+            <!-- TAMAÑO DE LAS TARJETAS
+                 ================================= -->
 
             <section class="settings-section">
 
@@ -767,8 +356,8 @@
 
 
             <!-- ================================= -->
-            <!-- FONDO -->
-            <!-- ================================= -->
+            <!-- FONDO
+                 ================================= -->
 
             <section class="settings-section">
 
@@ -779,7 +368,9 @@
 
 
 
-                <!-- IMAGEN -->
+                <!-- ================================= -->
+                <!-- IMAGEN
+                     ================================= -->
 
                 <div class="background-option">
 
@@ -814,7 +405,9 @@
 
 
 
-                <!-- COLOR SÓLIDO -->
+                <!-- ================================= -->
+                <!-- COLOR SÓLIDO
+                     ================================= -->
 
                 <div class="background-option">
 
@@ -844,7 +437,9 @@
 
 
 
-                <!-- DEGRADADO -->
+                <!-- ================================= -->
+                <!-- DEGRADADO
+                     ================================= -->
 
                 <div class="background-option">
 
@@ -866,12 +461,16 @@
 
 
 
-                <!-- CONFIGURACIÓN DEL DEGRADADO -->
+                <!-- ================================= -->
+                <!-- CONFIGURACIÓN DEL DEGRADADO
+                     ================================= -->
 
                 <div id="gradient-settings">
 
 
-                    <!-- DIRECCIÓN -->
+                    <!-- ================================= -->
+                    <!-- DIRECCIÓN
+                         ================================= -->
 
                     <div class="gradient-setting">
 
@@ -921,7 +520,9 @@
 
 
 
-                    <!-- COLORES -->
+                    <!-- ================================= -->
+                    <!-- COLORES DEL DEGRADADO
+                         ================================= -->
 
                     <div id="gradient-colors">
 
@@ -1001,7 +602,9 @@
 
 
 
-                    <!-- AGREGAR COLOR -->
+                    <!-- ================================= -->
+                    <!-- AGREGAR COLOR
+                         ================================= -->
 
                     <button
                         id="add-gradient-color-button"
@@ -1019,8 +622,8 @@
 
 
             <!-- ================================= -->
-            <!-- COLORES DE GRUPOS -->
-            <!-- ================================= -->
+            <!-- COLORES DE GRUPOS
+                 ================================= -->
 
             <section class="settings-section">
 
@@ -1133,8 +736,8 @@
 
 
             <!-- ================================= -->
-            <!-- COLOR DEL TEXTO -->
-            <!-- ================================= -->
+            <!-- COLOR DEL TEXTO
+                 ================================= -->
 
             <section class="settings-section">
 
@@ -1191,8 +794,8 @@
 
 
             <!-- ================================= -->
-            <!-- REINICIAR CONFIGURACIÓN -->
-            <!-- ================================= -->
+            <!-- REINICIAR CONFIGURACIÓN
+                 ================================= -->
 
             <section class="settings-section">
 
@@ -1216,8 +819,8 @@
 
 
     <!-- ================================= -->
-    <!-- VENTANA EDITAR GRUPO -->
-    <!-- ================================= -->
+    <!-- EDITAR GRUPO
+         ================================= -->
 
     <div id="edit-group-overlay">
 
@@ -1233,7 +836,10 @@
                 </h2>
 
 
-                <button id="close-edit-group-button">
+                <button
+                    id="close-edit-group-button"
+                    type="button"
+                >
                     ×
                 </button>
 
@@ -1261,12 +867,18 @@
                 <div class="edit-group-actions">
 
 
-                    <button id="cancel-edit-group-button">
+                    <button
+                        id="cancel-edit-group-button"
+                        type="button"
+                    >
                         Cancelar
                     </button>
 
 
-                    <button id="save-edit-group-button">
+                    <button
+                        id="save-edit-group-button"
+                        type="button"
+                    >
                         Guardar
                     </button>
 
@@ -1285,8 +897,8 @@
 
 
     <!-- ================================= -->
-    <!-- VENTANA EDITAR SITIO -->
-    <!-- ================================= -->
+    <!-- EDITAR SITIO
+         ================================= -->
 
     <div id="edit-site-overlay">
 
@@ -1302,7 +914,10 @@
                 </h2>
 
 
-                <button id="close-edit-site-button">
+                <button
+                    id="close-edit-site-button"
+                    type="button"
+                >
                     ×
                 </button>
 
@@ -1355,12 +970,18 @@
                 <div class="edit-site-actions">
 
 
-                    <button id="cancel-edit-site-button">
+                    <button
+                        id="cancel-edit-site-button"
+                        type="button"
+                    >
                         Cancelar
                     </button>
 
 
-                    <button id="save-edit-site-button">
+                    <button
+                        id="save-edit-site-button"
+                        type="button"
+                    >
                         Guardar
                     </button>
 
@@ -1378,9 +999,9 @@
 
 
 
-    <!-- =========================================
-         MODAL AGREGAR SITIO
-         ========================================= -->
+    <!-- ================================= -->
+    <!-- AGREGAR SITIO
+         ================================= -->
 
     <div id="add-site-overlay">
 
@@ -1396,7 +1017,10 @@
                 </h2>
 
 
-                <button id="close-add-site-button">
+                <button
+                    id="close-add-site-button"
+                    type="button"
+                >
                     ×
                 </button>
 
@@ -1457,12 +1081,18 @@
                 <div class="add-site-actions">
 
 
-                    <button id="cancel-add-site-button">
+                    <button
+                        id="cancel-add-site-button"
+                        type="button"
+                    >
                         Cancelar
                     </button>
 
 
-                    <button id="save-add-site-button">
+                    <button
+                        id="save-add-site-button"
+                        type="button"
+                    >
                         Guardar
                     </button>
 
@@ -1480,9 +1110,9 @@
 
 
 
-    <!-- =========================================
-         MODAL AGREGAR GRUPO
-         ========================================= -->
+    <!-- ================================= -->
+    <!-- AGREGAR GRUPO
+         ================================= -->
 
     <div id="add-group-overlay">
 
@@ -1498,7 +1128,10 @@
                 </h2>
 
 
-                <button id="close-add-group-button">
+                <button
+                    id="close-add-group-button"
+                    type="button"
+                >
                     ×
                 </button>
 
@@ -1526,12 +1159,18 @@
                 <div class="add-group-actions">
 
 
-                    <button id="cancel-add-group-button">
+                    <button
+                        id="cancel-add-group-button"
+                        type="button"
+                    >
                         Cancelar
                     </button>
 
 
-                    <button id="save-add-group-button">
+                    <button
+                        id="save-add-group-button"
+                        type="button"
+                    >
                         Guardar
                     </button>
 
@@ -1550,8 +1189,8 @@
 
 
     <!-- ================================= -->
-    <!-- CONFIRMAR REINICIO -->
-    <!-- ================================= -->
+    <!-- CONFIRMAR REINICIO
+         ================================= -->
 
     <div id="reset-confirmation-overlay">
 
@@ -1567,7 +1206,10 @@
                 </h2>
 
 
-                <button id="close-reset-confirmation-button">
+                <button
+                    id="close-reset-confirmation-button"
+                    type="button"
+                >
                     ×
                 </button>
 
@@ -1588,12 +1230,18 @@
                 <div class="reset-confirmation-actions">
 
 
-                    <button id="cancel-reset-button">
+                    <button
+                        id="cancel-reset-button"
+                        type="button"
+                    >
                         Cancelar
                     </button>
 
 
-                    <button id="confirm-reset-button">
+                    <button
+                        id="confirm-reset-button"
+                        type="button"
+                    >
                         Reiniciar
                     </button>
 
@@ -1611,9 +1259,406 @@
 
 
 
+    <!-- ========================================= -->
+    <!-- MARCADORES DE CHROME                       -->
+    <!-- ========================================= -->
+
+
+    <!-- ========================================= -->
+    <!-- EDITAR MARCADOR                            -->
+    <!-- ========================================= -->
+
+    <div id="edit-bookmark-overlay">
+
+
+        <div id="edit-bookmark-modal">
+
+
+            <div class="edit-bookmark-header">
+
+
+                <h2>
+                    Editar marcador
+                </h2>
+
+
+                <button
+                    id="close-edit-bookmark-button"
+                    type="button"
+                >
+                    ×
+                </button>
+
+
+            </div>
+
+
+            <div class="edit-bookmark-content">
+
+
+                <label for="edit-bookmark-name">
+                    Nombre del marcador
+                </label>
+
+
+                <input
+                    type="text"
+                    id="edit-bookmark-name"
+                >
+
+
+                <p id="edit-bookmark-name-error"></p>
+
+
+                <label for="edit-bookmark-url">
+                    URL
+                </label>
+
+
+                <input
+                    type="url"
+                    id="edit-bookmark-url"
+                >
+
+
+                <p id="edit-bookmark-url-error"></p>
+
+
+                <div class="edit-bookmark-actions">
+
+
+                    <button
+                        id="cancel-edit-bookmark-button"
+                        type="button"
+                    >
+                        Cancelar
+                    </button>
+
+
+                    <button
+                        id="save-edit-bookmark-button"
+                        type="button"
+                    >
+                        Guardar
+                    </button>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- ELIMINAR MARCADOR                          -->
+    <!-- ========================================= -->
+
+    <div id="delete-bookmark-overlay">
+
+
+        <div id="delete-bookmark-modal">
+
+
+            <div class="delete-bookmark-header">
+
+
+                <h2>
+                    ¿Eliminar marcador?
+                </h2>
+
+
+                <button
+                    id="close-delete-bookmark-button"
+                    type="button"
+                >
+                    ×
+                </button>
+
+
+            </div>
+
+
+            <div class="delete-bookmark-content">
+
+
+                <p id="delete-bookmark-message">
+                    ¿Estás seguro de que deseas eliminar este marcador?
+                </p>
+
+
+                <div class="delete-bookmark-actions">
+
+
+                    <button
+                        id="cancel-delete-bookmark-button"
+                        type="button"
+                    >
+                        Cancelar
+                    </button>
+
+
+                    <button
+                        id="confirm-delete-bookmark-button"
+                        type="button"
+                    >
+                        Eliminar
+                    </button>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- CAMBIAR NOMBRE DE CARPETA                  -->
+    <!-- ========================================= -->
+
+    <div id="rename-bookmark-folder-overlay">
+
+
+        <div id="rename-bookmark-folder-modal">
+
+
+            <div class="rename-bookmark-folder-header">
+
+
+                <h2>
+                    Cambiar nombre
+                </h2>
+
+
+                <button
+                    id="close-rename-bookmark-folder-button"
+                    type="button"
+                >
+                    ×
+                </button>
+
+
+            </div>
+
+
+            <div class="rename-bookmark-folder-content">
+
+
+                <label for="rename-bookmark-folder-name">
+                    Nombre de la carpeta
+                </label>
+
+
+                <input
+                    type="text"
+                    id="rename-bookmark-folder-name"
+                >
+
+
+                <p id="rename-bookmark-folder-name-error"></p>
+
+
+                <div class="rename-bookmark-folder-actions">
+
+
+                    <button
+                        id="cancel-rename-bookmark-folder-button"
+                        type="button"
+                    >
+                        Cancelar
+                    </button>
+
+
+                    <button
+                        id="save-rename-bookmark-folder-button"
+                        type="button"
+                    >
+                        Guardar
+                    </button>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- NUEVA CARPETA                              -->
+    <!-- ========================================= -->
+
+    <div id="new-bookmark-folder-overlay">
+
+
+        <div id="new-bookmark-folder-modal">
+
+
+            <div class="new-bookmark-folder-header">
+
+
+                <h2>
+                    Nueva carpeta
+                </h2>
+
+
+                <button
+                    id="close-new-bookmark-folder-button"
+                    type="button"
+                >
+                    ×
+                </button>
+
+
+            </div>
+
+
+            <div class="new-bookmark-folder-content">
+
+
+                <label for="new-bookmark-folder-name">
+                    Nombre de la carpeta
+                </label>
+
+
+                <input
+                    type="text"
+                    id="new-bookmark-folder-name"
+                >
+
+
+                <p id="new-bookmark-folder-name-error"></p>
+
+
+                <div class="new-bookmark-folder-actions">
+
+
+                    <button
+                        id="cancel-new-bookmark-folder-button"
+                        type="button"
+                    >
+                        Cancelar
+                    </button>
+
+
+                    <button
+                        id="save-new-bookmark-folder-button"
+                        type="button"
+                    >
+                        Crear carpeta
+                    </button>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- ELIMINAR CARPETA                           -->
+    <!-- ========================================= -->
+
+    <div id="delete-bookmark-folder-overlay">
+
+
+        <div id="delete-bookmark-folder-modal">
+
+
+            <div class="delete-bookmark-folder-header">
+
+
+                <h2>
+                    ¿Eliminar carpeta?
+                </h2>
+
+
+                <button
+                    id="close-delete-bookmark-folder-button"
+                    type="button"
+                >
+                    ×
+                </button>
+
+
+            </div>
+
+
+            <div class="delete-bookmark-folder-content">
+
+
+                <p id="delete-bookmark-folder-message">
+                    ¿Estás seguro de que deseas eliminar esta carpeta?
+                </p>
+
+
+                <p>
+                    También se eliminarán los marcadores
+                    y subcarpetas que contiene.
+                </p>
+
+
+                <div class="delete-bookmark-folder-actions">
+
+
+                    <button
+                        id="cancel-delete-bookmark-folder-button"
+                        type="button"
+                    >
+                        Cancelar
+                    </button>
+
+
+                    <button
+                        id="confirm-delete-bookmark-folder-button"
+                        type="button"
+                    >
+                        Eliminar
+                    </button>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
     <!-- ================================= -->
-    <!-- JAVASCRIPT PRINCIPAL -->
-    <!-- ================================= -->
+    <!-- JAVASCRIPT PRINCIPAL
+         ================================= -->
 
     <script src="newtab.js"></script>
 
@@ -1621,3 +1666,4 @@
 </body>
 
 </html>
+

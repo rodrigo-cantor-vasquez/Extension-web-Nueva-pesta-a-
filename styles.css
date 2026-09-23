@@ -97,7 +97,8 @@ header {
 .search-container input:focus {
     border-color: #6d9dfc;
 
-    box-shadow: 0 0 0 3px rgba(70, 120, 220, 0.12);
+    box-shadow:
+        0 0 0 3px rgba(70, 120, 220, 0.12);
 }
 
 
@@ -160,7 +161,8 @@ main {
     border: 1px solid #d6e3ff;
     border-radius: 16px;
 
-    box-shadow: 0 4px 15px rgba(70, 120, 220, 0.08);
+    box-shadow:
+        0 4px 15px rgba(70, 120, 220, 0.08);
 }
 
 
@@ -176,6 +178,7 @@ main {
     justify-content: space-between;
 
     margin: -22px -22px 20px;
+
     padding: 16px 18px;
 
     background: linear-gradient(
@@ -185,6 +188,7 @@ main {
     );
 
     border-bottom: 1px solid #dce6fa;
+
     border-radius: 16px 16px 0 0;
 }
 
@@ -211,11 +215,13 @@ main {
     margin: 0;
 
     display: flex;
+
     align-items: center;
 
     gap: 10px;
 
     font-size: 21px;
+
     font-weight: 700;
 
     color: #263b63;
@@ -230,6 +236,7 @@ main {
     height: 32px;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
@@ -245,7 +252,8 @@ main {
 
     font-size: 15px;
 
-    box-shadow: 0 4px 10px rgba(76, 141, 255, 0.25);
+    box-shadow:
+        0 4px 10px rgba(76, 141, 255, 0.25);
 }
 
 
@@ -258,18 +266,21 @@ main {
     height: 36px;
 
     border: none;
+
     border-radius: 8px;
 
     background-color: transparent;
 
     font-size: 24px;
+
     line-height: 1;
 
     color: #5277b9;
 
     cursor: pointer;
 
-    transition: background-color 0.2s;
+    transition:
+        background-color 0.2s;
 }
 
 .group-menu-button:hover {
@@ -314,6 +325,7 @@ main {
     background-color: #f8faff;
 
     border: 1px solid #dbe6ff;
+
     border-radius: 12px;
 
     cursor: pointer;
@@ -332,7 +344,8 @@ main {
 
     transform: translateY(-3px);
 
-    box-shadow: 0 6px 15px rgba(70, 120, 220, 0.15);
+    box-shadow:
+        0 6px 15px rgba(70, 120, 220, 0.15);
 }
 
 
@@ -376,6 +389,7 @@ main {
     white-space: nowrap;
 
     font-size: 15px;
+
     font-weight: 500;
 
     text-align: center;
@@ -398,11 +412,13 @@ main {
     height: 30px;
 
     border: none;
+
     border-radius: 7px;
 
     background-color: transparent;
 
     font-size: 20px;
+
     line-height: 1;
 
     color: #5277b9;
@@ -448,16 +464,19 @@ main {
     background-color: white;
 
     border: 1px solid #c8d8fa;
+
     border-radius: 8px;
 
     text-align: center;
 
     font-size: 13px;
+
     line-height: 1.4;
 
     color: #3d4d68;
 
-    box-shadow: 0 5px 15px rgba(50, 90, 160, 0.15);
+    box-shadow:
+        0 5px 15px rgba(50, 90, 160, 0.15);
 
     z-index: 20;
 }
@@ -484,9 +503,11 @@ main {
     background-color: white;
 
     border: 1px solid #cddcff;
+
     border-radius: 9px;
 
-    box-shadow: 0 5px 15px rgba(50, 90, 160, 0.15);
+    box-shadow:
+        0 5px 15px rgba(50, 90, 160, 0.15);
 
     z-index: 30;
 }
@@ -527,6 +548,7 @@ main {
     padding: 9px 10px;
 
     border: none;
+
     border-radius: 6px;
 
     background-color: transparent;
@@ -587,7 +609,8 @@ main {
 
     transform: translateY(-3px);
 
-    box-shadow: 0 6px 15px rgba(70, 120, 220, 0.12);
+    box-shadow:
+        0 6px 15px rgba(70, 120, 220, 0.12);
 }
 
 
@@ -613,6 +636,7 @@ main {
     color: #4c7ed1;
 
     font-size: 30px;
+
     font-weight: 300;
 
     line-height: 1;
@@ -684,7 +708,8 @@ main {
 
     transform: translateY(-2px);
 
-    box-shadow: 0 4px 10px rgba(70, 120, 220, 0.12);
+    box-shadow:
+        0 4px 10px rgba(70, 120, 220, 0.12);
 }
 
 
@@ -705,13 +730,15 @@ main {
 
     border-left: 1px solid #d6e3ff;
 
-    box-shadow: -5px 0 20px rgba(50, 90, 160, 0.15);
+    box-shadow:
+        -5px 0 20px rgba(50, 90, 160, 0.15);
 
     z-index: 100;
 
     transform: translateX(100%);
 
-    transition: transform 0.3s ease;
+    transition:
+        transform 0.3s ease;
 }
 
 
@@ -759,6 +786,7 @@ main {
     height: 36px;
 
     border: none;
+
     border-radius: 8px;
 
     background-color: transparent;
@@ -814,6 +842,7 @@ main {
     padding: 10px 12px;
 
     border: 1px solid #a9c3f5;
+
     border-radius: 8px;
 
     background-color: white;
@@ -838,7 +867,8 @@ main {
 
     transform: translateY(-2px);
 
-    box-shadow: 0 4px 10px rgba(70, 120, 220, 0.12);
+    box-shadow:
+        0 4px 10px rgba(70, 120, 220, 0.12);
 }
 
 
@@ -885,6 +915,7 @@ main {
     padding: 8px 10px;
 
     border: 1px solid #cddcff;
+
     border-radius: 7px;
 
     outline: none;
@@ -896,7 +927,8 @@ main {
 #card-size:focus {
     border-color: #6d9dfc;
 
-    box-shadow: 0 0 0 3px rgba(70, 120, 220, 0.12);
+    box-shadow:
+        0 0 0 3px rgba(70, 120, 220, 0.12);
 }
 
 .settings-section > span {
@@ -943,6 +975,7 @@ main {
     padding: 12px;
 
     border: 1px solid #d9e2f2;
+
     border-radius: 10px;
 
     background-color: #f8faff;
@@ -975,6 +1008,7 @@ main {
     background-color: #f8faff;
 
     border: 1px solid #dbe6ff;
+
     border-radius: 10px;
 }
 
@@ -1011,6 +1045,7 @@ main {
     padding: 8px 10px;
 
     border: 1px solid #cddcff;
+
     border-radius: 7px;
 
     background-color: white;
@@ -1070,6 +1105,7 @@ main {
     padding: 2px;
 
     border: 1px solid #cddcff;
+
     border-radius: 7px;
 
     background-color: white;
@@ -1089,6 +1125,7 @@ main {
     padding: 0;
 
     border: 1px solid #d6dff2;
+
     border-radius: 6px;
 
     background-color: white;
@@ -1128,6 +1165,7 @@ main {
     padding: 9px 12px;
 
     border: 1px dashed #a9c3f5;
+
     border-radius: 7px;
 
     background-color: white;
@@ -1166,6 +1204,7 @@ main {
     padding: 2px;
 
     border: 1px solid #cddcff;
+
     border-radius: 7px;
 
     background-color: white;
@@ -1231,6 +1270,7 @@ main {
     padding: 2px;
 
     border: 1px solid #cddcff;
+
     border-radius: 7px;
 
     background-color: white;
@@ -1290,6 +1330,7 @@ main {
     padding: 9px 12px;
 
     border: 1px solid #cddcff;
+
     border-radius: 7px;
 
     background-color: white;
@@ -1359,9 +1400,11 @@ main {
     background-color: white;
 
     border: 1px solid #d6e3ff;
+
     border-radius: 12px;
 
-    box-shadow: 0 8px 25px rgba(50, 90, 160, 0.2);
+    box-shadow:
+        0 8px 25px rgba(50, 90, 160, 0.2);
 
     overflow: hidden;
 }
@@ -1406,6 +1449,7 @@ main {
     height: 32px;
 
     border: none;
+
     border-radius: 7px;
 
     background-color: transparent;
@@ -1456,6 +1500,7 @@ main {
     margin-bottom: 16px;
 
     border: 1px solid #cddcff;
+
     border-radius: 7px;
 
     outline: none;
@@ -1472,7 +1517,8 @@ main {
 #edit-group-name:focus {
     border-color: #6d9dfc;
 
-    box-shadow: 0 0 0 3px rgba(70, 120, 220, 0.12);
+    box-shadow:
+        0 0 0 3px rgba(70, 120, 220, 0.12);
 }
 
 
@@ -1574,9 +1620,11 @@ main {
     background-color: white;
 
     border: 1px solid #d6e3ff;
+
     border-radius: 12px;
 
-    box-shadow: 0 8px 25px rgba(50, 90, 160, 0.2);
+    box-shadow:
+        0 8px 25px rgba(50, 90, 160, 0.2);
 
     overflow: hidden;
 }
@@ -1621,6 +1669,7 @@ main {
     height: 32px;
 
     border: none;
+
     border-radius: 7px;
 
     background-color: transparent;
@@ -1694,7 +1743,8 @@ main {
 #edit-site-description:focus {
     border-color: #6d9dfc;
 
-    box-shadow: 0 0 0 3px rgba(70, 120, 220, 0.12);
+    box-shadow:
+        0 0 0 3px rgba(70, 120, 220, 0.12);
 }
 
 #edit-site-description {
@@ -1784,9 +1834,9 @@ main {
 }
 
 
-/* ========================================= */
+/* ================================= */
 /* MODAL AGREGAR SITIO */
-/* ========================================= */
+/* ================================= */
 
 #add-site-overlay {
     position: fixed;
@@ -1823,9 +1873,11 @@ main {
     background-color: white;
 
     border: 1px solid #d6e3ff;
+
     border-radius: 12px;
 
-    box-shadow: 0 8px 25px rgba(50, 90, 160, 0.2);
+    box-shadow:
+        0 8px 25px rgba(50, 90, 160, 0.2);
 
     overflow: hidden;
 }
@@ -1870,6 +1922,7 @@ main {
     height: 32px;
 
     border: none;
+
     border-radius: 7px;
 
     background-color: transparent;
@@ -1945,7 +1998,8 @@ main {
 #add-site-group:focus {
     border-color: #6d9dfc;
 
-    box-shadow: 0 0 0 3px rgba(70, 120, 220, 0.12);
+    box-shadow:
+        0 0 0 3px rgba(70, 120, 220, 0.12);
 }
 
 #add-site-description {
@@ -2016,9 +2070,9 @@ main {
 }
 
 
-/* ========================================= */
+/* ================================= */
 /* MODAL AGREGAR GRUPO */
-/* ========================================= */
+/* ================================= */
 
 #add-group-overlay {
     position: fixed;
@@ -2055,9 +2109,11 @@ main {
     background-color: white;
 
     border: 1px solid #d6e3ff;
+
     border-radius: 12px;
 
-    box-shadow: 0 8px 25px rgba(50, 90, 160, 0.2);
+    box-shadow:
+        0 8px 25px rgba(50, 90, 160, 0.2);
 
     overflow: hidden;
 }
@@ -2102,6 +2158,7 @@ main {
     height: 32px;
 
     border: none;
+
     border-radius: 7px;
 
     background-color: transparent;
@@ -2171,7 +2228,8 @@ main {
 #add-group-name:focus {
     border-color: #6d9dfc;
 
-    box-shadow: 0 0 0 3px rgba(70, 120, 220, 0.12);
+    box-shadow:
+        0 0 0 3px rgba(70, 120, 220, 0.12);
 }
 
 #add-group-name-error {
@@ -2367,6 +2425,1088 @@ main {
 
 
 /* ================================= */
+/* ARRASTRAR GRUPOS */
+/* ================================= */
+
+.group-header {
+    cursor: grab;
+}
+
+.group-header:active {
+    cursor: grabbing;
+}
+
+.site-group.group-dragging {
+    opacity: 0.5;
+}
+
+.site-group.group-drag-over {
+    border-top: 3px solid #6f9ef0;
+}
+
+.site-card.site-dragging {
+    opacity: 0.5;
+}
+
+
+/* ================================= */
+/* CONTENEDOR DE LA BARRA DE MARCADORES */
+/* ================================= */
+
+#bookmarks-wrapper {
+    position: relative;
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    background-color: rgba(255, 255, 255, 0.92);
+
+    border-top: 1px solid #d6e3ff;
+
+    border-bottom: 1px solid #d6e3ff;
+
+    box-shadow:
+        0 2px 6px rgba(50, 90, 160, 0.08);
+
+    z-index: 50;
+
+    /*
+       IMPORTANTE:
+       No usamos overflow: hidden aquí.
+       El menú contextual vive fuera de este contenedor.
+    */
+
+    overflow: visible;
+}
+
+
+/* ================================= */
+/* BARRA DE MARCADORES DE CHROME */
+/* ================================= */
+
+#bookmarks-bar {
+    flex: 1;
+
+    min-width: 0;
+
+    min-height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    padding: 4px 10px;
+
+    position: relative;
+
+    z-index: 50;
+
+    overflow-x: auto;
+
+    overflow-y: hidden;
+
+    white-space: nowrap;
+
+    scroll-behavior: smooth;
+
+    scrollbar-width: none;
+}
+
+
+#bookmarks-bar::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* ================================= */
+/* BOTONES DE DESPLAZAMIENTO */
+/* ================================= */
+
+.bookmarks-scroll-button {
+    flex-shrink: 0;
+
+    width: 34px;
+
+    height: 34px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background-color: transparent;
+
+    color: #5277b9;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        color 0.2s,
+        opacity 0.2s;
+}
+
+.bookmarks-scroll-button:hover {
+    background-color: #e8efff;
+
+    color: #315ca8;
+}
+
+.bookmarks-scroll-button:disabled {
+    opacity: 0.25;
+
+    cursor: default;
+
+    background-color: transparent;
+}
+
+.bookmarks-scroll-button.hidden {
+    display: none;
+}
+
+
+/* ================================= */
+/* ELEMENTOS DE LA BARRA */
+/* ================================= */
+
+.bookmark-item,
+.bookmark-folder {
+    position: relative;
+
+    flex-shrink: 0;
+}
+
+
+/* ================================= */
+/* MARCADOR */
+/* ================================= */
+
+.bookmark-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    height: 34px;
+
+    padding: 5px 9px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background-color: transparent;
+
+    color: #34445f;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        color 0.2s;
+}
+
+.bookmark-item:hover {
+    background-color: #e8efff;
+
+    color: #315ca8;
+}
+
+
+/* ================================= */
+/* ICONO DEL MARCADOR */
+/* ================================= */
+
+.bookmark-icon {
+    width: 16px;
+    height: 16px;
+
+    display: block;
+
+    flex-shrink: 0;
+
+    object-fit: contain;
+}
+
+
+/* ================================= */
+/* NOMBRE DEL MARCADOR */
+/* ================================= */
+
+.bookmark-title {
+    max-width: 180px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+/* ================================= */
+/* CARPETA DE MARCADORES */
+/* ================================= */
+
+.bookmark-folder-button {
+    height: 34px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 5px 9px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background-color: transparent;
+
+    color: #34445f;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s,
+        color 0.2s;
+}
+
+.bookmark-folder-button:hover {
+    background-color: #e8efff;
+
+    color: #315ca8;
+}
+
+
+/* ================================= */
+/* ICONO DE CARPETA */
+/* ================================= */
+
+.bookmark-folder-icon {
+    font-size: 15px;
+
+    flex-shrink: 0;
+}
+
+
+/* ================================= */
+/* MENÚ DE CARPETA */
+/* ================================= */
+
+/*
+   Este menú SÍ pertenece a la barra.
+   Por eso continúa usando position: absolute.
+
+   Al hacer clic izquierdo en una carpeta,
+   JavaScript lo abre debajo de la carpeta.
+*/
+
+/* ================================= */
+/* MENÚ DE CARPETA */
+/* ================================= */
+
+.bookmark-menu {
+    display: none;
+
+    position: fixed;
+
+    min-width: 220px;
+    max-width: 320px;
+
+    padding: 6px;
+
+    background-color: white;
+
+    border: 1px solid #cddcff;
+
+    border-radius: 9px;
+
+    box-shadow:
+        0 6px 18px rgba(50, 90, 160, 0.18);
+
+    z-index: 99990;
+
+    overflow: visible;
+}
+
+
+/* ================================= */
+/* ELEMENTOS DENTRO DEL MENÚ */
+/* ================================= */
+
+.bookmark-menu-item {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 8px 10px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background-color: transparent;
+
+    color: #34445f;
+
+    font-size: 14px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.bookmark-menu-item:hover {
+    background-color: #eaf1ff;
+
+    color: #315ca8;
+}
+
+
+/* ================================= */
+/* SUBCARPETAS */
+/* ================================= */
+
+.bookmark-subfolder {
+    position: relative;
+}
+
+
+/* ================================= */
+/* BOTÓN DE SUBCARPETA */
+/* ================================= */
+
+.bookmark-subfolder-button {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 8px 10px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background-color: transparent;
+
+    color: #34445f;
+
+    font-size: 14px;
+
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.bookmark-subfolder-button:hover {
+    background-color: #eaf1ff;
+
+    color: #315ca8;
+}
+
+
+/* ================================= */
+/* FLECHA DE SUBCARPETA */
+/* ================================= */
+
+.bookmark-subfolder-arrow {
+    margin-left: auto;
+
+    font-size: 12px;
+
+    color: #7b879d;
+}
+
+
+/* ================================= */
+/* MENÚ DE SUBCARPETA */
+/* ================================= */
+
+/*
+   Los submenús se posicionan mediante
+   getBoundingClientRect() desde JavaScript.
+
+   Por eso usamos fixed.
+*/
+
+.bookmark-subfolder > .bookmark-menu {
+    display: none;
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    margin: 0;
+
+    min-width: 220px;
+
+    max-width: 320px;
+
+    padding: 6px;
+
+    background-color: white;
+
+    border: 1px solid #cddcff;
+
+    border-radius: 9px;
+
+    box-shadow:
+        0 6px 18px rgba(50, 90, 160, 0.18);
+
+    z-index: 2000;
+
+    pointer-events: auto;
+}
+
+
+/* ================================= */
+/* DESPLAZAMIENTO HORIZONTAL */
+/* ================================= */
+
+/*
+   La barra de desplazamiento nativa permanece
+   oculta porque el desplazamiento se controla
+   mediante los botones de los extremos.
+*/
+
+
+/* ================================= */
+/* RESPONSIVE MARCADORES */
+/* ================================= */
+
+@media (max-width: 500px) {
+
+    #bookmarks-bar {
+        padding-left: 6px;
+
+        padding-right: 6px;
+    }
+
+    .bookmark-item,
+    .bookmark-folder-button {
+        font-size: 13px;
+
+        padding-left: 7px;
+
+        padding-right: 7px;
+    }
+
+}
+
+
+/* ========================================= */
+/* MENÚ CONTEXTUAL DE MARCADORES */
+/* ========================================= */
+
+/*
+   MUY IMPORTANTE:
+
+   Este menú NO pertenece visualmente a la barra.
+
+   JavaScript debe agregarlo directamente a <body>.
+
+   position: fixed hace que left/top se calculen
+   respecto a la ventana del navegador.
+
+   Así el menú puede salir completamente del área
+   de #bookmarks-wrapper y #bookmarks-bar.
+*/
+
+.bookmark-context-menu {
+    position: fixed !important;
+
+    top: 0;
+    left: 0;
+
+    display: none;
+
+    min-width: 190px;
+
+    max-width: 300px;
+
+    padding: 6px;
+
+    margin: 0;
+
+    background-color: white;
+
+    border: 1px solid #cddcff;
+
+    border-radius: 9px;
+
+    box-shadow:
+        0 8px 25px rgba(30, 60, 110, 0.22);
+
+    z-index: 999999 !important;
+
+    overflow: visible;
+
+    white-space: normal;
+
+    pointer-events: auto;
+}
+
+
+/* ========================================= */
+/* EVITAR QUE EL CONTEXT MENU SEA ATRAPADO */
+/* ========================================= */
+
+/*
+   Si por alguna razón el elemento termina dentro
+   de bookmarks-wrapper, estas reglas NO permiten
+   cambiar su posicionamiento a absolute.
+*/
+
+#bookmarks-wrapper .bookmark-context-menu,
+#bookmarks-bar .bookmark-context-menu,
+.bookmark-folder .bookmark-context-menu,
+.bookmark-subfolder .bookmark-context-menu {
+    position: fixed !important;
+
+    z-index: 999999 !important;
+
+    margin: 0 !important;
+}
+
+
+/* ========================================= */
+/* BOTONES DEL MENÚ CONTEXTUAL */
+/* ========================================= */
+
+.bookmark-context-menu button {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 8px 10px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background-color: transparent;
+
+    color: #34445f;
+
+    font-size: 14px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+.bookmark-context-menu button:hover {
+    background-color: #eaf1ff;
+
+    color: #315ca8;
+}
+
+
+/* ================================= */
+/* BOTÓN ELIMINAR */
+/* ================================= */
+
+.bookmark-context-menu .bookmark-context-delete {
+    color: #c74b4b;
+}
+
+.bookmark-context-menu .bookmark-context-delete:hover {
+    background-color: #fff0f0;
+
+    color: #c03939;
+}
+
+
+/* ================================= */
+/* MODALES DE MARCADORES */
+/* ================================= */
+
+/*
+   Estos overlays existen en newtab.html,
+   pero deben permanecer completamente ocultos
+   mientras no se abra su respectiva ventana.
+*/
+
+#edit-bookmark-overlay,
+#delete-bookmark-overlay,
+#rename-bookmark-folder-overlay,
+#new-bookmark-folder-overlay,
+#delete-bookmark-folder-overlay {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background-color: rgba(0, 0, 0, 0.45);
+
+    z-index: 300;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+}
+
+
+/* ================================= */
+/* OCULTAR MENÚ CONTEXTUAL ANTIGUO */
+/* ================================= */
+
+/*
+   Este selector solamente afecta al antiguo
+   elemento que utilizaba id="bookmark-context-menu".
+
+   El nuevo menú utiliza la clase:
+   .bookmark-context-menu
+*/
+
+#bookmark-context-menu {
+    display: none !important;
+}
+
+
+/* =========================================
+   ESTADO VISIBLE DE LOS MODALES
+   ========================================= */
+
+#edit-bookmark-overlay.show,
+#delete-bookmark-overlay.show,
+#rename-bookmark-folder-overlay.show,
+#new-bookmark-folder-overlay.show,
+#delete-bookmark-folder-overlay.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+
+/* =========================================
+   TARJETAS DE LOS MODALES
+   ========================================= */
+
+#edit-bookmark-modal,
+#delete-bookmark-modal,
+#rename-bookmark-folder-modal,
+#new-bookmark-folder-modal,
+#delete-bookmark-folder-modal {
+    background-color: white;
+
+    border: 1px solid #d6e3ff;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.18);
+
+    overflow: hidden;
+}
+
+
+/* =========================================
+   MODAL EDITAR MARCADOR
+   ========================================= */
+
+#edit-bookmark-modal {
+    width: 420px;
+
+    max-width: calc(100% - 30px);
+}
+
+
+/* =========================================
+   MODAL ELIMINAR MARCADOR
+   ========================================= */
+
+#delete-bookmark-modal {
+    width: 380px;
+
+    max-width: calc(100% - 30px);
+}
+
+
+/* =========================================
+   MODAL RENOMBRAR CARPETA
+   ========================================= */
+
+#rename-bookmark-folder-modal {
+    width: 380px;
+
+    max-width: calc(100% - 30px);
+}
+
+
+/* =========================================
+   MODAL NUEVA CARPETA
+   ========================================= */
+
+#new-bookmark-folder-modal {
+    width: 380px;
+
+    max-width: calc(100% - 30px);
+}
+
+
+/* =========================================
+   MODAL ELIMINAR CARPETA
+   ========================================= */
+
+#delete-bookmark-folder-modal {
+    width: 400px;
+
+    max-width: calc(100% - 30px);
+}
+
+
+/* =========================================
+   CABECERAS
+   ========================================= */
+
+.edit-bookmark-header,
+.delete-bookmark-header,
+.rename-bookmark-folder-header,
+.new-bookmark-folder-header,
+.delete-bookmark-folder-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 16px 20px;
+
+    background-color: #eef4ff;
+
+    border-bottom: 1px solid #d6e3ff;
+}
+
+
+.edit-bookmark-header h2,
+.delete-bookmark-header h2,
+.rename-bookmark-folder-header h2,
+.new-bookmark-folder-header h2,
+.delete-bookmark-folder-header h2 {
+    margin: 0;
+
+    color: #263b63;
+
+    font-size: 18px;
+}
+
+
+/* =========================================
+   BOTONES X
+   ========================================= */
+
+#close-edit-bookmark-button,
+#close-delete-bookmark-button,
+#close-rename-bookmark-folder-button,
+#close-new-bookmark-folder-button,
+#close-delete-bookmark-folder-button {
+    width: 32px;
+    height: 32px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #5277b9;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+    border-radius: 6px;
+}
+
+
+#close-edit-bookmark-button:hover,
+#close-delete-bookmark-button:hover,
+#close-rename-bookmark-folder-button:hover,
+#close-new-bookmark-folder-button:hover,
+#close-delete-bookmark-folder-button:hover {
+    background-color: #d6e3ff;
+}
+
+
+/* =========================================
+   CONTENIDO
+   ========================================= */
+
+.edit-bookmark-content,
+.delete-bookmark-content,
+.rename-bookmark-folder-content,
+.new-bookmark-folder-content,
+.delete-bookmark-folder-content {
+    padding: 20px;
+}
+
+
+/* =========================================
+   ETIQUETAS
+   ========================================= */
+
+.edit-bookmark-content label,
+.rename-bookmark-folder-content label,
+.new-bookmark-folder-content label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #263b63;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================
+   INPUTS
+   ========================================= */
+
+#edit-bookmark-name,
+#edit-bookmark-url,
+#rename-bookmark-folder-name,
+#new-bookmark-folder-name {
+    width: 100%;
+
+    padding: 10px 12px;
+
+    margin-bottom: 5px;
+
+    border: 1px solid #c7d5ec;
+
+    border-radius: 7px;
+
+    background-color: white;
+
+    color: #263b63;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    outline: none;
+}
+
+
+#edit-bookmark-name:focus,
+#edit-bookmark-url:focus,
+#rename-bookmark-folder-name:focus,
+#new-bookmark-folder-name:focus {
+    border-color: #6f9ef0;
+
+    box-shadow:
+        0 0 0 2px rgba(111, 158, 240, 0.15);
+}
+
+
+/* =========================================
+   ERRORES
+   ========================================= */
+
+#edit-bookmark-name-error,
+#edit-bookmark-url-error,
+#rename-bookmark-folder-name-error,
+#new-bookmark-folder-name-error {
+    min-height: 18px;
+
+    margin-bottom: 10px;
+
+    color: #c0392b;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   MENSAJES DE CONFIRMACIÓN
+   ========================================= */
+
+#delete-bookmark-message,
+#delete-bookmark-folder-message {
+    margin: 0;
+
+    color: #263b63;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================
+   BOTONES DE ACCIONES
+   ========================================= */
+
+.edit-bookmark-actions,
+.delete-bookmark-actions,
+.rename-bookmark-folder-actions,
+.new-bookmark-folder-actions,
+.delete-bookmark-folder-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    padding: 15px 20px;
+
+    border-top: 1px solid #e3ebf8;
+
+    background-color: #f8faff;
+}
+
+
+/* =========================================
+   BOTONES CANCELAR
+   ========================================= */
+
+#cancel-edit-bookmark-button,
+#cancel-delete-bookmark-button,
+#cancel-rename-bookmark-folder-button,
+#cancel-new-bookmark-folder-button,
+#cancel-delete-bookmark-folder-button {
+    padding: 9px 16px;
+
+    border: 1px solid #c7d5ec;
+
+    border-radius: 7px;
+
+    background-color: white;
+
+    color: #5277b9;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+
+#cancel-edit-bookmark-button:hover,
+#cancel-delete-bookmark-button:hover,
+#cancel-rename-bookmark-folder-button:hover,
+#cancel-new-bookmark-folder-button:hover,
+#cancel-delete-bookmark-folder-button:hover {
+    background-color: #eef4ff;
+}
+
+
+/* =========================================
+   BOTONES GUARDAR / CREAR
+   ========================================= */
+
+#save-edit-bookmark-button,
+#save-rename-bookmark-folder-button,
+#save-new-bookmark-folder-button {
+    padding: 9px 18px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background-color: #5277b9;
+
+    color: white;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+
+#save-edit-bookmark-button:hover,
+#save-rename-bookmark-folder-button:hover,
+#save-new-bookmark-folder-button:hover {
+    background-color: #4267a5;
+}
+
+
+/* =========================================
+   BOTONES ELIMINAR
+   ========================================= */
+
+#confirm-delete-bookmark-button,
+#confirm-delete-bookmark-folder-button {
+    padding: 9px 18px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background-color: #c94c4c;
+
+    color: white;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+
+#confirm-delete-bookmark-button:hover,
+#confirm-delete-bookmark-folder-button:hover {
+    background-color: #b43e3e;
+}
+
+
+/* ================================= */
 /* RESPONSIVE */
 /* ================================= */
 
@@ -2401,29 +3541,4 @@ main {
     .global-actions {
         flex-direction: column;
     }
-}
-
-
-/* ================================= */
-/* ARRASTRAR GRUPOS */
-/* ================================= */
-
-.group-header {
-    cursor: grab;
-}
-
-.group-header:active {
-    cursor: grabbing;
-}
-
-.site-group.group-dragging {
-    opacity: 0.5;
-}
-
-.site-group.group-drag-over {
-    border-top: 3px solid #6f9ef0;
-}
-
-.site-card.site-dragging {
-    opacity: 0.5;
 }

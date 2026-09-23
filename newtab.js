@@ -5076,3 +5076,3300 @@ async function init() {
 // =========================================
 
 init();
+
+
+// =========================================
+// MARCADORES DE CHROME
+// =========================================
+
+
+// =========================================
+// VARIABLES GLOBALES
+// =========================================
+
+let bookmarkContextMenu = null;
+
+let selectedBookmarkNode = null;
+
+let selectedBookmarkType = null;
+
+
+// =========================================
+// CREAR MENÚ CONTEXTUAL
+// =========================================
+
+// =========================================
+// CREAR MENÚ CONTEXTUAL
+// =========================================
+
+function createBookmarkContextMenu() {
+
+    if (bookmarkContextMenu) {
+        return;
+    }
+
+
+    bookmarkContextMenu =
+        document.createElement("div");
+
+
+    bookmarkContextMenu.className =
+        "bookmark-context-menu";
+
+
+    bookmarkContextMenu.style.display =
+        "none";
+
+
+    // =====================================
+    // IMPORTANTE
+    // =====================================
+    // El menú contextual pertenece al BODY,
+    // no al bookmarks-wrapper.
+    //
+    // Así no queda limitado por el contenedor
+    // de la barra de marcadores.
+
+    document.body.appendChild(
+        bookmarkContextMenu
+    );
+
+
+    // =====================================
+    // EVITAR CERRAR EL MENÚ AL HACER CLICK
+    // DENTRO DE ÉL
+    // =====================================
+
+    bookmarkContextMenu.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+        }
+    );
+
+}
+
+
+// =========================================
+// ABRIR MENÚ CONTEXTUAL
+// =========================================
+
+function openBookmarkContextMenu(
+    event,
+    node,
+    type
+) {
+
+    event.preventDefault();
+
+    event.stopPropagation();
+
+    createBookmarkContextMenu();
+
+
+    // =====================================
+    // CERRAR MENÚS DE CARPETAS
+    // =====================================
+
+    closeBookmarkMenus();
+
+
+    // =====================================
+    // GUARDAR SELECCIÓN
+    // =====================================
+
+    selectedBookmarkNode =
+        node;
+
+    selectedBookmarkType =
+        type;
+
+
+    // =====================================
+    // LIMPIAR MENÚ
+    // =====================================
+
+    bookmarkContextMenu.innerHTML =
+        "";
+
+
+    // =====================================
+    // EDITAR / RENOMBRAR
+    // =====================================
+
+    const editButton =
+        document.createElement("button");
+
+    editButton.textContent =
+        type === "bookmark"
+            ? "✏️ Editar"
+            : "✏️ Renombrar";
+
+
+    editButton.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+
+            const nodeToEdit =
+                selectedBookmarkNode;
+
+            const typeToEdit =
+                selectedBookmarkType;
+
+
+            closeBookmarkContextMenu();
+
+
+            if (!nodeToEdit) {
+                return;
+            }
+
+
+            if (typeToEdit === "bookmark") {
+
+                openEditBookmarkModal(
+                    nodeToEdit
+                );
+
+            } else {
+
+                openRenameBookmarkFolderModal(
+                    nodeToEdit
+                );
+
+            }
+
+        }
+    );
+
+
+    bookmarkContextMenu.appendChild(
+        editButton
+    );
+
+
+    // =====================================
+    // NUEVA CARPETA
+    // =====================================
+
+    if (type === "folder") {
+
+        const newFolderButton =
+            document.createElement("button");
+
+        newFolderButton.textContent =
+            "📁 Nueva carpeta";
+
+
+        newFolderButton.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+
+                const parentFolder =
+                    selectedBookmarkNode;
+
+
+                closeBookmarkContextMenu();
+
+
+                if (parentFolder) {
+
+                    openNewBookmarkFolderModal(
+                        parentFolder
+                    );
+
+                }
+
+            }
+        );
+
+
+        bookmarkContextMenu.appendChild(
+            newFolderButton
+        );
+
+    }
+
+
+    // =====================================
+    // ELIMINAR
+    // =====================================
+
+    const deleteButton =
+        document.createElement("button");
+
+    deleteButton.textContent =
+        "🗑️ Eliminar";
+
+    deleteButton.className =
+        "bookmark-context-delete";
+
+
+    deleteButton.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+
+            const nodeToDelete =
+                selectedBookmarkNode;
+
+            const typeToDelete =
+                selectedBookmarkType;
+
+
+            closeBookmarkContextMenu();
+
+
+            if (!nodeToDelete) {
+                return;
+            }
+
+
+            if (typeToDelete === "bookmark") {
+
+                openDeleteBookmarkModal(
+                    nodeToDelete
+                );
+
+            } else {
+
+                openDeleteBookmarkFolderModal(
+                    nodeToDelete
+                );
+
+            }
+
+        }
+    );
+
+
+    bookmarkContextMenu.appendChild(
+        deleteButton
+    );
+
+
+    // =====================================
+    // MOSTRAR MENÚ
+    // =====================================
+
+    bookmarkContextMenu.style.display =
+        "block";
+
+
+    // =====================================
+    // OBTENER TAMAÑO DEL MENÚ
+    // =====================================
+
+    const menuRect =
+        bookmarkContextMenu.getBoundingClientRect();
+
+
+    // =====================================
+    // POSICIÓN INICIAL
+    // =====================================
+
+    let left =
+        event.clientX;
+
+    let top =
+        event.clientY;
+
+
+    // =====================================
+    // EVITAR SALIR POR LA DERECHA
+    // =====================================
+
+    if (
+        left + menuRect.width >
+        window.innerWidth - 8
+    ) {
+
+        left =
+            window.innerWidth -
+            menuRect.width -
+            8;
+
+    }
+
+
+    // =====================================
+    // EVITAR SALIR POR ABAJO
+    // =====================================
+
+    if (
+        top + menuRect.height >
+        window.innerHeight - 8
+    ) {
+
+        top =
+            window.innerHeight -
+            menuRect.height -
+            8;
+
+    }
+
+
+    // =====================================
+    // APLICAR POSICIÓN
+    // =====================================
+
+    bookmarkContextMenu.style.left =
+        Math.max(
+            8,
+            left
+        ) + "px";
+
+    bookmarkContextMenu.style.top =
+        Math.max(
+            8,
+            top
+        ) + "px";
+
+}
+
+
+// =========================================
+// CERRAR MENÚS DE CARPETAS
+// =========================================
+
+function closeBookmarkMenus() {
+
+    document
+        .querySelectorAll(
+            ".bookmark-menu"
+        )
+        .forEach(
+            function (menu) {
+
+                menu.style.display =
+                    "none";
+
+            }
+        );
+
+}
+
+
+// =========================================
+// CERRAR MENÚ CONTEXTUAL
+// =========================================
+
+function closeBookmarkContextMenu() {
+
+    if (
+        bookmarkContextMenu
+    ) {
+
+        bookmarkContextMenu.style.display =
+            "none";
+
+    }
+
+}
+
+
+// =========================================
+// CARGAR MARCADORES
+// =========================================
+
+function loadBookmarks() {
+
+    chrome.bookmarks.getTree(
+        function (bookmarkTree) {
+
+            if (
+                chrome.runtime.lastError
+            ) {
+
+                console.error(
+                    "Error al cargar marcadores:",
+                    chrome.runtime.lastError.message
+                );
+
+                return;
+
+            }
+
+
+            const bookmarksBar =
+                findBookmarksBar(
+                    bookmarkTree
+                );
+
+
+            if (
+                !bookmarksBar
+            ) {
+
+                console.log(
+                    "No se encontró la Barra de marcadores."
+                );
+
+                return;
+
+            }
+
+
+            renderBookmarksBar(
+                bookmarksBar.children || []
+            );
+
+        }
+    );
+
+}
+
+
+// =========================================
+// BUSCAR BARRA DE MARCADORES
+// =========================================
+
+function findBookmarksBar(nodes) {
+
+    for (
+        const node of nodes
+    ) {
+
+        if (
+            node.id === "1"
+        ) {
+
+            return node;
+
+        }
+
+
+        if (
+            node.children
+        ) {
+
+            const result =
+                findBookmarksBar(
+                    node.children
+                );
+
+
+            if (
+                result
+            ) {
+
+                return result;
+
+            }
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+// =========================================
+// MOSTRAR BARRA DE MARCADORES
+// =========================================
+
+function renderBookmarksBar(nodes) {
+
+    const bookmarksBar =
+        document.getElementById(
+            "bookmarks-bar"
+        );
+
+
+    if (
+        !bookmarksBar
+    ) {
+
+        console.log(
+            "No existe #bookmarks-bar."
+        );
+
+        return;
+
+    }
+
+
+    bookmarksBar.innerHTML =
+        "";
+
+
+    nodes.forEach(
+        function (node) {
+
+            if (
+                node.url
+            ) {
+
+                createBookmarkItem(
+                    node,
+                    bookmarksBar
+                );
+
+            } else {
+
+                createBookmarkFolder(
+                    node,
+                    bookmarksBar
+                );
+
+            }
+
+        }
+    );
+
+
+    // =====================================
+    // ACTUALIZAR DESPLAZAMIENTO
+    // =====================================
+
+    requestAnimationFrame(
+        function () {
+
+            updateBookmarkScrollButtons();
+
+        }
+    );
+
+}
+
+
+// =========================================
+// CREAR MARCADOR
+// =========================================
+
+function createBookmarkItem(
+    bookmark,
+    container
+) {
+
+    const button =
+        document.createElement("button");
+
+    button.className =
+        "bookmark-item";
+
+    button.title =
+        bookmark.title ||
+        bookmark.url;
+
+
+    // =====================================
+    // FAVICON
+    // =====================================
+
+    const icon =
+        document.createElement("img");
+
+    icon.className =
+        "bookmark-icon";
+
+    icon.alt =
+        "";
+
+    icon.src =
+        getBookmarkFavicon(
+            bookmark.url
+        );
+
+
+    icon.onerror =
+        function () {
+
+            icon.onerror =
+                null;
+
+            icon.src =
+                "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext y='20' font-size='20'%3E🔖%3C/text%3E%3C/svg%3E";
+
+        };
+
+
+    // =====================================
+    // TÍTULO
+    // =====================================
+
+    const title =
+        document.createElement("span");
+
+    title.className =
+        "bookmark-title";
+
+    title.textContent =
+        bookmark.title ||
+        bookmark.url;
+
+
+    button.appendChild(
+        icon
+    );
+
+    button.appendChild(
+        title
+    );
+
+
+    // =====================================
+    // CLICK NORMAL
+    // =====================================
+
+    button.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+            closeBookmarkMenus();
+
+            closeBookmarkContextMenu();
+
+
+            window.location.href =
+                bookmark.url;
+
+        }
+    );
+
+
+    // =====================================
+    // CLICK DERECHO
+    // =====================================
+
+    button.addEventListener(
+        "contextmenu",
+        function (event) {
+
+            openBookmarkContextMenu(
+                event,
+                bookmark,
+                "bookmark"
+            );
+
+        }
+    );
+
+
+    container.appendChild(
+        button
+    );
+
+}
+
+
+// =========================================
+// OBTENER FAVICON
+// =========================================
+
+function getBookmarkFavicon(url) {
+
+    try {
+
+        const urlObject =
+            new URL(url);
+
+        const domain =
+            urlObject.hostname;
+
+
+        return (
+            "https://www.google.com/s2/favicons" +
+            "?domain=" +
+            encodeURIComponent(domain) +
+            "&sz=32"
+        );
+
+    } catch (error) {
+
+        return "";
+
+    }
+
+}
+
+
+// =========================================
+// CREAR CARPETA
+// =========================================
+
+function createBookmarkFolder(
+    folder,
+    container
+) {
+
+    const folderContainer =
+        document.createElement("div");
+
+    folderContainer.className =
+        "bookmark-folder";
+
+
+    // =====================================
+    // BOTÓN
+    // =====================================
+
+    const button =
+        document.createElement("button");
+
+    button.className =
+        "bookmark-folder-button";
+
+
+    const icon =
+        document.createElement("span");
+
+    icon.className =
+        "bookmark-folder-icon";
+
+    icon.textContent =
+        "📁";
+
+
+    const title =
+        document.createElement("span");
+
+    title.className =
+        "bookmark-title";
+
+    title.textContent =
+        folder.title ||
+        "Carpeta";
+
+
+    button.appendChild(
+        icon
+    );
+
+    button.appendChild(
+        title
+    );
+
+
+    // =====================================
+    // MENÚ DE LA CARPETA
+    // =====================================
+
+    const menu =
+        document.createElement("div");
+
+    menu.className =
+        "bookmark-menu";
+
+    menu.style.display =
+        "none";
+
+
+    renderBookmarkMenu(
+        folder.children || [],
+        menu
+    );
+
+
+// =====================================
+// CLICK IZQUIERDO EN CARPETA
+// =====================================
+
+button.addEventListener(
+    "click",
+    function (event) {
+
+        event.stopPropagation();
+
+        // =================================
+        // COMPROBAR SI YA ESTABA ABIERTO
+        // =================================
+
+        const wasOpen =
+            menu.style.display === "block";
+
+
+        // =================================
+        // CERRAR OTROS MENÚS
+        // =================================
+
+        closeBookmarkMenus();
+
+        // Cerrar menú contextual
+        closeBookmarkContextMenu();
+
+
+        // =================================
+        // SI YA ESTABA ABIERTO, TERMINAR
+        // =================================
+
+        if (wasOpen) {
+
+            return;
+
+        }
+
+
+        // =================================
+        // MOSTRAR EL MENÚ
+        // =================================
+
+        menu.style.display =
+            "block";
+
+
+        // =================================
+        // IMPORTANTE
+        // =================================
+        // Usamos position: fixed para que el
+        // menú NO sea recortado por:
+        //
+        // #bookmarks-bar
+        //
+        // que tiene overflow-x: auto.
+        //
+        // Visualmente seguirá apareciendo
+        // debajo de la carpeta.
+
+        menu.style.position =
+            "fixed";
+
+
+        // =================================
+        // OBTENER POSICIÓN DE LA CARPETA
+        // =================================
+
+        const buttonRect =
+            button.getBoundingClientRect();
+
+
+        // =================================
+        // OBTENER TAMAÑO DEL MENÚ
+        // =================================
+
+        const menuRect =
+            menu.getBoundingClientRect();
+
+
+        // =================================
+        // POSICIÓN HORIZONTAL
+        // =================================
+
+        let left =
+            buttonRect.left;
+
+
+        // =================================
+        // POSICIÓN VERTICAL
+        // =================================
+
+        let top =
+            buttonRect.bottom + 4;
+
+
+        // =================================
+        // EVITAR SALIR POR LA DERECHA
+        // =================================
+
+        if (
+            left + menuRect.width >
+            window.innerWidth - 8
+        ) {
+
+            left =
+                window.innerWidth -
+                menuRect.width -
+                8;
+
+        }
+
+
+        // =================================
+        // EVITAR SALIR POR ABAJO
+        // =================================
+
+        if (
+            top + menuRect.height >
+            window.innerHeight - 8
+        ) {
+
+            // Intentar abrir hacia arriba
+            top =
+                buttonRect.top -
+                menuRect.height -
+                4;
+
+        }
+
+
+        // =================================
+        // EVITAR SALIR POR ARRIBA
+        // =================================
+
+        if (
+            top < 8
+        ) {
+
+            top = 8;
+
+        }
+
+
+        // =================================
+        // APLICAR POSICIÓN
+        // =================================
+
+        menu.style.left =
+            Math.max(
+                8,
+                left
+            ) + "px";
+
+
+        menu.style.top =
+            Math.max(
+                8,
+                top
+            ) + "px";
+
+    }
+);
+
+
+    // =====================================
+    // CLICK DERECHO EN CARPETA
+    // =====================================
+
+    button.addEventListener(
+        "contextmenu",
+        function (event) {
+
+            openBookmarkContextMenu(
+                event,
+                folder,
+                "folder"
+            );
+
+        }
+    );
+
+
+    folderContainer.appendChild(
+        button
+    );
+
+    folderContainer.appendChild(
+        menu
+    );
+
+    container.appendChild(
+        folderContainer
+    );
+
+}
+
+
+// =========================================
+// MOSTRAR CONTENIDO DE CARPETA
+// =========================================
+
+function renderBookmarkMenu(
+    nodes,
+    menu
+) {
+
+    nodes.forEach(
+        function (node) {
+
+            if (
+                node.url
+            ) {
+
+                createBookmarkMenuItem(
+                    node,
+                    menu
+                );
+
+            } else {
+
+                createBookmarkSubfolder(
+                    node,
+                    menu
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+// =========================================
+// CREAR MARCADOR DENTRO DE CARPETA
+// =========================================
+
+function createBookmarkMenuItem(
+    bookmark,
+    menu
+) {
+
+    const item =
+        document.createElement("button");
+
+    item.className =
+        "bookmark-menu-item";
+
+    item.title =
+        bookmark.title ||
+        bookmark.url;
+
+
+    // =====================================
+    // FAVICON
+    // =====================================
+
+    const icon =
+        document.createElement("img");
+
+    icon.className =
+        "bookmark-icon";
+
+    icon.alt =
+        "";
+
+    icon.src =
+        getBookmarkFavicon(
+            bookmark.url
+        );
+
+
+    icon.onerror =
+        function () {
+
+            icon.onerror =
+                null;
+
+            icon.src =
+                "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext y='20' font-size='20'%3E🔖%3C/text%3E%3C/svg%3E";
+
+        };
+
+
+    // =====================================
+    // TÍTULO
+    // =====================================
+
+    const title =
+        document.createElement("span");
+
+    title.className =
+        "bookmark-title";
+
+    title.textContent =
+        bookmark.title ||
+        bookmark.url;
+
+
+    item.appendChild(
+        icon
+    );
+
+    item.appendChild(
+        title
+    );
+
+
+    // =====================================
+    // CLICK NORMAL
+    // =====================================
+
+    item.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+            closeBookmarkMenus();
+
+            closeBookmarkContextMenu();
+
+
+            window.location.href =
+                bookmark.url;
+
+        }
+    );
+
+
+    // =====================================
+    // CLICK DERECHO
+    // =====================================
+
+    item.addEventListener(
+        "contextmenu",
+        function (event) {
+
+            openBookmarkContextMenu(
+                event,
+                bookmark,
+                "bookmark"
+            );
+
+        }
+    );
+
+
+    menu.appendChild(
+        item
+    );
+
+}
+
+
+// =========================================
+// CREAR SUBCARPETA
+// =========================================
+
+function createBookmarkSubfolder(
+    folder,
+    menu
+) {
+
+    const subfolder =
+        document.createElement("div");
+
+    subfolder.className =
+        "bookmark-subfolder";
+
+
+    // =====================================
+    // BOTÓN
+    // =====================================
+
+    const button =
+        document.createElement("button");
+
+    button.className =
+        "bookmark-subfolder-button";
+
+
+    const icon =
+        document.createElement("span");
+
+    icon.className =
+        "bookmark-folder-icon";
+
+    icon.textContent =
+        "📁";
+
+
+    const title =
+        document.createElement("span");
+
+    title.className =
+        "bookmark-title";
+
+    title.textContent =
+        folder.title ||
+        "Carpeta";
+
+
+    const arrow =
+        document.createElement("span");
+
+    arrow.className =
+        "bookmark-subfolder-arrow";
+
+    arrow.textContent =
+        "▶";
+
+
+    button.appendChild(
+        icon
+    );
+
+    button.appendChild(
+        title
+    );
+
+    button.appendChild(
+        arrow
+    );
+
+
+    // =====================================
+    // SUBMENÚ
+    // =====================================
+
+    const subMenu =
+        document.createElement("div");
+
+    subMenu.className =
+        "bookmark-menu";
+
+    subMenu.style.display =
+        "none";
+
+
+    renderBookmarkMenu(
+        folder.children || [],
+        subMenu
+    );
+
+
+    // =====================================
+    // ABRIR SUBMENÚ
+    // =====================================
+
+    subfolder.addEventListener(
+        "mouseenter",
+        function () {
+
+            const parentMenu =
+                subfolder.closest(
+                    ".bookmark-menu"
+                );
+
+
+            // =================================
+            // CERRAR OTROS SUBMENÚS
+            // =================================
+
+            if (
+                parentMenu
+            ) {
+
+                parentMenu
+                    .querySelectorAll(
+                        ":scope > .bookmark-subfolder > .bookmark-menu"
+                    )
+                    .forEach(
+                        function (otherMenu) {
+
+                            if (
+                                otherMenu !==
+                                subMenu
+                            ) {
+
+                                otherMenu.style.display =
+                                    "none";
+
+                            }
+
+                        }
+                    );
+
+            }
+
+
+            // =================================
+            // MOSTRAR SUBMENÚ
+            // =================================
+
+            subMenu.style.display =
+                "block";
+
+
+            // =================================
+            // OBTENER POSICIÓN
+            // =================================
+
+            const rect =
+                button.getBoundingClientRect();
+
+
+            let left =
+                rect.right + 4;
+
+            let top =
+                rect.top - 6;
+
+
+            // =================================
+            // OBTENER TAMAÑO
+            // =================================
+
+            const menuRect =
+                subMenu.getBoundingClientRect();
+
+
+            // =================================
+            // EVITAR SALIR POR LA DERECHA
+            // =================================
+
+            if (
+                left + menuRect.width >
+                window.innerWidth - 8
+            ) {
+
+                left =
+                    rect.left -
+                    menuRect.width -
+                    4;
+
+            }
+
+
+            // =================================
+            // EVITAR SALIR POR ABAJO
+            // =================================
+
+            if (
+                top + menuRect.height >
+                window.innerHeight - 8
+            ) {
+
+                top =
+                    window.innerHeight -
+                    menuRect.height -
+                    8;
+
+            }
+
+
+            // =================================
+            // EVITAR SALIR POR ARRIBA
+            // =================================
+
+            if (
+                top < 8
+            ) {
+
+                top = 8;
+
+            }
+
+
+            // =================================
+            // APLICAR POSICIÓN
+            // =================================
+
+            subMenu.style.left =
+                left + "px";
+
+            subMenu.style.top =
+                top + "px";
+
+        }
+    );
+
+
+    // =====================================
+    // CLICK DERECHO
+    // =====================================
+
+    button.addEventListener(
+        "contextmenu",
+        function (event) {
+
+            openBookmarkContextMenu(
+                event,
+                folder,
+                "folder"
+            );
+
+        }
+    );
+
+
+    subfolder.appendChild(
+        button
+    );
+
+    subfolder.appendChild(
+        subMenu
+    );
+
+    menu.appendChild(
+        subfolder
+    );
+
+}
+
+
+// =========================================
+// FUNCIONES DE MODALES
+// =========================================
+
+
+// =========================================
+// ABRIR MODAL
+// =========================================
+
+function openBookmarkOverlay(
+    overlay
+) {
+
+    if (!overlay) {
+        return;
+    }
+
+
+    overlay.classList.add(
+        "show"
+    );
+
+}
+
+
+// =========================================
+// CERRAR MODAL
+// =========================================
+
+function closeBookmarkOverlay(
+    overlay
+) {
+
+    if (!overlay) {
+        return;
+    }
+
+
+    overlay.classList.remove(
+        "show"
+    );
+
+}
+
+
+// =========================================
+// CERRAR TODOS LOS MODALES
+// =========================================
+
+function closeAllBookmarkModals() {
+
+    closeBookmarkOverlay(
+        document.getElementById(
+            "edit-bookmark-overlay"
+        )
+    );
+
+    closeBookmarkOverlay(
+        document.getElementById(
+            "delete-bookmark-overlay"
+        )
+    );
+
+    closeBookmarkOverlay(
+        document.getElementById(
+            "rename-bookmark-folder-overlay"
+        )
+    );
+
+    closeBookmarkOverlay(
+        document.getElementById(
+            "new-bookmark-folder-overlay"
+        )
+    );
+
+    closeBookmarkOverlay(
+        document.getElementById(
+            "delete-bookmark-folder-overlay"
+        )
+    );
+
+}
+
+
+// =========================================
+// EDITAR MARCADOR
+// =========================================
+
+function openEditBookmarkModal(
+    bookmark
+) {
+
+    if (!bookmark) {
+        return;
+    }
+
+
+    selectedBookmarkNode =
+        bookmark;
+
+    selectedBookmarkType =
+        "bookmark";
+
+
+    const overlay =
+        document.getElementById(
+            "edit-bookmark-overlay"
+        );
+
+    const nameInput =
+        document.getElementById(
+            "edit-bookmark-name"
+        );
+
+    const urlInput =
+        document.getElementById(
+            "edit-bookmark-url"
+        );
+
+    const nameError =
+        document.getElementById(
+            "edit-bookmark-name-error"
+        );
+
+    const urlError =
+        document.getElementById(
+            "edit-bookmark-url-error"
+        );
+
+
+    if (!overlay) {
+        return;
+    }
+
+
+    if (nameError) {
+        nameError.textContent =
+            "";
+    }
+
+
+    if (urlError) {
+        urlError.textContent =
+            "";
+    }
+
+
+    if (nameInput) {
+
+        nameInput.value =
+            bookmark.title ||
+            "";
+
+    }
+
+
+    if (urlInput) {
+
+        urlInput.value =
+            bookmark.url ||
+            "";
+
+    }
+
+
+    openBookmarkOverlay(
+        overlay
+    );
+
+
+    if (nameInput) {
+
+        setTimeout(
+            function () {
+
+                nameInput.focus();
+
+                nameInput.select();
+
+            },
+            50
+        );
+
+    }
+
+}
+
+
+// =========================================
+// GUARDAR MARCADOR
+// =========================================
+
+function saveEditedBookmark() {
+
+    if (!selectedBookmarkNode) {
+        return;
+    }
+
+
+    const nameInput =
+        document.getElementById(
+            "edit-bookmark-name"
+        );
+
+    const urlInput =
+        document.getElementById(
+            "edit-bookmark-url"
+        );
+
+    const nameError =
+        document.getElementById(
+            "edit-bookmark-name-error"
+        );
+
+    const urlError =
+        document.getElementById(
+            "edit-bookmark-url-error"
+        );
+
+
+    const name =
+        nameInput
+            ? nameInput.value.trim()
+            : "";
+
+    const url =
+        urlInput
+            ? urlInput.value.trim()
+            : "";
+
+
+    // =====================================
+    // VALIDAR NOMBRE
+    // =====================================
+
+    if (name === "") {
+
+        if (nameError) {
+
+            nameError.textContent =
+                "Escribe un nombre.";
+
+        }
+
+        if (nameInput) {
+
+            nameInput.focus();
+
+        }
+
+        return;
+
+    }
+
+
+    // =====================================
+    // VALIDAR URL VACÍA
+    // =====================================
+
+    if (url === "") {
+
+        if (urlError) {
+
+            urlError.textContent =
+                "Escribe una URL.";
+
+        }
+
+        if (urlInput) {
+
+            urlInput.focus();
+
+        }
+
+        return;
+
+    }
+
+
+    // =====================================
+    // VALIDAR URL
+    // =====================================
+
+    let validUrl;
+
+
+    try {
+
+        validUrl =
+            new URL(url);
+
+    } catch (error) {
+
+        if (urlError) {
+
+            urlError.textContent =
+                "La URL no es válida.";
+
+        }
+
+        if (urlInput) {
+
+            urlInput.focus();
+
+        }
+
+        return;
+
+    }
+
+
+    // =====================================
+    // HTTP / HTTPS
+    // =====================================
+
+    if (
+        validUrl.protocol !== "http:" &&
+        validUrl.protocol !== "https:"
+    ) {
+
+        if (urlError) {
+
+            urlError.textContent =
+                "La URL debe comenzar con http:// o https://.";
+
+        }
+
+        if (urlInput) {
+
+            urlInput.focus();
+
+        }
+
+        return;
+
+    }
+
+
+    // =====================================
+    // ACTUALIZAR MARCADOR
+    // =====================================
+
+    chrome.bookmarks.update(
+        selectedBookmarkNode.id,
+        {
+            title:
+                name,
+
+            url:
+                url
+        },
+        function () {
+
+            if (
+                chrome.runtime.lastError
+            ) {
+
+                console.error(
+                    "Error al editar marcador:",
+                    chrome.runtime.lastError.message
+                );
+
+                if (urlError) {
+
+                    urlError.textContent =
+                        "No se pudo guardar el marcador.";
+
+                }
+
+                return;
+
+            }
+
+
+            closeBookmarkOverlay(
+                document.getElementById(
+                    "edit-bookmark-overlay"
+                )
+            );
+
+
+            selectedBookmarkNode =
+                null;
+
+            selectedBookmarkType =
+                null;
+
+
+            loadBookmarks();
+
+        }
+    );
+
+}
+
+
+// =========================================
+// ELIMINAR MARCADOR
+// =========================================
+
+function openDeleteBookmarkModal(
+    bookmark
+) {
+
+    if (!bookmark) {
+        return;
+    }
+
+
+    selectedBookmarkNode =
+        bookmark;
+
+    selectedBookmarkType =
+        "bookmark";
+
+
+    const overlay =
+        document.getElementById(
+            "delete-bookmark-overlay"
+        );
+
+    const message =
+        document.getElementById(
+            "delete-bookmark-message"
+        );
+
+
+    if (!overlay) {
+        return;
+    }
+
+
+    if (message) {
+
+        const title =
+            bookmark.title ||
+            bookmark.url ||
+            "este marcador";
+
+
+        message.textContent =
+            '¿Estás seguro de que deseas eliminar "' +
+            title +
+            '"?';
+
+    }
+
+
+    openBookmarkOverlay(
+        overlay
+    );
+
+}
+
+
+// =========================================
+// CONFIRMAR ELIMINACIÓN
+// =========================================
+
+function confirmDeleteBookmark() {
+
+    if (!selectedBookmarkNode) {
+        return;
+    }
+
+
+    const bookmarkId =
+        selectedBookmarkNode.id;
+
+
+    chrome.bookmarks.remove(
+        bookmarkId,
+        function () {
+
+            if (
+                chrome.runtime.lastError
+            ) {
+
+                console.error(
+                    "Error al eliminar marcador:",
+                    chrome.runtime.lastError.message
+                );
+
+                return;
+
+            }
+
+
+            closeBookmarkOverlay(
+                document.getElementById(
+                    "delete-bookmark-overlay"
+                )
+            );
+
+
+            selectedBookmarkNode =
+                null;
+
+            selectedBookmarkType =
+                null;
+
+
+            loadBookmarks();
+
+        }
+    );
+
+}
+
+
+// =========================================
+// RENOMBRAR CARPETA
+// =========================================
+
+function openRenameBookmarkFolderModal(
+    folder
+) {
+
+    if (!folder) {
+        return;
+    }
+
+
+    selectedBookmarkNode =
+        folder;
+
+    selectedBookmarkType =
+        "folder";
+
+
+    const overlay =
+        document.getElementById(
+            "rename-bookmark-folder-overlay"
+        );
+
+    const nameInput =
+        document.getElementById(
+            "rename-bookmark-folder-name"
+        );
+
+    const nameError =
+        document.getElementById(
+            "rename-bookmark-folder-name-error"
+        );
+
+
+    if (!overlay) {
+        return;
+    }
+
+
+    if (nameInput) {
+
+        nameInput.value =
+            folder.title ||
+            "";
+
+    }
+
+
+    if (nameError) {
+
+        nameError.textContent =
+            "";
+
+    }
+
+
+    openBookmarkOverlay(
+        overlay
+    );
+
+
+    if (nameInput) {
+
+        setTimeout(
+            function () {
+
+                nameInput.focus();
+
+                nameInput.select();
+
+            },
+            50
+        );
+
+    }
+
+}
+
+
+// =========================================
+// GUARDAR NOMBRE DE CARPETA
+// =========================================
+
+function saveRenamedBookmarkFolder() {
+
+    if (!selectedBookmarkNode) {
+        return;
+    }
+
+
+    const nameInput =
+        document.getElementById(
+            "rename-bookmark-folder-name"
+        );
+
+    const nameError =
+        document.getElementById(
+            "rename-bookmark-folder-name-error"
+        );
+
+
+    const name =
+        nameInput
+            ? nameInput.value.trim()
+            : "";
+
+
+    if (name === "") {
+
+        if (nameError) {
+
+            nameError.textContent =
+                "Escribe un nombre.";
+
+        }
+
+        if (nameInput) {
+
+            nameInput.focus();
+
+        }
+
+        return;
+
+    }
+
+
+    chrome.bookmarks.update(
+        selectedBookmarkNode.id,
+        {
+            title:
+                name
+        },
+        function () {
+
+            if (
+                chrome.runtime.lastError
+            ) {
+
+                console.error(
+                    "Error al renombrar carpeta:",
+                    chrome.runtime.lastError.message
+                );
+
+                if (nameError) {
+
+                    nameError.textContent =
+                        "No se pudo cambiar el nombre.";
+
+                }
+
+                return;
+
+            }
+
+
+            closeBookmarkOverlay(
+                document.getElementById(
+                    "rename-bookmark-folder-overlay"
+                )
+            );
+
+
+            selectedBookmarkNode =
+                null;
+
+            selectedBookmarkType =
+                null;
+
+
+            loadBookmarks();
+
+        }
+    );
+
+}
+
+
+// =========================================
+// NUEVA CARPETA
+// =========================================
+
+function openNewBookmarkFolderModal(
+    parentFolder
+) {
+
+    if (!parentFolder) {
+        return;
+    }
+
+
+    selectedBookmarkNode =
+        parentFolder;
+
+    selectedBookmarkType =
+        "folder";
+
+
+    const overlay =
+        document.getElementById(
+            "new-bookmark-folder-overlay"
+        );
+
+    const nameInput =
+        document.getElementById(
+            "new-bookmark-folder-name"
+        );
+
+    const nameError =
+        document.getElementById(
+            "new-bookmark-folder-name-error"
+        );
+
+
+    if (!overlay) {
+        return;
+    }
+
+
+    if (nameInput) {
+
+        nameInput.value =
+            "";
+
+    }
+
+
+    if (nameError) {
+
+        nameError.textContent =
+            "";
+
+    }
+
+
+    openBookmarkOverlay(
+        overlay
+    );
+
+
+    if (nameInput) {
+
+        setTimeout(
+            function () {
+
+                nameInput.focus();
+
+            },
+            50
+        );
+
+    }
+
+}
+
+
+// =========================================
+// CREAR NUEVA CARPETA
+// =========================================
+
+function saveNewBookmarkFolder() {
+
+    if (!selectedBookmarkNode) {
+        return;
+    }
+
+
+    const nameInput =
+        document.getElementById(
+            "new-bookmark-folder-name"
+        );
+
+    const nameError =
+        document.getElementById(
+            "new-bookmark-folder-name-error"
+        );
+
+
+    const name =
+        nameInput
+            ? nameInput.value.trim()
+            : "";
+
+
+    if (name === "") {
+
+        if (nameError) {
+
+            nameError.textContent =
+                "Escribe un nombre.";
+
+        }
+
+        if (nameInput) {
+
+            nameInput.focus();
+
+        }
+
+        return;
+
+    }
+
+
+    chrome.bookmarks.create(
+        {
+            parentId:
+                selectedBookmarkNode.id,
+
+            title:
+                name
+        },
+        function () {
+
+            if (
+                chrome.runtime.lastError
+            ) {
+
+                console.error(
+                    "Error al crear carpeta:",
+                    chrome.runtime.lastError.message
+                );
+
+                if (nameError) {
+
+                    nameError.textContent =
+                        "No se pudo crear la carpeta.";
+
+                }
+
+                return;
+
+            }
+
+
+            closeBookmarkOverlay(
+                document.getElementById(
+                    "new-bookmark-folder-overlay"
+                )
+            );
+
+
+            selectedBookmarkNode =
+                null;
+
+            selectedBookmarkType =
+                null;
+
+
+            loadBookmarks();
+
+        }
+    );
+
+}
+
+
+// =========================================
+// ELIMINAR CARPETA
+// =========================================
+
+function openDeleteBookmarkFolderModal(
+    folder
+) {
+
+    if (!folder) {
+        return;
+    }
+
+
+    selectedBookmarkNode =
+        folder;
+
+    selectedBookmarkType =
+        "folder";
+
+
+    const overlay =
+        document.getElementById(
+            "delete-bookmark-folder-overlay"
+        );
+
+    const message =
+        document.getElementById(
+            "delete-bookmark-folder-message"
+        );
+
+
+    if (!overlay) {
+        return;
+    }
+
+
+    if (message) {
+
+        const title =
+            folder.title ||
+            "esta carpeta";
+
+
+        message.textContent =
+            '¿Estás seguro de que deseas eliminar "' +
+            title +
+            '"? También se eliminarán los marcadores y subcarpetas que contiene.';
+
+    }
+
+
+    openBookmarkOverlay(
+        overlay
+    );
+
+}
+
+
+// =========================================
+// CONFIRMAR ELIMINACIÓN DE CARPETA
+// =========================================
+
+function confirmDeleteBookmarkFolder() {
+
+    if (!selectedBookmarkNode) {
+        return;
+    }
+
+
+    const folderId =
+        selectedBookmarkNode.id;
+
+
+    chrome.bookmarks.removeTree(
+        folderId,
+        function () {
+
+            if (
+                chrome.runtime.lastError
+            ) {
+
+                console.error(
+                    "Error al eliminar carpeta:",
+                    chrome.runtime.lastError.message
+                );
+
+                return;
+
+            }
+
+
+            closeBookmarkOverlay(
+                document.getElementById(
+                    "delete-bookmark-folder-overlay"
+                )
+            );
+
+
+            selectedBookmarkNode =
+                null;
+
+            selectedBookmarkType =
+                null;
+
+
+            loadBookmarks();
+
+        }
+    );
+
+}
+
+
+// =========================================
+// CONFIGURAR EVENTOS DE LOS MODALES
+// =========================================
+
+function setupBookmarkModalEvents() {
+
+
+    // =====================================
+    // EDITAR MARCADOR
+    // =====================================
+
+    const closeEditButton =
+        document.getElementById(
+            "close-edit-bookmark-button"
+        );
+
+    const cancelEditButton =
+        document.getElementById(
+            "cancel-edit-bookmark-button"
+        );
+
+    const saveEditButton =
+        document.getElementById(
+            "save-edit-bookmark-button"
+        );
+
+
+    if (closeEditButton) {
+
+        closeEditButton.addEventListener(
+            "click",
+            function () {
+
+                closeBookmarkOverlay(
+                    document.getElementById(
+                        "edit-bookmark-overlay"
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    if (cancelEditButton) {
+
+        cancelEditButton.addEventListener(
+            "click",
+            function () {
+
+                closeBookmarkOverlay(
+                    document.getElementById(
+                        "edit-bookmark-overlay"
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    if (saveEditButton) {
+
+        saveEditButton.addEventListener(
+            "click",
+            saveEditedBookmark
+        );
+
+    }
+
+
+    // =====================================
+    // ELIMINAR MARCADOR
+    // =====================================
+
+    const closeDeleteButton =
+        document.getElementById(
+            "close-delete-bookmark-button"
+        );
+
+    const cancelDeleteButton =
+        document.getElementById(
+            "cancel-delete-bookmark-button"
+        );
+
+    const confirmDeleteButton =
+        document.getElementById(
+            "confirm-delete-bookmark-button"
+        );
+
+
+    if (closeDeleteButton) {
+
+        closeDeleteButton.addEventListener(
+            "click",
+            function () {
+
+                closeBookmarkOverlay(
+                    document.getElementById(
+                        "delete-bookmark-overlay"
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    if (cancelDeleteButton) {
+
+        cancelDeleteButton.addEventListener(
+            "click",
+            function () {
+
+                closeBookmarkOverlay(
+                    document.getElementById(
+                        "delete-bookmark-overlay"
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    if (confirmDeleteButton) {
+
+        confirmDeleteButton.addEventListener(
+            "click",
+            confirmDeleteBookmark
+        );
+
+    }
+
+
+    // =====================================
+    // RENOMBRAR CARPETA
+    // =====================================
+
+    const closeRenameButton =
+        document.getElementById(
+            "close-rename-bookmark-folder-button"
+        );
+
+    const cancelRenameButton =
+        document.getElementById(
+            "cancel-rename-bookmark-folder-button"
+        );
+
+    const saveRenameButton =
+        document.getElementById(
+            "save-rename-bookmark-folder-button"
+        );
+
+
+    if (closeRenameButton) {
+
+        closeRenameButton.addEventListener(
+            "click",
+            function () {
+
+                closeBookmarkOverlay(
+                    document.getElementById(
+                        "rename-bookmark-folder-overlay"
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    if (cancelRenameButton) {
+
+        cancelRenameButton.addEventListener(
+            "click",
+            function () {
+
+                closeBookmarkOverlay(
+                    document.getElementById(
+                        "rename-bookmark-folder-overlay"
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    if (saveRenameButton) {
+
+        saveRenameButton.addEventListener(
+            "click",
+            saveRenamedBookmarkFolder
+        );
+
+    }
+
+
+    // =====================================
+    // NUEVA CARPETA
+    // =====================================
+
+    const closeNewFolderButton =
+        document.getElementById(
+            "close-new-bookmark-folder-button"
+        );
+
+    const cancelNewFolderButton =
+        document.getElementById(
+            "cancel-new-bookmark-folder-button"
+        );
+
+    const saveNewFolderButton =
+        document.getElementById(
+            "save-new-bookmark-folder-button"
+        );
+
+
+    if (closeNewFolderButton) {
+
+        closeNewFolderButton.addEventListener(
+            "click",
+            function () {
+
+                closeBookmarkOverlay(
+                    document.getElementById(
+                        "new-bookmark-folder-overlay"
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    if (cancelNewFolderButton) {
+
+        cancelNewFolderButton.addEventListener(
+            "click",
+            function () {
+
+                closeBookmarkOverlay(
+                    document.getElementById(
+                        "new-bookmark-folder-overlay"
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    if (saveNewFolderButton) {
+
+        saveNewFolderButton.addEventListener(
+            "click",
+            saveNewBookmarkFolder
+        );
+
+    }
+
+
+    // =====================================
+    // ELIMINAR CARPETA
+    // =====================================
+
+    const closeDeleteFolderButton =
+        document.getElementById(
+            "close-delete-bookmark-folder-button"
+        );
+
+    const cancelDeleteFolderButton =
+        document.getElementById(
+            "cancel-delete-bookmark-folder-button"
+        );
+
+    const confirmDeleteFolderButton =
+        document.getElementById(
+            "confirm-delete-bookmark-folder-button"
+        );
+
+
+    if (closeDeleteFolderButton) {
+
+        closeDeleteFolderButton.addEventListener(
+            "click",
+            function () {
+
+                closeBookmarkOverlay(
+                    document.getElementById(
+                        "delete-bookmark-folder-overlay"
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    if (cancelDeleteFolderButton) {
+
+        cancelDeleteFolderButton.addEventListener(
+            "click",
+            function () {
+
+                closeBookmarkOverlay(
+                    document.getElementById(
+                        "delete-bookmark-folder-overlay"
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    if (confirmDeleteFolderButton) {
+
+        confirmDeleteFolderButton.addEventListener(
+            "click",
+            confirmDeleteBookmarkFolder
+        );
+
+    }
+
+
+    // =====================================
+    // CERRAR AL HACER CLICK EN EL FONDO
+    // =====================================
+
+    const overlayIds = [
+
+        "edit-bookmark-overlay",
+
+        "delete-bookmark-overlay",
+
+        "rename-bookmark-folder-overlay",
+
+        "new-bookmark-folder-overlay",
+
+        "delete-bookmark-folder-overlay"
+
+    ];
+
+
+    overlayIds.forEach(
+        function (overlayId) {
+
+            const overlay =
+                document.getElementById(
+                    overlayId
+                );
+
+
+            if (!overlay) {
+                return;
+            }
+
+
+            overlay.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        event.target ===
+                        overlay
+                    ) {
+
+                        closeBookmarkOverlay(
+                            overlay
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    // =====================================
+    // ESC
+    // =====================================
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key !== "Escape"
+            ) {
+                return;
+            }
+
+
+            closeAllBookmarkModals();
+
+            closeBookmarkContextMenu();
+
+        }
+    );
+
+
+    // =====================================
+    // ENTER - EDITAR
+    // =====================================
+
+    const editNameInput =
+        document.getElementById(
+            "edit-bookmark-name"
+        );
+
+    const editUrlInput =
+        document.getElementById(
+            "edit-bookmark-url"
+        );
+
+
+    if (editNameInput) {
+
+        editNameInput.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key ===
+                    "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    saveEditedBookmark();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if (editUrlInput) {
+
+        editUrlInput.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key ===
+                    "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    saveEditedBookmark();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // =====================================
+    // ENTER - RENOMBRAR
+    // =====================================
+
+    const renameInput =
+        document.getElementById(
+            "rename-bookmark-folder-name"
+        );
+
+
+    if (renameInput) {
+
+        renameInput.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key ===
+                    "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    saveRenamedBookmarkFolder();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // =====================================
+    // ENTER - NUEVA CARPETA
+    // =====================================
+
+    const newFolderInput =
+        document.getElementById(
+            "new-bookmark-folder-name"
+        );
+
+
+    if (newFolderInput) {
+
+        newFolderInput.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key ===
+                    "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    saveNewBookmarkFolder();
+
+                }
+
+            }
+        );
+
+    }
+
+}
+
+
+// =========================================
+// CLICK FUERA
+// =========================================
+
+document.addEventListener(
+    "click",
+    function () {
+
+        closeBookmarkMenus();
+
+        closeBookmarkContextMenu();
+
+    }
+);
+
+
+// =========================================
+// CLIC DERECHO FUERA
+// =========================================
+
+document.addEventListener(
+    "contextmenu",
+    function (event) {
+
+        const bookmarkElement =
+            event.target.closest(
+                ".bookmark-item, " +
+                ".bookmark-folder-button, " +
+                ".bookmark-menu-item, " +
+                ".bookmark-subfolder-button, " +
+                ".bookmark-context-menu"
+            );
+
+
+        if (!bookmarkElement) {
+
+            closeBookmarkContextMenu();
+
+        }
+
+    }
+);
+
+
+// =========================================
+// ACTUALIZAR MARCADORES
+// =========================================
+
+chrome.bookmarks.onCreated.addListener(
+    function () {
+
+        loadBookmarks();
+
+    }
+);
+
+
+chrome.bookmarks.onRemoved.addListener(
+    function () {
+
+        loadBookmarks();
+
+    }
+);
+
+
+chrome.bookmarks.onChanged.addListener(
+    function () {
+
+        loadBookmarks();
+
+    }
+);
+
+
+chrome.bookmarks.onMoved.addListener(
+    function () {
+
+        loadBookmarks();
+
+    }
+);
+
+
+chrome.bookmarks.onChildrenReordered.addListener(
+    function () {
+
+        loadBookmarks();
+
+    }
+);
+
+
+// =========================================
+// DESPLAZAMIENTO DE MARCADORES
+// =========================================
+
+
+// =========================================
+// ACTUALIZAR BOTONES
+// =========================================
+
+function updateBookmarkScrollButtons() {
+
+    const bookmarksBar =
+        document.getElementById(
+            "bookmarks-bar"
+        );
+
+    const leftButton =
+        document.getElementById(
+            "bookmarks-scroll-left"
+        );
+
+    const rightButton =
+        document.getElementById(
+            "bookmarks-scroll-right"
+        );
+
+
+    if (
+        !bookmarksBar ||
+        !leftButton ||
+        !rightButton
+    ) {
+        return;
+    }
+
+
+    const maxScroll =
+        bookmarksBar.scrollWidth -
+        bookmarksBar.clientWidth;
+
+
+    // =====================================
+    // NO HAY DESPLAZAMIENTO
+    // =====================================
+
+    if (maxScroll <= 1) {
+
+        leftButton.classList.add(
+            "hidden"
+        );
+
+        rightButton.classList.add(
+            "hidden"
+        );
+
+        leftButton.disabled =
+            true;
+
+        rightButton.disabled =
+            true;
+
+        return;
+
+    }
+
+
+    // =====================================
+    // MOSTRAR BOTONES
+    // =====================================
+
+    leftButton.classList.remove(
+        "hidden"
+    );
+
+    rightButton.classList.remove(
+        "hidden"
+    );
+
+
+    // =====================================
+    // BOTÓN IZQUIERDO
+    // =====================================
+
+    if (
+        bookmarksBar.scrollLeft <= 1
+    ) {
+
+        leftButton.disabled =
+            true;
+
+    } else {
+
+        leftButton.disabled =
+            false;
+
+    }
+
+
+    // =====================================
+    // BOTÓN DERECHO
+    // =====================================
+
+    if (
+        bookmarksBar.scrollLeft >=
+        maxScroll - 1
+    ) {
+
+        rightButton.disabled =
+            true;
+
+    } else {
+
+        rightButton.disabled =
+            false;
+
+    }
+
+}
+
+
+// =========================================
+// CONFIGURAR DESPLAZAMIENTO
+// =========================================
+
+function setupBookmarkScroll() {
+
+    const bookmarksBar =
+        document.getElementById(
+            "bookmarks-bar"
+        );
+
+    const leftButton =
+        document.getElementById(
+            "bookmarks-scroll-left"
+        );
+
+    const rightButton =
+        document.getElementById(
+            "bookmarks-scroll-right"
+        );
+
+
+    if (
+        !bookmarksBar ||
+        !leftButton ||
+        !rightButton
+    ) {
+        return;
+    }
+
+
+    // =====================================
+    // BOTÓN IZQUIERDO
+    // =====================================
+
+    leftButton.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+
+            bookmarksBar.scrollBy(
+                {
+                    left:
+                        -250,
+
+                    behavior:
+                        "smooth"
+                }
+            );
+
+        }
+    );
+
+
+    // =====================================
+    // BOTÓN DERECHO
+    // =====================================
+
+    rightButton.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+
+            bookmarksBar.scrollBy(
+                {
+                    left:
+                        250,
+
+                    behavior:
+                        "smooth"
+                }
+            );
+
+        }
+    );
+
+
+    // =====================================
+    // DETECTAR DESPLAZAMIENTO
+    // =====================================
+
+    bookmarksBar.addEventListener(
+        "scroll",
+        function () {
+
+            updateBookmarkScrollButtons();
+
+        }
+    );
+
+
+    // =====================================
+    // DETECTAR CAMBIO DE TAMAÑO
+    // =====================================
+
+    window.addEventListener(
+        "resize",
+        function () {
+
+            updateBookmarkScrollButtons();
+
+        }
+    );
+
+
+    // =====================================
+    // ESTADO INICIAL
+    // =====================================
+
+    updateBookmarkScrollButtons();
+
+}
+
+
+// =========================================
+// INICIALIZAR MARCADORES
+// =========================================
+
+// Ocultar cualquier modal que pudiera
+// aparecer al cargar la página.
+
+closeAllBookmarkModals();
+
+
+// Configurar botones de los modales.
+
+setupBookmarkModalEvents();
+
+
+// Configurar desplazamiento de marcadores.
+
+setupBookmarkScroll();
+
+
+// Cargar marcadores reales de Chrome.
+
+loadBookmarks();

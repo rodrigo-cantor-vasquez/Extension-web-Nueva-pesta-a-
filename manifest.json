@@ -6,7 +6,8 @@
 
     "permissions": [
         "storage",
-        "search"
+        "search",
+        "bookmarks"
     ],
 
     "icons": {
