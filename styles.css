@@ -181,11 +181,9 @@ main {
 
     padding: 16px 18px;
 
-    background: linear-gradient(
-        90deg,
-        #f3f7ff,
-        #ffffff
-    );
+    background: linear-gradient(90deg,
+            #f3f7ff,
+            #ffffff);
 
     border-bottom: 1px solid #dce6fa;
 
@@ -242,11 +240,9 @@ main {
 
     border-radius: 9px;
 
-    background: linear-gradient(
-        135deg,
-        #4c8dff,
-        #7657c8
-    );
+    background: linear-gradient(135deg,
+            #4c8dff,
+            #7657c8);
 
     color: white;
 
@@ -756,11 +752,9 @@ main {
 
     border-bottom: 1px solid #dce6fa;
 
-    background: linear-gradient(
-        90deg,
-        #f3f7ff,
-        #ffffff
-    );
+    background: linear-gradient(90deg,
+            #f3f7ff,
+            #ffffff);
 }
 
 
@@ -931,7 +925,7 @@ main {
         0 0 0 3px rgba(70, 120, 220, 0.12);
 }
 
-.settings-section > span {
+.settings-section>span {
     margin-left: 5px;
 
     font-size: 14px;
@@ -1422,11 +1416,9 @@ main {
 
     padding: 16px 18px;
 
-    background: linear-gradient(
-        90deg,
-        #f3f7ff,
-        #ffffff
-    );
+    background: linear-gradient(90deg,
+            #f3f7ff,
+            #ffffff);
 
     border-bottom: 1px solid #dce6fa;
 }
@@ -1642,11 +1634,9 @@ main {
 
     padding: 16px 18px;
 
-    background: linear-gradient(
-        90deg,
-        #f3f7ff,
-        #ffffff
-    );
+    background: linear-gradient(90deg,
+            #f3f7ff,
+            #ffffff);
 
     border-bottom: 1px solid #dce6fa;
 }
@@ -1895,11 +1885,9 @@ main {
 
     padding: 16px 18px;
 
-    background: linear-gradient(
-        90deg,
-        #f3f7ff,
-        #ffffff
-    );
+    background: linear-gradient(90deg,
+            #f3f7ff,
+            #ffffff);
 
     border-bottom: 1px solid #dce6fa;
 }
@@ -2131,11 +2119,9 @@ main {
 
     padding: 16px 18px;
 
-    background: linear-gradient(
-        90deg,
-        #f3f7ff,
-        #ffffff
-    );
+    background: linear-gradient(90deg,
+            #f3f7ff,
+            #ffffff);
 
     border-bottom: 1px solid #dce6fa;
 }
@@ -2866,7 +2852,7 @@ main {
    Por eso usamos fixed.
 */
 
-.bookmark-subfolder > .bookmark-menu {
+.bookmark-subfolder>.bookmark-menu {
     display: none;
 
     position: fixed;

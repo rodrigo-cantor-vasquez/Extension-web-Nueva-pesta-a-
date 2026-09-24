@@ -714,7 +714,7 @@ function scrollGroupContainer(amount) {
 
     if (
         container ===
-            document.documentElement ||
+        document.documentElement ||
         container === document.body
     ) {
 
@@ -841,7 +841,7 @@ function runGroupDragAutoScroll() {
     } else if (
         groupDragMouseY >
         windowHeight -
-            GROUP_DRAG_SCROLL_ZONE
+        GROUP_DRAG_SCROLL_ZONE
     ) {
 
         const distance =
@@ -2088,227 +2088,1121 @@ function findGroupByName(groupName) {
     return null;
 }
 
-
 // =========================================
-// ICONO DEL SITIO
+// ICONO DEL SITIO (v2)
 // =========================================
 //
 // Orden de búsqueda:
 //
-// 1. favicon del host completo
-//    Ejemplo:
-//    https://mail.google.com/favicon.ico
-//
-// 2. favicon del dominio principal
-//    Ejemplo:
-//    https://google.com/favicon.ico
-//
-// 3. 🌐 como fallback
-//
-// No usamos servicios externos como Google
-// Favicon o DuckDuckGo, para evitar que
-// aparezcan iconos genéricos.
-//
+// 1. Favicon de una pestaña abierta (URL exacta o mismo host)
+// 2. Caché (verificado: si ya no carga, se descarta)
+// 3. API de favicons de Chrome  (necesita permiso "favicon")
+// 4. /favicon.ico del dominio principal
+// 5. /favicon.ico del host completo
+// 6. 🌐
 
-function setupSiteIcon(
-    siteIcon,
-    url
-) {
+const FAVICON_CACHE_PREFIX = "favicon_v2_";
 
-    // -----------------------------------------
-    // FALLBACK INICIAL
-    // -----------------------------------------
-
-    siteIcon.innerHTML = "";
-
-    siteIcon.textContent = "🌐";
+let defaultChromeFaviconSignature = null;
 
 
-    // -----------------------------------------
-    // VALIDAR URL
-    // -----------------------------------------
+// -----------------------------------------
+// Cargar una imagen con timeout
+// Devuelve el <img> si cargó, o null
+// -----------------------------------------
 
-    let parsedUrl;
+function loadFaviconImage(src, timeoutMs = 4000) {
+
+    return new Promise((resolve) => {
+
+        const img = new Image();
+
+        let finished = false;
+
+        const timer = setTimeout(
+            () => finish(null),
+            timeoutMs
+        );
+
+        function finish(result) {
+
+            if (finished) {
+                return;
+            }
+
+            finished = true;
+
+            clearTimeout(timer);
+
+            img.onload = null;
+            img.onerror = null;
+
+            resolve(result);
+        }
+
+        img.alt = "";
+
+        img.onload = () =>
+            finish(
+                img.naturalWidth > 0
+                    ? img
+                    : null
+            );
+
+        img.onerror = () => finish(null);
+
+        img.src = src;
+    });
+}
+
+
+// -----------------------------------------
+// URL de la API de favicons de Chrome
+// -----------------------------------------
+
+function getChromeFaviconUrl(pageUrl, size = 64) {
+
+    const u = new URL(
+        chrome.runtime.getURL("/_favicon/")
+    );
+
+    u.searchParams.set("pageUrl", pageUrl);
+    u.searchParams.set("size", String(size));
+
+    return u.toString();
+}
+
+
+// -----------------------------------------
+// "Huella" de una imagen (para detectar
+// el globo genérico que Chrome devuelve
+// cuando no conoce el sitio)
+// -----------------------------------------
+
+function getImageSignature(img) {
 
     try {
 
-        parsedUrl =
-            new URL(url);
+        const canvas =
+            document.createElement("canvas");
+
+        canvas.width = 16;
+        canvas.height = 16;
+
+        const ctx = canvas.getContext(
+            "2d",
+            { willReadFrequently: true }
+        );
+
+        ctx.drawImage(img, 0, 0, 16, 16);
+
+        return Array
+            .from(
+                ctx.getImageData(0, 0, 16, 16).data
+            )
+            .join(",");
 
     } catch {
 
-        return;
+        return null;
+    }
+}
+
+
+async function getDefaultChromeFaviconSignature() {
+
+    if (defaultChromeFaviconSignature === null) {
+
+        defaultChromeFaviconSignature =
+            (async () => {
+
+                const img = await loadFaviconImage(
+                    getChromeFaviconUrl(
+                        "https://sitio-inexistente.invalid/"
+                    )
+                );
+
+                return img
+                    ? getImageSignature(img)
+                    : "";
+
+            })();
+    }
+
+    return defaultChromeFaviconSignature;
+}
+
+
+// -----------------------------------------
+// Favicon desde Chrome (ignora el genérico)
+// -----------------------------------------
+
+async function loadChromeFavicon(pageUrl) {
+
+    if (
+        typeof chrome === "undefined" ||
+        !chrome.runtime ||
+        !chrome.runtime.getURL
+    ) {
+        return null;
+    }
+
+    const img = await loadFaviconImage(
+        getChromeFaviconUrl(pageUrl)
+    );
+
+    if (!img) {
+        return null;
+    }
+
+    const signature = getImageSignature(img);
+
+    const defaultSignature =
+        await getDefaultChromeFaviconSignature();
+
+    if (
+        signature &&
+        defaultSignature &&
+        signature === defaultSignature
+    ) {
+        return null;
+    }
+
+    return img;
+}
+
+
+// -----------------------------------------
+// Dominio principal (soporta .com.co, etc.)
+// -----------------------------------------
+
+function getMainDomain(hostname) {
+
+    const parts = hostname.split(".");
+
+    if (parts.length <= 2) {
+        return hostname;
+    }
+
+    const lastTwo =
+        parts.slice(-2).join(".");
+
+    const specialTlds = [
+        "com.co", "org.co", "net.co",
+        "gov.co", "edu.co", "mil.co",
+        "co.uk", "org.uk", "ac.uk",
+        "com.au", "net.au", "org.au",
+        "co.nz",
+        "com.br", "com.mx", "com.ar"
+    ];
+
+    if (specialTlds.includes(lastTwo)) {
+        return parts.slice(-3).join(".");
+    }
+
+    return parts.slice(-2).join(".");
+}
+
+
+// -----------------------------------------
+// Favicons de pestañas abiertas
+// (primero URL exacta, luego mismo host)
+// -----------------------------------------
+
+async function getOpenTabFavicons(normalizedUrl, hostname) {
+
+    const exact = [];
+    const sameHost = [];
+
+    try {
+
+        if (
+            !chrome.tabs ||
+            typeof chrome.tabs.query !== "function"
+        ) {
+            return [];
+        }
+
+        const tabs = await chrome.tabs.query({});
+
+        for (const tab of tabs) {
+
+            if (!tab.url || !tab.favIconUrl) {
+                continue;
+            }
+
+            try {
+
+                const tabUrl = new URL(tab.url);
+
+                const tabNormalized =
+                    tabUrl.href.replace(/\/$/, "");
+
+                if (tabNormalized === normalizedUrl) {
+
+                    exact.push(tab.favIconUrl);
+
+                } else if (
+                    tabUrl.hostname.toLowerCase() === hostname
+                ) {
+
+                    sameHost.push(tab.favIconUrl);
+                }
+
+            } catch {
+                // URL inválida: ignorar
+            }
+        }
+
+    } catch {
+        return [];
+    }
+
+    return [...exact, ...sameHost];
+}
+
+
+// >>> INICIO ICONO DEL SITIO >>>
+// =========================================
+// ICONO DEL SITIO (v4)
+// =========================================
+//
+// Orden de búsqueda:
+//
+// 1. Favicon de una pestaña abierta (URL exacta o mismo host)
+// 2. Caché (verificado: si ya no carga, se descarta)
+// 3. Icono que la propia página declara en su HTML
+//    (<link rel="icon">) = el mismo que muestra la pestaña
+// 4. API de favicons de Chrome (necesita permiso "favicon")
+// 5. /favicon.ico directo
+// 6. 🌐
+
+// Todo el código auxiliar vive dentro de una función anónima,
+// así que no puede chocar con otros nombres de newtab.js.
+
+var faviconTools = (function () {
+
+    const FAVICON_CACHE_PREFIX = "favicon_v4_";
+
+    let defaultChromeFaviconSignature = null;
+
+
+    // -----------------------------------------
+    // Cargar un <img> con timeout
+    // Devuelve el <img> si cargó, o null
+    // -----------------------------------------
+
+    function loadImageElement(src, timeoutMs) {
+
+        return new Promise((resolve) => {
+
+            const img = new Image();
+
+            let finished = false;
+
+            const timer = setTimeout(
+                () => finish(null),
+                timeoutMs
+            );
+
+            function finish(result) {
+
+                if (finished) {
+                    return;
+                }
+
+                finished = true;
+
+                clearTimeout(timer);
+
+                img.onload = null;
+                img.onerror = null;
+
+                resolve(result);
+            }
+
+            img.alt = "";
+
+            img.onload = () =>
+                finish(
+                    img.naturalWidth > 0
+                        ? img
+                        : null
+                );
+
+            img.onerror = () => finish(null);
+
+            img.src = src;
+        });
     }
 
 
     // -----------------------------------------
-    // OBTENER HOST
+    // ¿La imagen está vacía? (transparente o
+    // toda blanca). Algunos sitios devuelven un
+    // favicon.ico "en blanco" que carga sin error.
     // -----------------------------------------
 
-    const hostname =
-        parsedUrl.hostname;
+    function isBlankImage(img) {
 
+        try {
 
-    // -----------------------------------------
-    // CREAR LISTA DE DOMINIOS
-    // -----------------------------------------
+            const canvas =
+                document.createElement("canvas");
 
-    const faviconSources = [];
+            canvas.width = 32;
+            canvas.height = 32;
 
-
-    // -----------------------------------------
-    // 1. HOST COMPLETO
-    // -----------------------------------------
-    //
-    // Ejemplo:
-    //
-    // mail.google.com
-    // docs.google.com
-    // drive.google.com
-    //
-
-    faviconSources.push(
-        `https://${hostname}/favicon.ico`
-    );
-
-
-    // -----------------------------------------
-    // 2. DOMINIO PRINCIPAL
-    // -----------------------------------------
-    //
-    // Ejemplo:
-    //
-    // mail.google.com
-    //       ↓
-    // google.com
-    //
-    // www.ejemplo.com
-    //       ↓
-    // ejemplo.com
-    //
-
-    const hostnameParts =
-        hostname.split(".");
-
-
-    if (
-        hostnameParts.length >= 3
-    ) {
-
-        const mainDomain =
-            hostnameParts
-                .slice(-2)
-                .join(".");
-
-
-        const mainDomainFavicon =
-            `https://${mainDomain}/favicon.ico`;
-
-
-        if (
-            !faviconSources.includes(
-                mainDomainFavicon
-            )
-        ) {
-
-            faviconSources.push(
-                mainDomainFavicon
+            const ctx = canvas.getContext(
+                "2d",
+                { willReadFrequently: true }
             );
+
+            ctx.drawImage(img, 0, 0, 32, 32);
+
+            const data =
+                ctx.getImageData(0, 0, 32, 32).data;
+
+            for (let i = 0; i < data.length; i += 4) {
+
+                const alpha = data[i + 3];
+
+                const isWhite =
+                    data[i] >= 245 &&
+                    data[i + 1] >= 245 &&
+                    data[i + 2] >= 245;
+
+                if (alpha > 24 && !isWhite) {
+                    return false;
+                }
+            }
+
+            return true;
+
+        } catch {
+
+            // Canvas bloqueado: no podemos saberlo
+            return false;
         }
     }
 
 
     // -----------------------------------------
-    // CONTROL DE INTENTOS
+    // Descargar la imagen como blob.
+    // Devuelve:
+    //   "blob:..."  si es una imagen válida
+    //   false       si NO es una imagen (404, HTML...)
+    //   null        si la descarga falló y conviene
+    //               probar con un <img> normal
     // -----------------------------------------
 
-    let currentSource = 0;
+    async function fetchImageAsBlobUrl(src, timeoutMs) {
+
+        const controller = new AbortController();
+
+        const timer = setTimeout(
+            () => controller.abort(),
+            timeoutMs
+        );
+
+        try {
+
+            const response = await fetch(src, {
+                credentials: "include",
+                signal: controller.signal
+            });
+
+            if (!response.ok) {
+                return false;
+            }
+
+            let blob = await response.blob();
+
+            if (!blob.size) {
+                return false;
+            }
+
+            const type =
+                (blob.type || "").toLowerCase();
+
+            const isTextLike =
+                (
+                    type.startsWith("text/") ||
+                    type.includes("json") ||
+                    type.includes("html")
+                ) &&
+                !type.includes("svg");
+
+            if (isTextLike) {
+                return false;
+            }
+
+            // Algunos servidores envían los .ico sin tipo
+            if (
+                !type.startsWith("image/") &&
+                /\.ico(\?|$)/i.test(src)
+            ) {
+                blob = new Blob(
+                    [blob],
+                    { type: "image/x-icon" }
+                );
+            }
+
+            return URL.createObjectURL(blob);
+
+        } catch {
+
+            return null;
+
+        } finally {
+
+            clearTimeout(timer);
+        }
+    }
 
 
     // -----------------------------------------
-    // INTENTAR SIGUIENTE FAVICON
+    // Cargar un favicon:
+    // - descarta errores, HTML y timeouts
+    // - descarta imágenes en blanco
+    // Devuelve el <img> o null
     // -----------------------------------------
 
-    function tryNextFavicon() {
+    async function loadFaviconImage(src, timeoutMs = 4000) {
 
-        // -------------------------------------
-        // NO QUEDAN MÁS FAVICONS
-        // -------------------------------------
+        const isLocal =
+            src.startsWith("data:") ||
+            src.startsWith("blob:") ||
+            src.startsWith("chrome-extension:");
+
+        if (!isLocal) {
+
+            const blobUrl =
+                await fetchImageAsBlobUrl(src, timeoutMs);
+
+            if (blobUrl === false) {
+                return null;
+            }
+
+            if (blobUrl) {
+
+                const img =
+                    await loadImageElement(blobUrl, timeoutMs);
+
+                if (!img || isBlankImage(img)) {
+                    URL.revokeObjectURL(blobUrl);
+                    return null;
+                }
+
+                return img;
+            }
+        }
+
+        // Datos locales, o la descarga falló:
+        // probamos con un <img> normal
+        const img =
+            await loadImageElement(src, timeoutMs);
+
+        if (!img || isBlankImage(img)) {
+            return null;
+        }
+
+        return img;
+    }
+
+
+    // -----------------------------------------
+    // Extraer los iconos declarados en un HTML
+    // Devuelve URLs ordenadas de mejor a peor
+    // -----------------------------------------
+
+    function parseIconsFromHtml(html, baseUrl) {
+
+        const doc = new DOMParser()
+            .parseFromString(html, "text/html");
+
+        // Si la página define <base href>, se respeta
+        let base = baseUrl;
+
+        const baseTag = doc.querySelector("base[href]");
+
+        if (baseTag) {
+
+            try {
+                base = new URL(
+                    baseTag.getAttribute("href"),
+                    baseUrl
+                ).href;
+            } catch {
+                // se queda baseUrl
+            }
+        }
+
+        const icons = [];
+        const touchIcons = [];
+
+        doc.querySelectorAll("link[rel][href]")
+            .forEach((link, index) => {
+
+                const rel = link
+                    .getAttribute("rel")
+                    .toLowerCase()
+                    .split(/\s+/);
+
+                const isIcon =
+                    rel.includes("icon") ||
+                    rel.includes("shortcut");
+
+                const isTouch =
+                    rel.includes("apple-touch-icon") ||
+                    rel.includes("apple-touch-icon-precomposed");
+
+                if (!isIcon && !isTouch) {
+                    return;
+                }
+
+                let href;
+
+                try {
+
+                    href = new URL(
+                        link.getAttribute("href").trim(),
+                        base
+                    ).href;
+
+                } catch {
+                    return;
+                }
+
+                // Tamaño más cercano a 32px
+                // (más pequeño penaliza más que más grande)
+                const type =
+                    (link.getAttribute("type") || "")
+                        .toLowerCase();
+
+                const sizesAttr =
+                    (link.getAttribute("sizes") || "")
+                        .toLowerCase();
+
+                let size = 32;
+
+                if (
+                    sizesAttr === "any" ||
+                    type.includes("svg") ||
+                    href.toLowerCase().endsWith(".svg")
+                ) {
+
+                    size = 32;
+
+                } else {
+
+                    const sizes = [
+                        ...sizesAttr.matchAll(/(\d+)x\d+/g)
+                    ].map((m) => Number(m[1]));
+
+                    if (sizes.length) {
+
+                        size = sizes.reduce(
+                            (best, s) =>
+                                score(s) < score(best) ? s : best
+                        );
+                    }
+                }
+
+                function score(s) {
+                    return s >= 32
+                        ? s - 32
+                        : (32 - s) * 2;
+                }
+
+                (isIcon ? icons : touchIcons).push({
+                    href,
+                    score: score(size),
+                    index
+                });
+            });
+
+        const sort = (a, b) =>
+            a.score - b.score || a.index - b.index;
+
+        return [
+            ...icons.sort(sort),
+            ...touchIcons.sort(sort)
+        ].map((item) => item.href);
+    }
+
+
+    // -----------------------------------------
+    // Descargar la página y leer sus iconos
+    // -----------------------------------------
+
+    async function fetchDeclaredIcons(pageUrl, timeoutMs = 6000) {
+
+        const controller = new AbortController();
+
+        const timer = setTimeout(
+            () => controller.abort(),
+            timeoutMs
+        );
+
+        try {
+
+            const response = await fetch(pageUrl, {
+                credentials: "include",
+                redirect: "follow",
+                signal: controller.signal
+            });
+
+            if (!response.ok) {
+                return [];
+            }
+
+            const contentType =
+                response.headers.get("content-type") || "";
+
+            if (!/html/i.test(contentType)) {
+                return [];
+            }
+
+            // El <head> está al principio: no hace falta más
+            const html =
+                (await response.text()).slice(0, 300000);
+
+            return parseIconsFromHtml(
+                html,
+                response.url || pageUrl
+            );
+
+        } catch {
+
+            return [];
+
+        } finally {
+
+            clearTimeout(timer);
+        }
+    }
+
+
+    // -----------------------------------------
+    // URL de la API de favicons de Chrome
+    // -----------------------------------------
+
+    function getChromeFaviconUrl(pageUrl, size = 64) {
+
+        const u = new URL(
+            chrome.runtime.getURL("/_favicon/")
+        );
+
+        u.searchParams.set("pageUrl", pageUrl);
+        u.searchParams.set("size", String(size));
+
+        return u.toString();
+    }
+
+
+    // -----------------------------------------
+    // "Huella" de una imagen (para detectar
+    // el globo genérico que Chrome devuelve
+    // cuando no conoce el sitio)
+    // -----------------------------------------
+
+    function getImageSignature(img) {
+
+        try {
+
+            const canvas =
+                document.createElement("canvas");
+
+            canvas.width = 16;
+            canvas.height = 16;
+
+            const ctx = canvas.getContext(
+                "2d",
+                { willReadFrequently: true }
+            );
+
+            ctx.drawImage(img, 0, 0, 16, 16);
+
+            return Array
+                .from(
+                    ctx.getImageData(0, 0, 16, 16).data
+                )
+                .join(",");
+
+        } catch {
+
+            return null;
+        }
+    }
+
+
+    async function getDefaultChromeFaviconSignature() {
+
+        if (defaultChromeFaviconSignature === null) {
+
+            defaultChromeFaviconSignature =
+                (async () => {
+
+                    const img = await loadFaviconImage(
+                        getChromeFaviconUrl(
+                            "https://sitio-inexistente.invalid/"
+                        )
+                    );
+
+                    return img
+                        ? getImageSignature(img)
+                        : "";
+
+                })();
+        }
+
+        return defaultChromeFaviconSignature;
+    }
+
+
+    // -----------------------------------------
+    // Favicon desde Chrome (ignora el genérico)
+    // -----------------------------------------
+
+    async function loadChromeFavicon(pageUrl) {
 
         if (
-            currentSource >=
-            faviconSources.length
+            typeof chrome === "undefined" ||
+            !chrome.runtime ||
+            !chrome.runtime.getURL
         ) {
+            return null;
+        }
 
-            siteIcon.innerHTML = "";
+        const img = await loadFaviconImage(
+            getChromeFaviconUrl(pageUrl)
+        );
 
-            siteIcon.textContent =
-                "🌐";
+        if (!img) {
+            return null;
+        }
 
+        const signature = getImageSignature(img);
+
+        const defaultSignature =
+            await getDefaultChromeFaviconSignature();
+
+        if (
+            signature &&
+            defaultSignature &&
+            signature === defaultSignature
+        ) {
+            return null;
+        }
+
+        return img;
+    }
+
+
+    // -----------------------------------------
+    // Dominio principal (soporta .com.co, etc.)
+    // -----------------------------------------
+
+    function getMainDomain(hostname) {
+
+        const parts = hostname.split(".");
+
+        if (parts.length <= 2) {
+            return hostname;
+        }
+
+        const lastTwo =
+            parts.slice(-2).join(".");
+
+        const specialTlds = [
+            "com.co", "org.co", "net.co",
+            "gov.co", "edu.co", "mil.co",
+            "co.uk", "org.uk", "ac.uk",
+            "com.au", "net.au", "org.au",
+            "co.nz",
+            "com.br", "com.mx", "com.ar"
+        ];
+
+        if (specialTlds.includes(lastTwo)) {
+            return parts.slice(-3).join(".");
+        }
+
+        return parts.slice(-2).join(".");
+    }
+
+
+    // -----------------------------------------
+    // Favicons de pestañas abiertas
+    // (primero URL exacta, luego mismo host)
+    // -----------------------------------------
+
+    async function getOpenTabFavicons(normalizedUrl, hostname) {
+
+        const exact = [];
+        const sameHost = [];
+
+        try {
+
+            if (
+                !chrome.tabs ||
+                typeof chrome.tabs.query !== "function"
+            ) {
+                return [];
+            }
+
+            const tabs = await chrome.tabs.query({});
+
+            for (const tab of tabs) {
+
+                if (!tab.url || !tab.favIconUrl) {
+                    continue;
+                }
+
+                try {
+
+                    const tabUrl = new URL(tab.url);
+
+                    tabUrl.hash = "";
+
+                    const tabNormalized =
+                        tabUrl.href.replace(/\/$/, "");
+
+                    if (tabNormalized === normalizedUrl) {
+
+                        exact.push(tab.favIconUrl);
+
+                    } else if (
+                        tabUrl.hostname.toLowerCase() === hostname
+                    ) {
+
+                        sameHost.push(tab.favIconUrl);
+                    }
+
+                } catch {
+                    // URL inválida: ignorar
+                }
+            }
+
+        } catch {
+            return [];
+        }
+
+        return [...exact, ...sameHost];
+    }
+
+
+    // =========================================
+    // CONFIGURAR ICONO DEL SITIO
+    // =========================================
+
+    function setup(siteIcon, url) {
+
+        // Fallback inicial
+        siteIcon.textContent = "🌐";
+
+
+        // Validar URL
+        let parsedUrl;
+
+        try {
+            parsedUrl = new URL(url);
+        } catch {
+            return;
+        }
+
+        if (!/^https?:$/.test(parsedUrl.protocol)) {
             return;
         }
 
 
-        // -------------------------------------
-        // CREAR IMAGEN
-        // -------------------------------------
+        // Evita que una búsqueda antigua pise a una nueva
+        // (por ejemplo, al editar la URL de la tarjeta)
+        const token =
+            `${Date.now()}_${Math.random()}`;
 
-        const favicon =
-            document.createElement(
-                "img"
-            );
+        siteIcon.dataset.iconToken = token;
 
-        favicon.alt = "";
+        const isStale = () =>
+            siteIcon.dataset.iconToken !== token;
 
 
-        // -------------------------------------
-        // FAVICON CARGADO
-        // -------------------------------------
+        const hostname =
+            parsedUrl.hostname.toLowerCase();
 
-        favicon.addEventListener(
-            "load",
-            () => {
+        // La parte #/ruta (apps tipo Angular/React) no
+        // se envía al servidor: la quitamos para buscar.
+        const pageUrlObject = new URL(parsedUrl.href);
 
-                siteIcon.innerHTML = "";
+        pageUrlObject.hash = "";
 
-                siteIcon.appendChild(
-                    favicon
+        const pageUrl = pageUrlObject.href;
+
+        const normalizedUrl =
+            pageUrl.replace(/\/$/, "");
+
+        const mainDomain =
+            getMainDomain(hostname);
+
+        const cacheKey =
+            FAVICON_CACHE_PREFIX + normalizedUrl;
+
+
+        function show(img) {
+            siteIcon.replaceChildren(img);
+        }
+
+        function saveCache(faviconUrl) {
+
+            // No guardamos data: (muy pesados)
+            if (
+                !faviconUrl ||
+                faviconUrl.startsWith("data:")
+            ) {
+                return;
+            }
+
+            chrome.storage.local
+                .set({ [cacheKey]: faviconUrl })
+                .catch(() => { });
+        }
+
+
+        // Prueba una lista de URLs de imagen en orden.
+        // Devuelve true si ya terminó (se mostró o quedó obsoleto).
+        async function tryImageList(list) {
+
+            for (const src of list) {
+
+                const img = await loadFaviconImage(src);
+
+                if (isStale()) return true;
+
+                if (img) {
+                    show(img);
+                    saveCache(src);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
+        async function resolveFavicon() {
+
+            // 1. Pestañas abiertas
+            const tabFavicons =
+                await getOpenTabFavicons(
+                    normalizedUrl,
+                    hostname
+                );
+
+            if (await tryImageList(tabFavicons)) {
+                return;
+            }
+
+
+            // 2. Caché (verificado)
+            try {
+
+                const stored =
+                    await chrome.storage.local.get(cacheKey);
+
+                const cached = stored[cacheKey];
+
+                if (cached) {
+
+                    const img =
+                        await loadFaviconImage(cached);
+
+                    if (isStale()) return;
+
+                    if (img) {
+                        show(img);
+                        return;
+                    }
+
+                    // El icono guardado ya no sirve
+                    chrome.storage.local
+                        .remove(cacheKey)
+                        .catch(() => { });
+                }
+
+            } catch {
+                // Sin caché: seguimos
+            }
+
+
+            // 3. Icono declarado por la página
+            //    (el mismo que muestra la pestaña)
+            const declared =
+                await fetchDeclaredIcons(pageUrl);
+
+            if (isStale()) return;
+
+            if (await tryImageList(declared)) {
+                return;
+            }
+
+
+            // 4. API de favicons de Chrome
+            const chromePages = [
+                ...new Set([
+                    parsedUrl.href,
+                    pageUrl,
+                    `https://${hostname}/`,
+                    `https://${mainDomain}/`
+                ])
+            ];
+
+            for (const chromePage of chromePages) {
+
+                const img =
+                    await loadChromeFavicon(chromePage);
+
+                if (isStale()) return;
+
+                if (img) {
+                    show(img);
+                    return;
+                }
+            }
+
+
+            // 5. /favicon.ico directo
+            const direct = [
+                `https://${hostname}/favicon.ico`
+            ];
+
+            if (mainDomain !== hostname) {
+                direct.push(
+                    `https://${mainDomain}/favicon.ico`
                 );
             }
-        );
 
+            await tryImageList(direct);
 
-        // -------------------------------------
-        // FAVICON NO DISPONIBLE
-        // -------------------------------------
+            // 6. Se queda el 🌐
+        }
 
-        favicon.addEventListener(
-            "error",
-            () => {
-
-                currentSource++;
-
-                tryNextFavicon();
-            }
-        );
-
-
-        // -------------------------------------
-        // CARGAR FAVICON
-        // -------------------------------------
-
-        favicon.src =
-            faviconSources[currentSource];
+        resolveFavicon();
     }
 
+    return { setup };
 
-    // -----------------------------------------
-    // COMENZAR
-    // -----------------------------------------
+})();
 
-    tryNextFavicon();
+
+// =========================================
+// FUNCIÓN QUE USA EL RESTO DEL PROGRAMA
+// =========================================
+
+function setupSiteIcon(siteIcon, url) {
+
+    faviconTools.setup(siteIcon, url);
 }
-
+// <<< FIN ICONO DEL SITIO <
 
 // =========================================
 // CREAR TARJETA DE SITIO
@@ -4878,7 +5772,7 @@ addGradientColorButton.addEventListener(
 
         const newColor =
             colors[
-                colors.length - 1
+            colors.length - 1
             ] ||
             defaultSettings
                 .gradientColors[1];
@@ -4960,7 +5854,7 @@ function loadGradientColors(
 
     const gradientColorList =
         colors &&
-        colors.length >= 2
+            colors.length >= 2
             ? colors
             : defaultSettings.gradientColors;
 
@@ -5632,7 +6526,7 @@ importDataFile.addEventListener(
                 ) ||
                 !importedData.settings ||
                 typeof importedData.settings !==
-                    "object"
+                "object"
             ) {
 
                 alert(
@@ -5897,12 +6791,12 @@ async function init() {
         };
     }
 
-
+    /*
     console.log(
         "Datos cargados:",
         data
     );
-
+    */
 
     const main =
         document.querySelector(
@@ -6101,9 +6995,9 @@ async function init() {
             );
 
 
-    // =====================================
-    // FONDO DEGRADADO
-    // =====================================
+        // =====================================
+        // FONDO DEGRADADO
+        // =====================================
 
     } else if (
         backgroundType ===
@@ -6154,9 +7048,9 @@ async function init() {
         ).checked = true;
 
 
-    // =====================================
-    // FONDO SÓLIDO
-    // =====================================
+        // =====================================
+        // FONDO SÓLIDO
+        // =====================================
 
     } else {
 
