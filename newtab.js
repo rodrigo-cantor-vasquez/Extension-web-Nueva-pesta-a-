@@ -162,7 +162,7 @@ function updateSiteDescription(
 
 const defaultSettings = {
     cardSize: 95,
-    containerWidth: 807,
+    cardsPerRow: 7,
     backgroundType: "solid",
     backgroundColor: "#eef4ff",
     gradientDirection: 90,
@@ -4662,115 +4662,165 @@ function renderGroups(groups) {
 
 
 // =========================================
-// TAMAÑO DEL CONTENEDOR
+// TARJETAS POR FILA
 // =========================================
+//
+// En vez de guardar un ancho en píxeles,
+// guardamos cuántas tarjetas caben en una
+// fila. El ancho real (en px) se calcula
+// según el tamaño de tarjeta actual y el
+// espacio disponible en la ventana.
 
-const containerWidthInput =
+const cardsPerRowInput =
     document.getElementById(
-        "container-width"
+        "cards-per-row"
     );
 
+// Separación entre tarjetas (.sites-container { gap: 16px }).
+const CARD_GAP = 16;
 
-function applyContainerWidth(
-    width
-) {
+// Relleno + borde de .site-group:
+// padding 22px * 2 + border 1px * 2 = 46.
+const GROUP_OVERHEAD = 46;
 
-    let preferredWidth =
-        Number(width);
-
-    if (isNaN(preferredWidth)) {
-
-        preferredWidth =
-            defaultSettings.containerWidth;
-    }
+// Nunca menos de esta cantidad de tarjetas
+// por fila, sin importar qué tan angosta
+// esté la ventana.
+const MIN_CARDS_PER_ROW = 5;
 
 
-    if (preferredWidth < 475) {
-        preferredWidth = 475;
-    }
+// =========================================
+// MÁXIMO DE TARJETAS SEGÚN LA PANTALLA
+// =========================================
 
+function getMaxCardsPerRow(cardSize) {
 
     const maxWidth =
         Math.floor(
             window.innerWidth * 0.92
         );
 
+    const availableContentWidth =
+        maxWidth - GROUP_OVERHEAD;
 
-    const appliedWidth =
-        Math.min(
-            preferredWidth,
-            maxWidth
+    const maxCards =
+        Math.floor(
+            (availableContentWidth + CARD_GAP) /
+            (cardSize + CARD_GAP)
         );
 
+    return Math.max(
+        MIN_CARDS_PER_ROW,
+        maxCards
+    );
+
+}
+
+
+// =========================================
+// APLICAR TARJETAS POR FILA
+// =========================================
+
+function applyCardsPerRow(
+    cardsPerRow,
+    cardSize
+) {
+
+    // Esto es lo que el usuario eligió.
+    // NO se reduce solo porque la ventana
+    // se haya hecho más chica por un momento.
+    let preferredCardsPerRow =
+        Number(cardsPerRow);
+
+    if (isNaN(preferredCardsPerRow)) {
+        preferredCardsPerRow =
+            defaultSettings.cardsPerRow;
+    }
+
+    // Mínimo permitido.
+    if (preferredCardsPerRow < MIN_CARDS_PER_ROW) {
+        preferredCardsPerRow = MIN_CARDS_PER_ROW;
+    }
+
+    // Máximo que permite la pantalla actual,
+    // con el tamaño de tarjeta actual.
+    // (Ya NO recorta preferredCardsPerRow con
+    // esto, solo se usa para el "max" del input
+    // y como tope del ancho aplicado.)
+    const maxCardsPerRow =
+        getMaxCardsPerRow(cardSize);
+
+    // =====================================
+    // CALCULAR EL ANCHO NECESARIO
+    // =====================================
+    //
+    // El ancho que necesitaría el valor
+    // preferido, sin recortar.
+
+    const preferredContentWidth =
+        (preferredCardsPerRow * cardSize) +
+        ((preferredCardsPerRow - 1) * CARD_GAP);
+
+    const preferredWidth =
+        preferredContentWidth + GROUP_OVERHEAD;
+
+    // Máximo que permite la ventana actual, en px.
+    const maxWidth =
+        Math.floor(window.innerWidth * 0.92);
+
+    // El ancho APLICADO sí se recorta al
+    // espacio disponible ahora mismo.
+    const appliedWidth =
+        Math.min(preferredWidth, maxWidth);
 
     document.documentElement.style.setProperty(
         "--container-width",
         `${appliedWidth}px`
     );
 
+    // El input muestra el máximo disponible
+    // (solo como referencia / validación nativa)...
+    cardsPerRowInput.max =
+        maxCardsPerRow;
 
-    containerWidthInput.value =
-        preferredWidth;
+    // ...pero conserva el valor real que
+    // el usuario eligió, aunque ahora mismo
+    // no quepa entero en la ventana.
+    cardsPerRowInput.value =
+        preferredCardsPerRow;
+
+    return preferredCardsPerRow;
+
 }
 
 
 // =========================================
-// GUARDAR CAMBIO DE ANCHO
+// GUARDAR CAMBIO
 // =========================================
 
-containerWidthInput.addEventListener(
+cardsPerRowInput.addEventListener(
     "change",
     async () => {
 
-        let preferredWidth =
-            Number(
-                containerWidthInput.value
+        const currentCardSize =
+            Number(cardSizeInput.value) ||
+            defaultSettings.cardSize;
+
+        const appliedCardsPerRow =
+            applyCardsPerRow(
+                cardsPerRowInput.value,
+                currentCardSize
             );
-
-
-        if (isNaN(preferredWidth)) {
-
-            preferredWidth =
-                defaultSettings.containerWidth;
-        }
-
-
-        if (preferredWidth < 475) {
-            preferredWidth = 475;
-        }
-
-
-        const maxWidth =
-            Math.floor(
-                window.innerWidth * 0.92
-            );
-
-
-        if (
-            preferredWidth >
-            maxWidth
-        ) {
-
-            preferredWidth =
-                maxWidth;
-        }
-
-
-        applyContainerWidth(
-            preferredWidth
-        );
-
 
         const data =
             await loadData();
-
 
         await saveData({
             settings: {
                 ...defaultSettings,
                 ...data.settings,
-                containerWidth:
-                    preferredWidth
+                cardsPerRow:
+                    appliedCardsPerRow
             }
         });
     }
@@ -4778,16 +4828,22 @@ containerWidthInput.addEventListener(
 
 
 // =========================================
-// ACTUALIZAR ANCHO AL REDIMENSIONAR
+// ACTUALIZAR AL REDIMENSIONAR
 // =========================================
 
 window.addEventListener(
     "resize",
     () => {
 
-        applyContainerWidth(
-            containerWidthInput.value
+        const currentCardSize =
+            Number(cardSizeInput.value) ||
+            defaultSettings.cardSize;
+
+        applyCardsPerRow(
+            cardsPerRowInput.value,
+            currentCardSize
         );
+
     }
 );
 
@@ -6247,12 +6303,13 @@ async function resetExtension() {
     setupExistingElements();
 
 
-    applyContainerWidth(
-        defaultSettings.containerWidth
+    applyCardSize(
+        defaultSettings.cardSize
     );
 
 
-    applyCardSize(
+    applyCardsPerRow(
+        defaultSettings.cardsPerRow,
         defaultSettings.cardSize
     );
 
@@ -6824,16 +6881,6 @@ async function init() {
     // ANCHO DEL CONTENEDOR
     // =====================================
 
-    const containerWidth =
-        data.settings?.containerWidth ??
-        defaultSettings.containerWidth;
-
-
-    applyContainerWidth(
-        containerWidth
-    );
-
-
     // =====================================
     // TAMAÑO DE TARJETAS
     // =====================================
@@ -6844,6 +6891,21 @@ async function init() {
 
 
     applyCardSize(
+        cardSize
+    );
+
+
+    // =====================================
+    // TARJETAS POR FILA
+    // =====================================
+
+    const cardsPerRow =
+        data.settings?.cardsPerRow ??
+        defaultSettings.cardsPerRow;
+
+
+    applyCardsPerRow(
+        cardsPerRow,
         cardSize
     );
 
