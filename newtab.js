@@ -5099,13 +5099,171 @@ let bookmarksBarNode = null;
 
 
 // =========================================
+// ARRASTRE DE MARCADORES
+// =========================================
+
+let draggedBookmarkId = null;
+
+let draggedBookmarkType = null; // "bookmark" | "folder"
+
+let draggedBookmarkElement = null;
+
+let bookmarkFileIntoFolderId = null;
+
+
+// =========================================
+// INFORMACIÓN DEL MOVIMIENTO ACTUAL
+// =========================================
+//
+// Guardamos la posición ORIGINAL del elemento.
+// Esto es importante para calcular correctamente
+// el índice que debemos enviar a chrome.bookmarks.move()
+// cuando movemos un elemento dentro del mismo padre.
+//
+
+let draggedBookmarkOriginalParentId = null;
+
+let draggedBookmarkOriginalIndex = -1;
+
+
+// =========================================
+// CONTROL DE MOVIMIENTO INTERNO
+// =========================================
+//
+// Mientras nosotros estamos realizando un movimiento,
+// no queremos que los eventos de Chrome reconstruyan
+// toda la interfaz.
+//
+
+let bookmarkInternalMoveInProgress = false;
+
+let bookmarkInternalMoveReleaseTimer = null;
+
+
+// =========================================
+// IGNORAR "CLICKS FANTASMA"
+// =========================================
+
+let bookmarkDragJustEnded = false;
+
+let bookmarkDragEndTime = 0;
+
+
+function markBookmarkDragJustEnded() {
+
+    bookmarkDragJustEnded =
+        true;
+
+    bookmarkDragEndTime =
+        Date.now();
+
+
+    setTimeout(
+        function () {
+
+            bookmarkDragJustEnded =
+                false;
+
+        },
+        600
+    );
+
+}
+
+
+// =========================================
+// COMPROBAR CLICK RECIENTE DESPUÉS
+// DE UN ARRASTRE
+// =========================================
+
+function wasBookmarkDragRecentlyEnded() {
+
+    return (
+        bookmarkDragJustEnded ||
+        (
+            Date.now() -
+            bookmarkDragEndTime
+        ) < 600
+    );
+
+}
+
+
+// =========================================
+// COMENZAR MOVIMIENTO INTERNO
+// =========================================
+
+function beginInternalBookmarkMove() {
+
+    bookmarkInternalMoveInProgress =
+        true;
+
+
+    if (
+        bookmarkInternalMoveReleaseTimer
+    ) {
+
+        clearTimeout(
+            bookmarkInternalMoveReleaseTimer
+        );
+
+        bookmarkInternalMoveReleaseTimer =
+            null;
+
+    }
+
+}
+
+
+// =========================================
+// TERMINAR MOVIMIENTO INTERNO
+// =========================================
+//
+// Dejamos una pequeña ventana de seguridad para
+// que los eventos de Chrome relacionados con el
+// movimiento no reconstruyan la interfaz.
+//
+
+function finishInternalBookmarkMove() {
+
+    if (
+        bookmarkInternalMoveReleaseTimer
+    ) {
+
+        clearTimeout(
+            bookmarkInternalMoveReleaseTimer
+        );
+
+    }
+
+
+    bookmarkInternalMoveReleaseTimer =
+        setTimeout(
+            function () {
+
+                bookmarkInternalMoveInProgress =
+                    false;
+
+                bookmarkInternalMoveReleaseTimer =
+                    null;
+
+            },
+            800
+        );
+
+}
+
+
+// =========================================
 // CREAR MENÚ CONTEXTUAL
 // =========================================
 
 function createBookmarkContextMenu() {
 
     // Si ya existe, no crear otro.
-    if (bookmarkContextMenu) {
+    if (
+        bookmarkContextMenu
+    ) {
 
         // Asegurarnos de que esté directamente
         // dentro del BODY.
@@ -5140,19 +5298,8 @@ function createBookmarkContextMenu() {
         "none";
 
 
-    // =====================================
-    // IMPORTANTE
-    // =====================================
-    // El menú contextual SIEMPRE pertenece
+    // El menú contextual siempre pertenece
     // al BODY.
-    //
-    // De esta manera no queda limitado por:
-    //
-    // #bookmarks-wrapper
-    // #bookmarks-bar
-    //
-    // ni por sus overflow.
-
     document.body.appendChild(
         bookmarkContextMenu
     );
@@ -5189,7 +5336,6 @@ function openBookmarkContextMenu(
     event.stopPropagation();
 
 
-    // Crear menú si todavía no existe.
     createBookmarkContextMenu();
 
 
@@ -5226,10 +5372,6 @@ function openBookmarkContextMenu(
     if (
         type === "bookmark"
     ) {
-
-        // =================================
-        // EDITAR MARCADOR
-        // =================================
 
         const editButton =
             document.createElement("button");
@@ -5269,10 +5411,6 @@ function openBookmarkContextMenu(
             editButton
         );
 
-
-        // =================================
-        // ELIMINAR MARCADOR
-        // =================================
 
         const deleteButton =
             document.createElement("button");
@@ -5326,10 +5464,6 @@ function openBookmarkContextMenu(
         type === "folder"
     ) {
 
-        // =================================
-        // RENOMBRAR
-        // =================================
-
         const editButton =
             document.createElement("button");
 
@@ -5369,10 +5503,6 @@ function openBookmarkContextMenu(
         );
 
 
-        // =================================
-        // NUEVA CARPETA
-        // =================================
-
         const newFolderButton =
             document.createElement("button");
 
@@ -5411,10 +5541,6 @@ function openBookmarkContextMenu(
             newFolderButton
         );
 
-
-        // =================================
-        // ELIMINAR CARPETA
-        // =================================
 
         const deleteButton =
             document.createElement("button");
@@ -5468,10 +5594,6 @@ function openBookmarkContextMenu(
         type === "bar"
     ) {
 
-        // =================================
-        // NUEVA CARPETA
-        // =================================
-
         const newFolderButton =
             document.createElement("button");
 
@@ -5521,17 +5643,9 @@ function openBookmarkContextMenu(
         "block";
 
 
-    // =====================================
-    // OBTENER TAMAÑO
-    // =====================================
-
     const menuRect =
         bookmarkContextMenu.getBoundingClientRect();
 
-
-    // =====================================
-    // POSICIÓN INICIAL
-    // =====================================
 
     let left =
         event.clientX;
@@ -5539,10 +5653,6 @@ function openBookmarkContextMenu(
     let top =
         event.clientY;
 
-
-    // =====================================
-    // EVITAR SALIR POR LA DERECHA
-    // =====================================
 
     if (
         left + menuRect.width >
@@ -5557,10 +5667,6 @@ function openBookmarkContextMenu(
     }
 
 
-    // =====================================
-    // EVITAR SALIR POR ABAJO
-    // =====================================
-
     if (
         top + menuRect.height >
         window.innerHeight - 8
@@ -5573,10 +5679,6 @@ function openBookmarkContextMenu(
 
     }
 
-
-    // =====================================
-    // APLICAR POSICIÓN
-    // =====================================
 
     bookmarkContextMenu.style.left =
         Math.max(
@@ -5675,18 +5777,6 @@ function loadBookmarks() {
 
             }
 
-
-            // =================================
-            // GUARDAR NODO DE LA BARRA
-            // =================================
-            //
-            // Este nodo será utilizado cuando
-            // hagamos clic derecho en un espacio
-            // vacío de la barra.
-            //
-            // Así podemos crear una carpeta
-            // directamente dentro de la Barra
-            // de marcadores.
 
             bookmarksBarNode =
                 bookmarksBar;
@@ -5803,10 +5893,6 @@ function renderBookmarksBar(nodes) {
     );
 
 
-    // =====================================
-    // ACTUALIZAR DESPLAZAMIENTO
-    // =====================================
-
     requestAnimationFrame(
         function () {
 
@@ -5838,10 +5924,6 @@ function createBookmarkItem(
         bookmark.url;
 
 
-    // =====================================
-    // FAVICON
-    // =====================================
-
     const icon =
         document.createElement("img");
 
@@ -5868,10 +5950,6 @@ function createBookmarkItem(
 
         };
 
-
-    // =====================================
-    // TÍTULO
-    // =====================================
 
     const title =
         document.createElement("span");
@@ -5903,6 +5981,17 @@ function createBookmarkItem(
 
             event.stopPropagation();
 
+
+            if (
+                draggedBookmarkId ||
+                wasBookmarkDragRecentlyEnded()
+            ) {
+
+                return;
+
+            }
+
+
             closeBookmarkMenus();
 
             closeBookmarkContextMenu();
@@ -5930,6 +6019,12 @@ function createBookmarkItem(
             );
 
         }
+    );
+
+
+    setupBookmarkItemDrag(
+        button,
+        bookmark
     );
 
 
@@ -5972,6 +6067,1107 @@ function getBookmarkFavicon(url) {
 
 
 // =========================================
+// MOVER MARCADOR A UN ÍNDICE
+// =========================================
+//
+// IMPORTANTE:
+//
+// Chrome tiene un comportamiento especial al mover
+// un elemento dentro del MISMO padre.
+//
+// Si el elemento estaba antes del índice destino,
+// debemos sumar 1 al índice enviado a Chrome.
+//
+// Además, si una CARPETA cambia de padre,
+// reconstruimos inmediatamente la interfaz.
+//
+// Esto hace que:
+//
+// .bookmark-subfolder
+//
+// pase inmediatamente a:
+//
+// .bookmark-folder
+//
+// cuando sale de una carpeta.
+//
+
+function moveBookmarkNodeToIndex(
+    id,
+    parentId,
+    index,
+    originalParentId,
+    originalIndex,
+    movedType
+) {
+
+    let chromeIndex =
+        index;
+
+
+    // =====================================
+    // MISMO PADRE
+    // =====================================
+
+    if (
+        originalParentId === parentId &&
+        originalIndex !== -1 &&
+        originalIndex < index
+    ) {
+
+        chromeIndex =
+            index + 1;
+
+    }
+
+
+    // =====================================
+    // ASEGURAR ÍNDICE VÁLIDO
+    // =====================================
+
+    if (
+        chromeIndex < 0
+    ) {
+
+        chromeIndex =
+            0;
+
+    }
+
+
+    // =====================================
+    // COMPROBAR SI CAMBIÓ DE PADRE
+    // =====================================
+
+    const parentChanged =
+        originalParentId !== parentId;
+
+
+    beginInternalBookmarkMove();
+
+
+    chrome.bookmarks.move(
+        id,
+        {
+            parentId:
+                parentId,
+
+            index:
+                chromeIndex
+        },
+        function () {
+
+            if (
+                chrome.runtime.lastError
+            ) {
+
+                console.error(
+                    "Error al mover marcador:",
+                    chrome.runtime.lastError.message
+                );
+
+
+                bookmarkInternalMoveInProgress =
+                    false;
+
+
+                loadBookmarks();
+
+                return;
+
+            }
+
+
+            // =====================================
+            // CARPETA CAMBIÓ DE PADRE
+            // =====================================
+            //
+            // IMPORTANTE:
+            //
+            // No intentamos convertir manualmente
+            // el elemento HTML.
+            //
+            // Dejamos que Chrome sea la fuente
+            // de verdad y reconstruimos el árbol.
+            //
+            // Así una subcarpeta que salió de otra
+            // carpeta se convierte inmediatamente
+            // en carpeta principal.
+            //
+
+            if (
+                movedType === "folder" &&
+                parentChanged
+            ) {
+
+                loadBookmarks();
+
+            }
+
+
+            finishInternalBookmarkMove();
+
+        }
+    );
+
+}
+
+
+// =========================================
+// MOVER MARCADOR AL FINAL DE UNA CARPETA
+// =========================================
+//
+// Este método se usa cuando soltamos un elemento
+// dentro de una carpeta.
+//
+
+function moveBookmarkNodeIntoFolder(
+    id,
+    parentId,
+    movedType
+) {
+
+    // Guardamos el padre original antes de
+    // ejecutar el movimiento.
+    const originalParentId =
+        draggedBookmarkOriginalParentId;
+
+
+    const parentChanged =
+        originalParentId !== parentId;
+
+
+    beginInternalBookmarkMove();
+
+
+    chrome.bookmarks.move(
+        id,
+        {
+            parentId:
+                parentId
+        },
+        function () {
+
+            if (
+                chrome.runtime.lastError
+            ) {
+
+                console.error(
+                    "Error al mover marcador a la carpeta:",
+                    chrome.runtime.lastError.message
+                );
+
+
+                bookmarkInternalMoveInProgress =
+                    false;
+
+
+                loadBookmarks();
+
+                return;
+
+            }
+
+
+            // =====================================
+            // SI ES UNA CARPETA
+            // =====================================
+            //
+            // Al entrar a otra carpeta debe pasar de:
+            //
+            // .bookmark-folder
+            //
+            // a:
+            //
+            // .bookmark-subfolder
+            //
+            // Por eso reconstruimos el árbol.
+            //
+
+            if (
+                movedType === "folder" &&
+                parentChanged
+            ) {
+
+                loadBookmarks();
+
+            }
+
+
+            finishInternalBookmarkMove();
+
+        }
+    );
+
+}
+
+
+// =========================================
+// LIMPIAR RESALTADOS
+// =========================================
+
+function clearBookmarkDragHighlights() {
+
+    document
+        .querySelectorAll(
+            ".bookmark-drop-inside"
+        )
+        .forEach(
+            function (element) {
+
+                element.classList.remove(
+                    "bookmark-drop-inside"
+                );
+
+            }
+        );
+
+
+    bookmarkFileIntoFolderId =
+        null;
+
+}
+
+
+// =========================================
+// MOVER ELEMENTO ANTES DE OTRO
+// =========================================
+
+function moveBookmarkElementBefore(
+    element,
+    targetElement
+) {
+
+    if (
+        !element ||
+        !targetElement ||
+        element === targetElement
+    ) {
+
+        return;
+
+    }
+
+
+    const parent =
+        targetElement.parentNode;
+
+
+    if (!parent) {
+        return;
+    }
+
+
+    if (
+        targetElement.previousElementSibling !==
+        element
+    ) {
+
+        parent.insertBefore(
+            element,
+            targetElement
+        );
+
+    }
+
+}
+
+
+// =========================================
+// MOVER ELEMENTO AL FINAL
+// =========================================
+
+function moveBookmarkElementToEnd(
+    element,
+    container
+) {
+
+    if (
+        !element ||
+        !container
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        container.lastElementChild !==
+        element
+    ) {
+
+        container.appendChild(
+            element
+        );
+
+    }
+
+}
+
+
+// =========================================
+// REORDENAR BARRA
+// =========================================
+
+function moveBookmarkBarElementAccordingToMouse(
+    element,
+    targetElement,
+    event
+) {
+
+    if (
+        !element ||
+        !targetElement ||
+        element === targetElement
+    ) {
+
+        return;
+
+    }
+
+
+    const targetRect =
+        targetElement.getBoundingClientRect();
+
+
+    const middleX =
+        targetRect.left +
+        targetRect.width / 2;
+
+
+    if (
+        event.clientX < middleX
+    ) {
+
+        moveBookmarkElementBefore(
+            element,
+            targetElement
+        );
+
+    } else {
+
+        const nextElement =
+            targetElement.nextElementSibling;
+
+
+        if (
+            nextElement &&
+            nextElement !== element
+        ) {
+
+            moveBookmarkElementBefore(
+                element,
+                nextElement
+            );
+
+        } else if (
+            !nextElement
+        ) {
+
+            moveBookmarkElementToEnd(
+                element,
+                targetElement.parentNode
+            );
+
+        }
+
+    }
+
+}
+
+
+// =========================================
+// REORDENAR MENÚ
+// =========================================
+
+function moveBookmarkMenuElementAccordingToMouse(
+    element,
+    targetElement,
+    event
+) {
+
+    if (
+        !element ||
+        !targetElement ||
+        element === targetElement
+    ) {
+
+        return;
+
+    }
+
+
+    const targetRect =
+        targetElement.getBoundingClientRect();
+
+
+    const middleY =
+        targetRect.top +
+        targetRect.height / 2;
+
+
+    if (
+        event.clientY < middleY
+    ) {
+
+        moveBookmarkElementBefore(
+            element,
+            targetElement
+        );
+
+    } else {
+
+        const nextElement =
+            targetElement.nextElementSibling;
+
+
+        if (
+            nextElement &&
+            nextElement !== element
+        ) {
+
+            moveBookmarkElementBefore(
+                element,
+                nextElement
+            );
+
+        } else if (
+            !nextElement
+        ) {
+
+            moveBookmarkElementToEnd(
+                element,
+                targetElement.parentNode
+            );
+
+        }
+
+    }
+
+}
+
+
+// =========================================
+// ¿MOUSE EN EL CENTRO DE CARPETA?
+// =========================================
+
+function isMouseOverFolderCenter(
+    button,
+    event,
+    axis
+) {
+
+    const rect =
+        button.getBoundingClientRect();
+
+
+    if (
+        axis === "horizontal"
+    ) {
+
+        const relativeX =
+            event.clientX -
+            rect.left;
+
+
+        return (
+            relativeX >
+            rect.width * 0.25 &&
+            relativeX <
+            rect.width * 0.75
+        );
+
+    }
+
+
+    const relativeY =
+        event.clientY -
+        rect.top;
+
+
+    return (
+        relativeY >
+        rect.height * 0.25 &&
+        relativeY <
+        rect.height * 0.75
+    );
+
+}
+
+
+// =========================================
+// CONFIGURAR ARRASTRE - MARCADOR
+// =========================================
+
+function setupBookmarkItemDrag(
+    button,
+    bookmark
+) {
+
+    button.dataset.bookmarkId =
+        bookmark.id;
+
+    button.draggable =
+        true;
+
+
+    button.addEventListener(
+        "dragstart",
+        function (event) {
+
+            event.stopPropagation();
+
+
+            draggedBookmarkId =
+                bookmark.id;
+
+            draggedBookmarkType =
+                "bookmark";
+
+            draggedBookmarkElement =
+                button;
+
+
+            // =================================
+            // GUARDAR POSICIÓN ORIGINAL
+            // =================================
+
+            const parent =
+                button.parentElement;
+
+
+            if (
+                parent
+            ) {
+
+                if (
+                    parent.id ===
+                    "bookmarks-bar"
+                ) {
+
+                    draggedBookmarkOriginalParentId =
+                        bookmarksBarNode
+                            ? bookmarksBarNode.id
+                            : null;
+
+                } else if (
+                    parent.classList.contains(
+                        "bookmark-menu"
+                    )
+                ) {
+
+                    draggedBookmarkOriginalParentId =
+                        parent.dataset.parentId;
+
+                } else {
+
+                    draggedBookmarkOriginalParentId =
+                        null;
+
+                }
+
+
+                draggedBookmarkOriginalIndex =
+                    Array.from(
+                        parent.children
+                    ).indexOf(
+                        button
+                    );
+
+            } else {
+
+                draggedBookmarkOriginalParentId =
+                    null;
+
+                draggedBookmarkOriginalIndex =
+                    -1;
+
+            }
+
+
+            button.classList.add(
+                "bookmark-dragging"
+            );
+
+
+            event.dataTransfer.effectAllowed =
+                "move";
+
+
+            event.dataTransfer.setData(
+                "text/plain",
+                bookmark.id
+            );
+
+        }
+    );
+
+
+    button.addEventListener(
+        "dragend",
+        function () {
+
+            button.classList.remove(
+                "bookmark-dragging"
+            );
+
+
+            clearBookmarkDragHighlights();
+
+
+            draggedBookmarkId =
+                null;
+
+            draggedBookmarkType =
+                null;
+
+            draggedBookmarkElement =
+                null;
+
+
+            draggedBookmarkOriginalParentId =
+                null;
+
+            draggedBookmarkOriginalIndex =
+                -1;
+
+
+            markBookmarkDragJustEnded();
+
+        }
+    );
+
+}
+
+
+// =========================================
+// CONFIGURAR ARRASTRE - CARPETA
+// =========================================
+
+function setupBookmarkFolderDrag(
+    folderContainer,
+    button,
+    folder
+) {
+
+    folderContainer.dataset.bookmarkId =
+        folder.id;
+
+    folderContainer.draggable =
+        true;
+
+
+    folderContainer.addEventListener(
+        "dragstart",
+        function (event) {
+
+            // =================================
+            // EVITAR QUE UN ELEMENTO INTERNO
+            // INICIE EL DRAG DE LA CARPETA PADRE
+            // =================================
+
+            if (
+                event.target.closest &&
+                event.target.closest(".bookmark-menu")
+            ) {
+
+                event.preventDefault();
+
+                return;
+
+            }
+
+
+            event.stopPropagation();
+
+
+            draggedBookmarkId =
+                folder.id;
+
+            draggedBookmarkType =
+                "folder";
+
+            draggedBookmarkElement =
+                folderContainer;
+
+
+            // =================================
+            // POSICIÓN ORIGINAL
+            // =================================
+
+            const parent =
+                folderContainer.parentElement;
+
+
+            if (
+                parent
+            ) {
+
+                if (
+                    parent.id ===
+                    "bookmarks-bar"
+                ) {
+
+                    draggedBookmarkOriginalParentId =
+                        bookmarksBarNode
+                            ? bookmarksBarNode.id
+                            : null;
+
+                } else if (
+                    parent.classList.contains(
+                        "bookmark-menu"
+                    )
+                ) {
+
+                    draggedBookmarkOriginalParentId =
+                        parent.dataset.parentId;
+
+                } else {
+
+                    draggedBookmarkOriginalParentId =
+                        null;
+
+                }
+
+
+                draggedBookmarkOriginalIndex =
+                    Array.from(
+                        parent.children
+                    ).indexOf(
+                        folderContainer
+                    );
+
+            } else {
+
+                draggedBookmarkOriginalParentId =
+                    null;
+
+                draggedBookmarkOriginalIndex =
+                    -1;
+
+            }
+
+
+            folderContainer.classList.add(
+                "bookmark-dragging"
+            );
+
+
+            event.dataTransfer.effectAllowed =
+                "move";
+
+
+            event.dataTransfer.setData(
+                "text/plain",
+                folder.id
+            );
+
+        }
+    );
+
+
+    folderContainer.addEventListener(
+        "dragend",
+        function () {
+
+            folderContainer.classList.remove(
+                "bookmark-dragging"
+            );
+
+
+            clearBookmarkDragHighlights();
+
+
+            draggedBookmarkId =
+                null;
+
+            draggedBookmarkType =
+                null;
+
+            draggedBookmarkElement =
+                null;
+
+
+            draggedBookmarkOriginalParentId =
+                null;
+
+            draggedBookmarkOriginalIndex =
+                -1;
+
+
+            markBookmarkDragJustEnded();
+
+        }
+    );
+
+}
+
+
+// =========================================
+// CONFIGURAR ARRASTRE - MARCADOR EN MENÚ
+// =========================================
+
+function setupBookmarkMenuItemDrag(
+    item,
+    bookmark
+) {
+
+    item.dataset.bookmarkId =
+        bookmark.id;
+
+    item.draggable =
+        true;
+
+
+    item.addEventListener(
+        "dragstart",
+        function (event) {
+
+            event.stopPropagation();
+
+
+            draggedBookmarkId =
+                bookmark.id;
+
+            draggedBookmarkType =
+                "bookmark";
+
+            draggedBookmarkElement =
+                item;
+
+
+            const parent =
+                item.parentElement;
+
+
+            if (
+                parent
+            ) {
+
+                draggedBookmarkOriginalParentId =
+                    parent.dataset.parentId ||
+                    null;
+
+
+                draggedBookmarkOriginalIndex =
+                    Array.from(
+                        parent.children
+                    ).indexOf(
+                        item
+                    );
+
+            } else {
+
+                draggedBookmarkOriginalParentId =
+                    null;
+
+                draggedBookmarkOriginalIndex =
+                    -1;
+
+            }
+
+
+            item.classList.add(
+                "bookmark-dragging"
+            );
+
+
+            event.dataTransfer.effectAllowed =
+                "move";
+
+
+            event.dataTransfer.setData(
+                "text/plain",
+                bookmark.id
+            );
+
+        }
+    );
+
+
+    item.addEventListener(
+        "dragend",
+        function () {
+
+            item.classList.remove(
+                "bookmark-dragging"
+            );
+
+
+            clearBookmarkDragHighlights();
+
+
+            draggedBookmarkId =
+                null;
+
+            draggedBookmarkType =
+                null;
+
+            draggedBookmarkElement =
+                null;
+
+
+            draggedBookmarkOriginalParentId =
+                null;
+
+            draggedBookmarkOriginalIndex =
+                -1;
+
+
+            markBookmarkDragJustEnded();
+
+        }
+    );
+
+}
+
+
+// =========================================
+// CONFIGURAR ARRASTRE - SUBCARPETA
+// =========================================
+//
+// IMPORTANTE:
+//
+// Una subcarpeta está dentro de un .bookmark-menu.
+//
+// Por eso NO debemos hacer:
+//
+// event.target.closest(".bookmark-menu")
+//
+// para cancelar el drag.
+//
+// Si lo hacemos, cualquier subcarpeta que esté
+// dentro de una carpeta quedará bloqueada.
+//
+
+function setupBookmarkSubfolderDrag(
+    subfolder,
+    button,
+    folder
+) {
+
+    subfolder.dataset.bookmarkId =
+        folder.id;
+
+    subfolder.draggable =
+        true;
+
+
+    subfolder.addEventListener(
+        "dragstart",
+        function (event) {
+
+            // =================================
+            // NO BLOQUEAR POR .bookmark-menu
+            // =================================
+
+            event.stopPropagation();
+
+
+            draggedBookmarkId =
+                folder.id;
+
+            draggedBookmarkType =
+                "folder";
+
+            draggedBookmarkElement =
+                subfolder;
+
+
+            // =================================
+            // GUARDAR PADRE ORIGINAL
+            // =================================
+
+            const parent =
+                subfolder.parentElement;
+
+
+            if (
+                parent
+            ) {
+
+                // El padre directo es el .bookmark-menu
+                // de la carpeta que contiene esta subcarpeta.
+                draggedBookmarkOriginalParentId =
+                    parent.dataset.parentId ||
+                    null;
+
+
+                draggedBookmarkOriginalIndex =
+                    Array.from(
+                        parent.children
+                    ).indexOf(
+                        subfolder
+                    );
+
+            } else {
+
+                draggedBookmarkOriginalParentId =
+                    null;
+
+                draggedBookmarkOriginalIndex =
+                    -1;
+
+            }
+
+
+            subfolder.classList.add(
+                "bookmark-dragging"
+            );
+
+
+            event.dataTransfer.effectAllowed =
+                "move";
+
+
+            event.dataTransfer.setData(
+                "text/plain",
+                folder.id
+            );
+
+        }
+    );
+
+
+    subfolder.addEventListener(
+        "dragend",
+        function () {
+
+            subfolder.classList.remove(
+                "bookmark-dragging"
+            );
+
+
+            clearBookmarkDragHighlights();
+
+
+            draggedBookmarkId =
+                null;
+
+            draggedBookmarkType =
+                null;
+
+            draggedBookmarkElement =
+                null;
+
+
+            draggedBookmarkOriginalParentId =
+                null;
+
+            draggedBookmarkOriginalIndex =
+                -1;
+
+
+            markBookmarkDragJustEnded();
+
+        }
+    );
+
+}
+
+
+// =========================================
 // CREAR CARPETA
 // =========================================
 
@@ -5986,10 +7182,9 @@ function createBookmarkFolder(
     folderContainer.className =
         "bookmark-folder";
 
+    folderContainer.dataset.bookmarkId =
+        folder.id;
 
-    // =====================================
-    // BOTÓN
-    // =====================================
 
     const button =
         document.createElement("button");
@@ -6028,10 +7223,6 @@ function createBookmarkFolder(
     );
 
 
-    // =====================================
-    // MENÚ DE LA CARPETA
-    // =====================================
-
     const menu =
         document.createElement("div");
 
@@ -6041,6 +7232,9 @@ function createBookmarkFolder(
     menu.style.display =
         "none";
 
+    menu.dataset.parentId =
+        folder.id;
+
 
     renderBookmarkMenu(
         folder.children || [],
@@ -6049,7 +7243,7 @@ function createBookmarkFolder(
 
 
     // =====================================
-    // CLICK IZQUIERDO EN CARPETA
+    // CLICK IZQUIERDO
     // =====================================
 
     button.addEventListener(
@@ -6059,34 +7253,37 @@ function createBookmarkFolder(
             event.stopPropagation();
 
 
-            const wasOpen =
-                menu.style.display === "block";
-
-
-            // Cerrar otros menús.
-            closeBookmarkMenus();
-
-            // Cerrar menú contextual.
-            closeBookmarkContextMenu();
-
-
-            // Si ya estaba abierto,
-            // simplemente dejarlo cerrado.
-            if (wasOpen) {
+            if (
+                draggedBookmarkId ||
+                wasBookmarkDragRecentlyEnded()
+            ) {
 
                 return;
 
             }
 
 
-            // Mostrar menú.
+            const wasOpen =
+                menu.style.display === "block";
+
+
+            closeBookmarkMenus();
+
+            closeBookmarkContextMenu();
+
+
+            if (
+                wasOpen
+            ) {
+
+                return;
+
+            }
+
+
             menu.style.display =
                 "block";
 
-
-            // =================================
-            // USAR POSITION FIXED
-            // =================================
 
             menu.style.position =
                 "fixed";
@@ -6108,10 +7305,6 @@ function createBookmarkFolder(
                 buttonRect.bottom + 4;
 
 
-            // =================================
-            // EVITAR SALIR POR LA DERECHA
-            // =================================
-
             if (
                 left + menuRect.width >
                 window.innerWidth - 8
@@ -6124,10 +7317,6 @@ function createBookmarkFolder(
 
             }
 
-
-            // =================================
-            // EVITAR SALIR POR ABAJO
-            // =================================
 
             if (
                 top + menuRect.height >
@@ -6142,22 +7331,15 @@ function createBookmarkFolder(
             }
 
 
-            // =================================
-            // EVITAR SALIR POR ARRIBA
-            // =================================
-
             if (
                 top < 8
             ) {
 
-                top = 8;
+                top =
+                    8;
 
             }
 
-
-            // =================================
-            // APLICAR POSICIÓN
-            // =================================
 
             menu.style.left =
                 Math.max(
@@ -6177,7 +7359,7 @@ function createBookmarkFolder(
 
 
     // =====================================
-    // CLICK DERECHO EN CARPETA
+    // CLICK DERECHO
     // =====================================
 
     button.addEventListener(
@@ -6191,6 +7373,13 @@ function createBookmarkFolder(
             );
 
         }
+    );
+
+
+    setupBookmarkFolderDrag(
+        folderContainer,
+        button,
+        folder
     );
 
 
@@ -6217,6 +7406,10 @@ function renderBookmarkMenu(
     nodes,
     menu
 ) {
+
+    menu.innerHTML =
+        "";
+
 
     nodes.forEach(
         function (node) {
@@ -6265,10 +7458,6 @@ function createBookmarkMenuItem(
         bookmark.url;
 
 
-    // =====================================
-    // FAVICON
-    // =====================================
-
     const icon =
         document.createElement("img");
 
@@ -6296,10 +7485,6 @@ function createBookmarkMenuItem(
         };
 
 
-    // =====================================
-    // TÍTULO
-    // =====================================
-
     const title =
         document.createElement("span");
 
@@ -6320,15 +7505,22 @@ function createBookmarkMenuItem(
     );
 
 
-    // =====================================
-    // CLICK NORMAL
-    // =====================================
-
     item.addEventListener(
         "click",
         function (event) {
 
             event.stopPropagation();
+
+
+            if (
+                draggedBookmarkId ||
+                wasBookmarkDragRecentlyEnded()
+            ) {
+
+                return;
+
+            }
+
 
             closeBookmarkMenus();
 
@@ -6342,10 +7534,6 @@ function createBookmarkMenuItem(
     );
 
 
-    // =====================================
-    // CLICK DERECHO
-    // =====================================
-
     item.addEventListener(
         "contextmenu",
         function (event) {
@@ -6357,6 +7545,12 @@ function createBookmarkMenuItem(
             );
 
         }
+    );
+
+
+    setupBookmarkMenuItemDrag(
+        item,
+        bookmark
     );
 
 
@@ -6382,10 +7576,9 @@ function createBookmarkSubfolder(
     subfolder.className =
         "bookmark-subfolder";
 
+    subfolder.dataset.bookmarkId =
+        folder.id;
 
-    // =====================================
-    // BOTÓN
-    // =====================================
 
     const button =
         document.createElement("button");
@@ -6438,10 +7631,6 @@ function createBookmarkSubfolder(
     );
 
 
-    // =====================================
-    // SUBMENÚ
-    // =====================================
-
     const subMenu =
         document.createElement("div");
 
@@ -6450,6 +7639,9 @@ function createBookmarkSubfolder(
 
     subMenu.style.display =
         "none";
+
+    subMenu.dataset.parentId =
+        folder.id;
 
 
     renderBookmarkMenu(
@@ -6471,10 +7663,6 @@ function createBookmarkSubfolder(
                     ".bookmark-menu"
                 );
 
-
-            // =================================
-            // CERRAR OTROS SUBMENÚS
-            // =================================
 
             if (
                 parentMenu
@@ -6503,10 +7691,6 @@ function createBookmarkSubfolder(
             }
 
 
-            // =================================
-            // MOSTRAR SUBMENÚ
-            // =================================
-
             subMenu.style.display =
                 "block";
 
@@ -6526,10 +7710,6 @@ function createBookmarkSubfolder(
                 subMenu.getBoundingClientRect();
 
 
-            // =================================
-            // EVITAR SALIR POR LA DERECHA
-            // =================================
-
             if (
                 left + menuRect.width >
                 window.innerWidth - 8
@@ -6542,10 +7722,6 @@ function createBookmarkSubfolder(
 
             }
 
-
-            // =================================
-            // EVITAR SALIR POR ABAJO
-            // =================================
 
             if (
                 top + menuRect.height >
@@ -6560,22 +7736,15 @@ function createBookmarkSubfolder(
             }
 
 
-            // =================================
-            // EVITAR SALIR POR ARRIBA
-            // =================================
-
             if (
                 top < 8
             ) {
 
-                top = 8;
+                top =
+                    8;
 
             }
 
-
-            // =================================
-            // APLICAR POSICIÓN
-            // =================================
 
             subMenu.style.left =
                 left + "px";
@@ -6606,6 +7775,13 @@ function createBookmarkSubfolder(
     );
 
 
+    setupBookmarkSubfolderDrag(
+        subfolder,
+        button,
+        folder
+    );
+
+
     subfolder.appendChild(
         button
     );
@@ -6625,11 +7801,6 @@ function createBookmarkSubfolder(
 // FUNCIONES DE MODALES
 // =========================================
 
-
-// =========================================
-// ABRIR MODAL
-// =========================================
-
 function openBookmarkOverlay(
     overlay
 ) {
@@ -6646,10 +7817,6 @@ function openBookmarkOverlay(
 }
 
 
-// =========================================
-// CERRAR MODAL
-// =========================================
-
 function closeBookmarkOverlay(
     overlay
 ) {
@@ -6665,10 +7832,6 @@ function closeBookmarkOverlay(
 
 }
 
-
-// =========================================
-// CERRAR TODOS LOS MODALES
-// =========================================
 
 function closeAllBookmarkModals() {
 
@@ -6757,18 +7920,11 @@ function openEditBookmarkModal(
 
 
     if (nameError) {
-
-        nameError.textContent =
-            "";
-
+        nameError.textContent = "";
     }
 
-
     if (urlError) {
-
-        urlError.textContent =
-            "";
-
+        urlError.textContent = "";
     }
 
 
@@ -6856,23 +8012,17 @@ function saveEditedBookmark() {
             : "";
 
 
-    // =====================================
-    // VALIDAR NOMBRE
-    // =====================================
-
-    if (name === "") {
+    if (
+        name === ""
+    ) {
 
         if (nameError) {
-
             nameError.textContent =
                 "Escribe un nombre.";
-
         }
 
         if (nameInput) {
-
             nameInput.focus();
-
         }
 
         return;
@@ -6880,33 +8030,23 @@ function saveEditedBookmark() {
     }
 
 
-    // =====================================
-    // VALIDAR URL VACÍA
-    // =====================================
-
-    if (url === "") {
+    if (
+        url === ""
+    ) {
 
         if (urlError) {
-
             urlError.textContent =
                 "Escribe una URL.";
-
         }
 
         if (urlInput) {
-
             urlInput.focus();
-
         }
 
         return;
 
     }
 
-
-    // =====================================
-    // VALIDAR URL
-    // =====================================
 
     let validUrl;
 
@@ -6919,26 +8059,18 @@ function saveEditedBookmark() {
     } catch (error) {
 
         if (urlError) {
-
             urlError.textContent =
                 "La URL no es válida.";
-
         }
 
         if (urlInput) {
-
             urlInput.focus();
-
         }
 
         return;
 
     }
 
-
-    // =====================================
-    // HTTP / HTTPS
-    // =====================================
 
     if (
         validUrl.protocol !== "http:" &&
@@ -6946,26 +8078,18 @@ function saveEditedBookmark() {
     ) {
 
         if (urlError) {
-
             urlError.textContent =
                 "La URL debe comenzar con http:// o https://.";
-
         }
 
         if (urlInput) {
-
             urlInput.focus();
-
         }
 
         return;
 
     }
 
-
-    // =====================================
-    // ACTUALIZAR MARCADOR
-    // =====================================
 
     chrome.bookmarks.update(
         selectedBookmarkNode.id,
@@ -6988,10 +8112,8 @@ function saveEditedBookmark() {
                 );
 
                 if (urlError) {
-
                     urlError.textContent =
                         "No se pudo guardar el marcador.";
-
                 }
 
                 return;
@@ -7177,19 +8299,15 @@ function openRenameBookmarkFolderModal(
 
 
     if (nameInput) {
-
         nameInput.value =
             folder.title ||
             "";
-
     }
 
 
     if (nameError) {
-
         nameError.textContent =
             "";
-
     }
 
 
@@ -7244,19 +8362,17 @@ function saveRenamedBookmarkFolder() {
             : "";
 
 
-    if (name === "") {
+    if (
+        name === ""
+    ) {
 
         if (nameError) {
-
             nameError.textContent =
                 "Escribe un nombre.";
-
         }
 
         if (nameInput) {
-
             nameInput.focus();
-
         }
 
         return;
@@ -7282,10 +8398,8 @@ function saveRenamedBookmarkFolder() {
                 );
 
                 if (nameError) {
-
                     nameError.textContent =
                         "No se pudo cambiar el nombre.";
-
                 }
 
                 return;
@@ -7357,18 +8471,14 @@ function openNewBookmarkFolderModal(
 
 
     if (nameInput) {
-
         nameInput.value =
             "";
-
     }
 
 
     if (nameError) {
-
         nameError.textContent =
             "";
-
     }
 
 
@@ -7421,33 +8531,23 @@ function saveNewBookmarkFolder() {
             : "";
 
 
-    // =====================================
-    // VALIDAR NOMBRE
-    // =====================================
-
-    if (name === "") {
+    if (
+        name === ""
+    ) {
 
         if (nameError) {
-
             nameError.textContent =
                 "Escribe un nombre.";
-
         }
 
         if (nameInput) {
-
             nameInput.focus();
-
         }
 
         return;
 
     }
 
-
-    // =====================================
-    // CREAR CARPETA
-    // =====================================
 
     chrome.bookmarks.create(
         {
@@ -7469,10 +8569,8 @@ function saveNewBookmarkFolder() {
                 );
 
                 if (nameError) {
-
                     nameError.textContent =
                         "No se pudo crear la carpeta.";
-
                 }
 
                 return;
@@ -7616,15 +8714,10 @@ function confirmDeleteBookmarkFolder() {
 
 
 // =========================================
-// CONFIGURAR EVENTOS DE LOS MODALES
+// CONFIGURAR EVENTOS DE MODALES
 // =========================================
 
 function setupBookmarkModalEvents() {
-
-
-    // =====================================
-    // EDITAR MARCADOR
-    // =====================================
 
     const closeEditButton =
         document.getElementById(
@@ -7688,10 +8781,6 @@ function setupBookmarkModalEvents() {
     }
 
 
-    // =====================================
-    // ELIMINAR MARCADOR
-    // =====================================
-
     const closeDeleteButton =
         document.getElementById(
             "close-delete-bookmark-button"
@@ -7753,10 +8842,6 @@ function setupBookmarkModalEvents() {
 
     }
 
-
-    // =====================================
-    // RENOMBRAR CARPETA
-    // =====================================
 
     const closeRenameButton =
         document.getElementById(
@@ -7820,10 +8905,6 @@ function setupBookmarkModalEvents() {
     }
 
 
-    // =====================================
-    // NUEVA CARPETA
-    // =====================================
-
     const closeNewFolderButton =
         document.getElementById(
             "close-new-bookmark-folder-button"
@@ -7885,10 +8966,6 @@ function setupBookmarkModalEvents() {
 
     }
 
-
-    // =====================================
-    // ELIMINAR CARPETA
-    // =====================================
 
     const closeDeleteFolderButton =
         document.getElementById(
@@ -7953,7 +9030,7 @@ function setupBookmarkModalEvents() {
 
 
     // =====================================
-    // CERRAR AL HACER CLICK EN EL FONDO
+    // CLICK EN FONDO
     // =====================================
 
     const overlayIds = [
@@ -8018,7 +9095,9 @@ function setupBookmarkModalEvents() {
             if (
                 event.key !== "Escape"
             ) {
+
                 return;
+
             }
 
 
@@ -8162,10 +9241,60 @@ function setupBookmarkModalEvents() {
 // =========================================
 // CLICK FUERA
 // =========================================
+//
+// IMPORTANTE:
+//
+// Ahora el menú NO se cierra simplemente porque
+// hicimos click dentro de él.
+//
+// Solo se cierra si hacemos click fuera.
+//
 
 document.addEventListener(
     "click",
-    function () {
+    function (event) {
+
+        if (
+            draggedBookmarkId ||
+            wasBookmarkDragRecentlyEnded()
+        ) {
+
+            return;
+
+        }
+
+
+        const clickedInsideBookmarkMenu =
+            event.target.closest &&
+            event.target.closest(
+                ".bookmark-menu"
+            );
+
+
+        const clickedBookmarkFolder =
+            event.target.closest &&
+            event.target.closest(
+                ".bookmark-folder-button, .bookmark-subfolder-button"
+            );
+
+
+        const clickedContextMenu =
+            event.target.closest &&
+            event.target.closest(
+                ".bookmark-context-menu"
+            );
+
+
+        if (
+            clickedInsideBookmarkMenu ||
+            clickedBookmarkFolder ||
+            clickedContextMenu
+        ) {
+
+            return;
+
+        }
+
 
         closeBookmarkMenus();
 
@@ -8176,17 +9305,12 @@ document.addEventListener(
 
 
 // =========================================
-// CLIC DERECHO EN LA BARRA DE MARCADORES
+// CLIC DERECHO EN LA BARRA
 // =========================================
 
 document.addEventListener(
     "contextmenu",
     function (event) {
-
-        // =====================================
-        // COMPROBAR SI EL CLICK FUE SOBRE
-        // UN ELEMENTO DE MARCADORES
-        // =====================================
 
         const bookmarkElement =
             event.target.closest(
@@ -8198,24 +9322,14 @@ document.addEventListener(
             );
 
 
-        // =====================================
-        // SI FUE SOBRE UN MARCADOR, CARPETA
-        // O MENÚ CONTEXTUAL
-        //
-        // El evento ya será manejado por
-        // su propio listener.
-        // =====================================
-
-        if (bookmarkElement) {
+        if (
+            bookmarkElement
+        ) {
 
             return;
 
         }
 
-
-        // =====================================
-        // OBTENER BARRA
-        // =====================================
 
         const bookmarksBar =
             document.getElementById(
@@ -8232,11 +9346,6 @@ document.addEventListener(
         }
 
 
-        // =====================================
-        // COMPROBAR SI EL CLICK FUE DENTRO
-        // DE LA BARRA
-        // =====================================
-
         if (
             !bookmarksBar.contains(
                 event.target
@@ -8248,19 +9357,10 @@ document.addEventListener(
         }
 
 
-        // =====================================
-        // EVITAR MENÚ NATIVO
-        // =====================================
-
         event.preventDefault();
 
         event.stopPropagation();
 
-
-        // =====================================
-        // ASEGURARNOS DE TENER EL NODO REAL
-        // DE LA BARRA DE MARCADORES
-        // =====================================
 
         if (
             !bookmarksBarNode
@@ -8274,19 +9374,6 @@ document.addEventListener(
 
         }
 
-
-        // =====================================
-        // ABRIR MENÚ CONTEXTUAL DE LA BARRA
-        // =====================================
-        //
-        // type = "bar"
-        //
-        // Esto hará que el menú muestre:
-        //
-        // 📁 Nueva carpeta
-        //
-        // y la carpeta será creada dentro
-        // de la Barra de marcadores.
 
         openBookmarkContextMenu(
             event,
@@ -8329,8 +9416,36 @@ chrome.bookmarks.onChanged.addListener(
 );
 
 
+// =========================================
+// MOVIMIENTO DE MARCADORES
+// =========================================
+//
+// Durante un movimiento iniciado desde nuestra
+// interfaz NO reconstruimos todo el DOM.
+//
+// Esto es importante porque si hacemos loadBookmarks()
+// aquí, la ventana de la carpeta abierta desaparece.
+//
+// En los movimientos internos normales simplemente
+// esperamos.
+//
+// Cuando una CARPETA cambia de padre, la función
+// moveBookmarkNodeToIndex() o
+// moveBookmarkNodeIntoFolder() hará el loadBookmarks()
+// explícitamente.
+//
+
 chrome.bookmarks.onMoved.addListener(
     function () {
+
+        if (
+            bookmarkInternalMoveInProgress
+        ) {
+
+            return;
+
+        }
+
 
         loadBookmarks();
 
@@ -8341,6 +9456,15 @@ chrome.bookmarks.onMoved.addListener(
 chrome.bookmarks.onChildrenReordered.addListener(
     function () {
 
+        if (
+            bookmarkInternalMoveInProgress
+        ) {
+
+            return;
+
+        }
+
+
         loadBookmarks();
 
     }
@@ -8349,11 +9473,6 @@ chrome.bookmarks.onChildrenReordered.addListener(
 
 // =========================================
 // DESPLAZAMIENTO DE MARCADORES
-// =========================================
-
-
-// =========================================
-// ACTUALIZAR BOTONES
 // =========================================
 
 function updateBookmarkScrollButtons() {
@@ -8379,7 +9498,9 @@ function updateBookmarkScrollButtons() {
         !leftButton ||
         !rightButton
     ) {
+
         return;
+
     }
 
 
@@ -8388,11 +9509,9 @@ function updateBookmarkScrollButtons() {
         bookmarksBar.clientWidth;
 
 
-    // =====================================
-    // NO HAY DESPLAZAMIENTO
-    // =====================================
-
-    if (maxScroll <= 1) {
+    if (
+        maxScroll <= 1
+    ) {
 
         leftButton.classList.add(
             "hidden"
@@ -8413,10 +9532,6 @@ function updateBookmarkScrollButtons() {
     }
 
 
-    // =====================================
-    // MOSTRAR BOTONES
-    // =====================================
-
     leftButton.classList.remove(
         "hidden"
     );
@@ -8425,10 +9540,6 @@ function updateBookmarkScrollButtons() {
         "hidden"
     );
 
-
-    // =====================================
-    // BOTÓN IZQUIERDO
-    // =====================================
 
     if (
         bookmarksBar.scrollLeft <= 1
@@ -8444,10 +9555,6 @@ function updateBookmarkScrollButtons() {
 
     }
 
-
-    // =====================================
-    // BOTÓN DERECHO
-    // =====================================
 
     if (
         bookmarksBar.scrollLeft >=
@@ -8494,13 +9601,11 @@ function setupBookmarkScroll() {
         !leftButton ||
         !rightButton
     ) {
+
         return;
+
     }
 
-
-    // =====================================
-    // BOTÓN IZQUIERDO
-    // =====================================
 
     leftButton.addEventListener(
         "click",
@@ -8523,10 +9628,6 @@ function setupBookmarkScroll() {
     );
 
 
-    // =====================================
-    // BOTÓN DERECHO
-    // =====================================
-
     rightButton.addEventListener(
         "click",
         function (event) {
@@ -8548,10 +9649,6 @@ function setupBookmarkScroll() {
     );
 
 
-    // =====================================
-    // DETECTAR DESPLAZAMIENTO
-    // =====================================
-
     bookmarksBar.addEventListener(
         "scroll",
         function () {
@@ -8561,10 +9658,6 @@ function setupBookmarkScroll() {
         }
     );
 
-
-    // =====================================
-    // DETECTAR CAMBIO DE TAMAÑO
-    // =====================================
 
     window.addEventListener(
         "resize",
@@ -8576,11 +9669,558 @@ function setupBookmarkScroll() {
     );
 
 
+    updateBookmarkScrollButtons();
+
+}
+
+
+// =========================================
+// ZONA GENERAL DE ARRASTRE
+// =========================================
+
+function setupBookmarkDragArea() {
+
     // =====================================
-    // ESTADO INICIAL
+    // DRAGOVER
     // =====================================
 
-    updateBookmarkScrollButtons();
+    document.addEventListener(
+        "dragover",
+        function (event) {
+
+            if (
+                !draggedBookmarkId
+            ) {
+
+                return;
+
+            }
+
+
+            event.preventDefault();
+
+
+            event.dataTransfer.dropEffect =
+                "move";
+
+
+            const element =
+                document.elementFromPoint(
+                    event.clientX,
+                    event.clientY
+                );
+
+
+            if (!element) {
+                return;
+            }
+
+
+            // =================================
+            // CARPETA
+            // =================================
+
+            const folderButton =
+                element.closest(
+                    ".bookmark-folder-button, .bookmark-subfolder-button"
+                );
+
+
+            if (
+                folderButton
+            ) {
+
+                const folderElement =
+                    folderButton.closest(
+                        ".bookmark-folder, .bookmark-subfolder"
+                    );
+
+
+                const folderId =
+                    folderElement
+                        ? folderElement.dataset.bookmarkId
+                        : null;
+
+
+                // =================================
+                // NO MOVER UNA CARPETA DENTRO
+                // DE SÍ MISMA
+                // =================================
+
+                if (
+                    !folderId ||
+                    folderId === draggedBookmarkId
+                ) {
+
+                    clearBookmarkDragHighlights();
+
+                    return;
+
+                }
+
+
+                // =================================
+                // NO MOVER UNA CARPETA DENTRO
+                // DE UNO DE SUS DESCENDIENTES
+                // =================================
+
+                if (
+                    draggedBookmarkType ===
+                    "folder" &&
+                    draggedBookmarkElement &&
+                    draggedBookmarkElement.contains(
+                        folderElement
+                    )
+                ) {
+
+                    clearBookmarkDragHighlights();
+
+                    return;
+
+                }
+
+
+                const isSubfolder =
+                    folderButton.classList.contains(
+                        "bookmark-subfolder-button"
+                    );
+
+
+                const axis =
+                    isSubfolder
+                        ? "vertical"
+                        : "horizontal";
+
+
+                if (
+                    isMouseOverFolderCenter(
+                        folderButton,
+                        event,
+                        axis
+                    )
+                ) {
+
+                    // =================================
+                    // METER DENTRO
+                    // =================================
+
+                    clearBookmarkDragHighlights();
+
+
+                    folderButton.classList.add(
+                        "bookmark-drop-inside"
+                    );
+
+
+                    bookmarkFileIntoFolderId =
+                        folderId;
+
+                } else {
+
+                    // =================================
+                    // REORDENAR JUNTO A LA CARPETA
+                    // =================================
+
+                    clearBookmarkDragHighlights();
+
+
+                    if (
+                        draggedBookmarkElement
+                    ) {
+
+                        if (
+                            axis ===
+                            "horizontal"
+                        ) {
+
+                            moveBookmarkBarElementAccordingToMouse(
+                                draggedBookmarkElement,
+                                folderElement,
+                                event
+                            );
+
+                        } else {
+
+                            moveBookmarkMenuElementAccordingToMouse(
+                                draggedBookmarkElement,
+                                folderElement,
+                                event
+                            );
+
+                        }
+
+                    }
+
+                }
+
+                return;
+
+            }
+
+
+            // =================================
+            // MARCADOR
+            // =================================
+
+            const bookmarkTarget =
+                element.closest(
+                    ".bookmark-item, .bookmark-menu-item"
+                );
+
+
+            if (
+                bookmarkTarget
+            ) {
+
+                if (
+                    bookmarkTarget.dataset.bookmarkId ===
+                    draggedBookmarkId
+                ) {
+
+                    return;
+
+                }
+
+
+                clearBookmarkDragHighlights();
+
+
+                if (
+                    !draggedBookmarkElement
+                ) {
+
+                    return;
+
+                }
+
+
+                const isInMenu =
+                    !!bookmarkTarget.closest(
+                        ".bookmark-menu"
+                    );
+
+
+                if (
+                    isInMenu
+                ) {
+
+                    moveBookmarkMenuElementAccordingToMouse(
+                        draggedBookmarkElement,
+                        bookmarkTarget,
+                        event
+                    );
+
+                } else {
+
+                    moveBookmarkBarElementAccordingToMouse(
+                        draggedBookmarkElement,
+                        bookmarkTarget,
+                        event
+                    );
+
+                }
+
+
+                return;
+
+            }
+
+
+            // =================================
+            // ESPACIO VACÍO
+            // =================================
+
+            clearBookmarkDragHighlights();
+
+
+            if (
+                !draggedBookmarkElement
+            ) {
+
+                return;
+
+            }
+
+
+            const emptyBar =
+                element.closest(
+                    "#bookmarks-bar"
+                );
+
+
+            if (
+                emptyBar
+            ) {
+
+                moveBookmarkElementToEnd(
+                    draggedBookmarkElement,
+                    emptyBar
+                );
+
+                return;
+
+            }
+
+
+            const emptyMenu =
+                element.closest(
+                    ".bookmark-menu"
+                );
+
+
+            if (
+                emptyMenu &&
+                emptyMenu.style.display ===
+                "block"
+            ) {
+
+                moveBookmarkElementToEnd(
+                    draggedBookmarkElement,
+                    emptyMenu
+                );
+
+            }
+
+        }
+    );
+
+
+    // =====================================
+    // DROP
+    // =====================================
+
+    document.addEventListener(
+        "drop",
+        function (event) {
+
+            if (
+                !draggedBookmarkId
+            ) {
+
+                return;
+
+            }
+
+
+            event.preventDefault();
+
+
+            event.stopPropagation();
+
+
+            // =================================
+            // GUARDAR DATOS DEL DRAG
+            // =================================
+            //
+            // Los guardamos antes de limpiar
+            // las variables al terminar.
+            //
+
+            const movedId =
+                draggedBookmarkId;
+
+            const movedType =
+                draggedBookmarkType;
+
+            const originalParentId =
+                draggedBookmarkOriginalParentId;
+
+            const originalIndex =
+                draggedBookmarkOriginalIndex;
+
+            const movedElement =
+                draggedBookmarkElement;
+
+            const targetFolderId =
+                bookmarkFileIntoFolderId;
+
+
+            // =================================
+            // CASO 1:
+            // METER DENTRO DE CARPETA
+            // =================================
+
+            if (
+                targetFolderId
+            ) {
+
+                // =================================
+                // BUSCAR MENÚ DESTINO
+                // =================================
+
+                const targetMenus =
+                    document.querySelectorAll(
+                        ".bookmark-menu"
+                    );
+
+
+                let targetMenu =
+                    null;
+
+
+                targetMenus.forEach(
+                    function (menu) {
+
+                        if (
+                            menu.dataset.parentId ===
+                            String(
+                                targetFolderId
+                            )
+                        ) {
+
+                            targetMenu =
+                                menu;
+
+                        }
+
+                    }
+                );
+
+
+                // =================================
+                // MOVER VISUALMENTE
+                // =================================
+
+                if (
+                    targetMenu &&
+                    movedElement
+                ) {
+
+                    targetMenu.appendChild(
+                        movedElement
+                    );
+
+                }
+
+
+                // =================================
+                // MOVER REALMENTE EN CHROME
+                // =================================
+
+                moveBookmarkNodeIntoFolder(
+                    movedId,
+                    targetFolderId,
+                    movedType
+                );
+
+
+                clearBookmarkDragHighlights();
+
+
+                return;
+
+            }
+
+
+            // =================================
+            // CASO 2:
+            // REORDENAR
+            // =================================
+
+            if (
+                !movedElement
+            ) {
+
+                clearBookmarkDragHighlights();
+
+                return;
+
+            }
+
+
+            const parent =
+                movedElement.parentNode;
+
+
+            if (
+                !parent
+            ) {
+
+                clearBookmarkDragHighlights();
+
+                return;
+
+            }
+
+
+            let parentId =
+                null;
+
+
+            if (
+                parent.id ===
+                "bookmarks-bar"
+            ) {
+
+                parentId =
+                    bookmarksBarNode
+                        ? bookmarksBarNode.id
+                        : null;
+
+            } else if (
+                parent.classList.contains(
+                    "bookmark-menu"
+                )
+            ) {
+
+                parentId =
+                    parent.dataset.parentId;
+
+            }
+
+
+            if (
+                !parentId
+            ) {
+
+                clearBookmarkDragHighlights();
+
+                return;
+
+            }
+
+
+            // =================================
+            // ÍNDICE FINAL VISUAL
+            // =================================
+
+            const index =
+                Array.from(
+                    parent.children
+                ).indexOf(
+                    movedElement
+                );
+
+
+            if (
+                index === -1
+            ) {
+
+                clearBookmarkDragHighlights();
+
+                return;
+
+            }
+
+
+            // =================================
+            // ENVIAR A CHROME
+            // =================================
+
+            moveBookmarkNodeToIndex(
+                movedId,
+                parentId,
+                index,
+                originalParentId,
+                originalIndex,
+                movedType
+            );
+
+
+            clearBookmarkDragHighlights();
+
+        }
+    );
 
 }
 
@@ -8589,23 +10229,12 @@ function setupBookmarkScroll() {
 // INICIALIZAR MARCADORES
 // =========================================
 
-
-// Ocultar cualquier modal que pudiera
-// aparecer al cargar la página.
-
 closeAllBookmarkModals();
-
-
-// Configurar botones de los modales.
 
 setupBookmarkModalEvents();
 
-
-// Configurar desplazamiento de marcadores.
-
 setupBookmarkScroll();
 
-
-// Cargar marcadores reales de Chrome.
+setupBookmarkDragArea();
 
 loadBookmarks();
