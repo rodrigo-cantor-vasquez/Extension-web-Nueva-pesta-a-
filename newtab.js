@@ -2092,16 +2092,41 @@ function findGroupByName(groupName) {
 // =========================================
 // ICONO DEL SITIO
 // =========================================
+//
+// Orden de búsqueda:
+//
+// 1. favicon del host completo
+//    Ejemplo:
+//    https://mail.google.com/favicon.ico
+//
+// 2. favicon del dominio principal
+//    Ejemplo:
+//    https://google.com/favicon.ico
+//
+// 3. 🌐 como fallback
+//
+// No usamos servicios externos como Google
+// Favicon o DuckDuckGo, para evitar que
+// aparezcan iconos genéricos.
+//
 
 function setupSiteIcon(
     siteIcon,
     url
 ) {
 
+    // -----------------------------------------
+    // FALLBACK INICIAL
+    // -----------------------------------------
+
     siteIcon.innerHTML = "";
 
-    siteIcon.textContent =
-        "🌐";
+    siteIcon.textContent = "🌐";
+
+
+    // -----------------------------------------
+    // VALIDAR URL
+    // -----------------------------------------
 
     let parsedUrl;
 
@@ -2115,32 +2140,104 @@ function setupSiteIcon(
         return;
     }
 
+
+    // -----------------------------------------
+    // OBTENER HOST
+    // -----------------------------------------
+
     const hostname =
         parsedUrl.hostname;
 
-    const iconSources = [
 
-        new URL(
-            "/favicon.ico",
-            url
-        ).href,
+    // -----------------------------------------
+    // CREAR LISTA DE DOMINIOS
+    // -----------------------------------------
 
-        `https://www.google.com/s2/favicons?domain=${encodeURIComponent(
-            hostname
-        )}&sz=64`,
+    const faviconSources = [];
 
-        `https://icons.duckduckgo.com/ip3/${encodeURIComponent(
-            hostname
-        )}.ico`
-    ];
+
+    // -----------------------------------------
+    // 1. HOST COMPLETO
+    // -----------------------------------------
+    //
+    // Ejemplo:
+    //
+    // mail.google.com
+    // docs.google.com
+    // drive.google.com
+    //
+
+    faviconSources.push(
+        `https://${hostname}/favicon.ico`
+    );
+
+
+    // -----------------------------------------
+    // 2. DOMINIO PRINCIPAL
+    // -----------------------------------------
+    //
+    // Ejemplo:
+    //
+    // mail.google.com
+    //       ↓
+    // google.com
+    //
+    // www.ejemplo.com
+    //       ↓
+    // ejemplo.com
+    //
+
+    const hostnameParts =
+        hostname.split(".");
+
+
+    if (
+        hostnameParts.length >= 3
+    ) {
+
+        const mainDomain =
+            hostnameParts
+                .slice(-2)
+                .join(".");
+
+
+        const mainDomainFavicon =
+            `https://${mainDomain}/favicon.ico`;
+
+
+        if (
+            !faviconSources.includes(
+                mainDomainFavicon
+            )
+        ) {
+
+            faviconSources.push(
+                mainDomainFavicon
+            );
+        }
+    }
+
+
+    // -----------------------------------------
+    // CONTROL DE INTENTOS
+    // -----------------------------------------
 
     let currentSource = 0;
 
-    function tryNextIcon() {
+
+    // -----------------------------------------
+    // INTENTAR SIGUIENTE FAVICON
+    // -----------------------------------------
+
+    function tryNextFavicon() {
+
+        // -------------------------------------
+        // NO QUEDAN MÁS FAVICONS
+        // -------------------------------------
 
         if (
             currentSource >=
-            iconSources.length
+            faviconSources.length
         ) {
 
             siteIcon.innerHTML = "";
@@ -2151,40 +2248,65 @@ function setupSiteIcon(
             return;
         }
 
-        const siteIconImage =
+
+        // -------------------------------------
+        // CREAR IMAGEN
+        // -------------------------------------
+
+        const favicon =
             document.createElement(
                 "img"
             );
 
-        siteIconImage.alt = "";
+        favicon.alt = "";
 
-        siteIconImage.addEventListener(
+
+        // -------------------------------------
+        // FAVICON CARGADO
+        // -------------------------------------
+
+        favicon.addEventListener(
             "load",
             () => {
 
                 siteIcon.innerHTML = "";
 
                 siteIcon.appendChild(
-                    siteIconImage
+                    favicon
                 );
             }
         );
 
-        siteIconImage.addEventListener(
+
+        // -------------------------------------
+        // FAVICON NO DISPONIBLE
+        // -------------------------------------
+
+        favicon.addEventListener(
             "error",
             () => {
 
                 currentSource++;
 
-                tryNextIcon();
+                tryNextFavicon();
             }
         );
 
-        siteIconImage.src =
-            iconSources[currentSource];
+
+        // -------------------------------------
+        // CARGAR FAVICON
+        // -------------------------------------
+
+        favicon.src =
+            faviconSources[currentSource];
     }
 
-    tryNextIcon();
+
+    // -----------------------------------------
+    // COMENZAR
+    // -----------------------------------------
+
+    tryNextFavicon();
 }
 
 
