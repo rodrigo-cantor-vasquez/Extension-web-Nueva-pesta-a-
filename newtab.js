@@ -66,6 +66,97 @@ function openSite(site) {
 
 
 // =========================================
+// ACTUALIZAR DESCRIPCIÓN DE UNA TARJETA
+// =========================================
+//
+// Esta función se encarga de:
+//
+// 1. Crear la descripción si se escribe una.
+// 2. Actualizarla si ya existe.
+// 3. Eliminarla si se deja vacía.
+//
+// De esta forma, una tarjeta sin descripción
+// NO tendrá el elemento .site-description
+// y por lo tanto no tendrá hover.
+//
+
+function updateSiteDescription(
+    site,
+    description
+) {
+
+    const cleanDescription =
+        (description || "").trim();
+
+    let siteDescription =
+        getSiteDescription(site);
+
+
+    // -----------------------------------------
+    // SI NO HAY DESCRIPCIÓN
+    // -----------------------------------------
+
+    if (cleanDescription === "") {
+
+        if (siteDescription) {
+            siteDescription.remove();
+        }
+
+        return;
+    }
+
+
+    // -----------------------------------------
+    // SI NO EXISTÍA, LA CREAMOS
+    // -----------------------------------------
+
+    if (!siteDescription) {
+
+        siteDescription =
+            document.createElement("div");
+
+        siteDescription.className =
+            "site-description";
+
+        const siteMenuButton =
+            site.querySelector(
+                ".site-menu-button"
+            );
+
+
+        // La descripción debe quedar:
+        //
+        // icono
+        // nombre
+        // descripción
+        // botón ⋮
+        //
+        if (siteMenuButton) {
+
+            site.insertBefore(
+                siteDescription,
+                siteMenuButton
+            );
+
+        } else {
+
+            site.appendChild(
+                siteDescription
+            );
+        }
+    }
+
+
+    // -----------------------------------------
+    // ACTUALIZAR TEXTO
+    // -----------------------------------------
+
+    siteDescription.textContent =
+        cleanDescription;
+}
+
+
+// =========================================
 // CONFIGURACIÓN POR DEFECTO
 // =========================================
 
@@ -137,12 +228,16 @@ function loadData() {
 // =========================================
 
 function getGroupsData() {
+
     const groups = [];
 
     const groupElements =
-        document.querySelectorAll(".site-group");
+        document.querySelectorAll(
+            ".site-group"
+        );
 
     groupElements.forEach((groupElement) => {
+
         const group = {
             name:
                 groupElement
@@ -154,9 +249,17 @@ function getGroupsData() {
         };
 
         const siteElements =
-            groupElement.querySelectorAll(".site-card");
+            groupElement.querySelectorAll(
+                ".site-card"
+            );
 
         siteElements.forEach((siteElement) => {
+
+            const descriptionElement =
+                siteElement.querySelector(
+                    ".site-description"
+                );
+
             const site = {
                 name:
                     siteElement
@@ -168,10 +271,9 @@ function getGroupsData() {
                     siteElement.dataset.url,
 
                 description:
-                    siteElement
-                        .querySelector(".site-description")
-                        .textContent
-                        .trim()
+                    descriptionElement
+                        ?.textContent
+                        .trim() || ""
             };
 
             group.sites.push(site);
@@ -189,9 +291,12 @@ function getGroupsData() {
 // =========================================
 
 async function saveCurrentData() {
-    const groups = getGroupsData();
 
-    const data = await loadData();
+    const groups =
+        getGroupsData();
+
+    const data =
+        await loadData();
 
     const settings = {
         ...defaultSettings,
@@ -209,25 +314,34 @@ async function saveCurrentData() {
 // HEX A RGBA
 // =========================================
 
-function hexToRgba(hex, transparency) {
-    const cleanHex = hex.replace("#", "");
+function hexToRgba(
+    hex,
+    transparency
+) {
 
-    const r = parseInt(
-        cleanHex.substring(0, 2),
-        16
-    );
+    const cleanHex =
+        hex.replace("#", "");
 
-    const g = parseInt(
-        cleanHex.substring(2, 4),
-        16
-    );
+    const r =
+        parseInt(
+            cleanHex.substring(0, 2),
+            16
+        );
 
-    const b = parseInt(
-        cleanHex.substring(4, 6),
-        16
-    );
+    const g =
+        parseInt(
+            cleanHex.substring(2, 4),
+            16
+        );
 
-    let validTransparency = Number(transparency);
+    const b =
+        parseInt(
+            cleanHex.substring(4, 6),
+            16
+        );
+
+    let validTransparency =
+        Number(transparency);
 
     if (isNaN(validTransparency)) {
         validTransparency = 0;
@@ -254,32 +368,46 @@ function hexToRgba(hex, transparency) {
 // =========================================
 
 const settingsButton =
-    document.getElementById("settings-button");
+    document.getElementById(
+        "settings-button"
+    );
 
 const settingsPanel =
-    document.getElementById("settings-panel");
+    document.getElementById(
+        "settings-panel"
+    );
 
 const closeSettingsButton =
-    document.getElementById("close-settings-button");
+    document.getElementById(
+        "close-settings-button"
+    );
 
 const settingsOverlay =
-    document.getElementById("settings-overlay");
+    document.getElementById(
+        "settings-overlay"
+    );
 
 settingsButton.addEventListener(
     "click",
     () => {
+
         settingsPanel.style.transform =
             "translateX(0)";
 
-        openOverlay(settingsOverlay);
+        openOverlay(
+            settingsOverlay
+        );
     }
 );
 
 function closeSettings() {
+
     settingsPanel.style.transform =
         "translateX(100%)";
 
-    closeOverlay(settingsOverlay);
+    closeOverlay(
+        settingsOverlay
+    );
 }
 
 closeSettingsButton.addEventListener(
@@ -337,10 +465,12 @@ function filterSiteCards() {
         sites.forEach((site) => {
 
             const name =
-                getSiteName(site)?.textContent || "";
+                getSiteName(site)?.textContent ||
+                "";
 
             const description =
-                getSiteDescription(site)?.textContent || "";
+                getSiteDescription(site)?.textContent ||
+                "";
 
             const url =
                 site.dataset.url || "";
@@ -431,7 +561,6 @@ webSearch.addEventListener(
             action: "searchWeb",
             text: searchText
         });
-
     }
 );
 
@@ -441,11 +570,16 @@ webSearch.addEventListener(
 // =========================================
 
 function setupGroupMenu(group) {
+
     const menuButton =
-        group.querySelector(".group-menu-button");
+        group.querySelector(
+            ".group-menu-button"
+        );
 
     const menu =
-        group.querySelector(".group-menu");
+        group.querySelector(
+            ".group-menu"
+        );
 
     if (!menuButton || !menu) {
         return;
@@ -464,6 +598,7 @@ function setupGroupMenu(group) {
     menuButton.addEventListener(
         "click",
         (event) => {
+
             event.preventDefault();
             event.stopPropagation();
 
@@ -505,9 +640,11 @@ let groupDragMouseY = 0;
 
 function getScrollContainer() {
 
-    const main = document.querySelector("main");
+    const main =
+        document.querySelector("main");
 
     if (main) {
+
         const mainStyle =
             window.getComputedStyle(main);
 
@@ -516,7 +653,8 @@ function getScrollContainer() {
                 mainStyle.overflowY === "auto" ||
                 mainStyle.overflowY === "scroll"
             ) &&
-            main.scrollHeight > main.clientHeight;
+            main.scrollHeight >
+            main.clientHeight;
 
         if (mainCanScroll) {
             return main;
@@ -525,15 +663,19 @@ function getScrollContainer() {
 
     if (draggedGroup) {
 
-        let element = draggedGroup;
+        let element =
+            draggedGroup;
 
         while (
             element &&
             element !== document.body &&
             element !== document.documentElement
         ) {
+
             const style =
-                window.getComputedStyle(element);
+                window.getComputedStyle(
+                    element
+                );
 
             const canScroll =
                 (
@@ -547,7 +689,8 @@ function getScrollContainer() {
                 return element;
             }
 
-            element = element.parentElement;
+            element =
+                element.parentElement;
         }
     }
 
@@ -570,12 +713,20 @@ function scrollGroupContainer(amount) {
     }
 
     if (
-        container === document.documentElement ||
+        container ===
+            document.documentElement ||
         container === document.body
     ) {
-        window.scrollBy(0, amount);
+
+        window.scrollBy(
+            0,
+            amount
+        );
+
     } else {
-        container.scrollTop += amount;
+
+        container.scrollTop +=
+            amount;
     }
 }
 
@@ -601,21 +752,30 @@ function updateDraggedGroupTarget() {
     }
 
     const targetGroup =
-        element.closest(".site-group");
+        element.closest(
+            ".site-group"
+        );
 
     if (!targetGroup) {
         return;
     }
 
-    if (targetGroup === draggedGroup) {
+    if (
+        targetGroup ===
+        draggedGroup
+    ) {
         return;
     }
 
-    if (targetGroup === hoveredGroup) {
+    if (
+        targetGroup ===
+        hoveredGroup
+    ) {
         return;
     }
 
-    hoveredGroup = targetGroup;
+    hoveredGroup =
+        targetGroup;
 
     swapGroups(
         draggedGroup,
@@ -623,12 +783,17 @@ function updateDraggedGroupTarget() {
     );
 
     document
-        .querySelectorAll(".site-group")
-        .forEach((otherGroup) => {
-            otherGroup.classList.remove(
-                "group-drag-over"
-            );
-        });
+        .querySelectorAll(
+            ".site-group"
+        )
+        .forEach(
+            (otherGroup) => {
+
+                otherGroup.classList.remove(
+                    "group-drag-over"
+                );
+            }
+        );
 
     targetGroup.classList.add(
         "group-drag-over"
@@ -643,7 +808,10 @@ function updateDraggedGroupTarget() {
 function runGroupDragAutoScroll() {
 
     if (!draggedGroup) {
-        groupDragScrollAnimation = null;
+
+        groupDragScrollAnimation =
+            null;
+
         return;
     }
 
@@ -656,6 +824,7 @@ function runGroupDragAutoScroll() {
         groupDragMouseY <
         GROUP_DRAG_SCROLL_ZONE
     ) {
+
         const distance =
             GROUP_DRAG_SCROLL_ZONE -
             groupDragMouseY;
@@ -668,13 +837,13 @@ function runGroupDragAutoScroll() {
                     distance / 5
                 )
             );
-    }
 
-    else if (
+    } else if (
         groupDragMouseY >
         windowHeight -
-        GROUP_DRAG_SCROLL_ZONE
+            GROUP_DRAG_SCROLL_ZONE
     ) {
+
         const distance =
             groupDragMouseY -
             (
@@ -693,7 +862,10 @@ function runGroupDragAutoScroll() {
     }
 
     if (speed !== 0) {
-        scrollGroupContainer(speed);
+
+        scrollGroupContainer(
+            speed
+        );
 
         updateDraggedGroupTarget();
     }
@@ -729,12 +901,14 @@ function startGroupDragAutoScroll() {
 function stopGroupDragAutoScroll() {
 
     if (groupDragScrollAnimation) {
+
         cancelAnimationFrame(
             groupDragScrollAnimation
         );
     }
 
-    groupDragScrollAnimation = null;
+    groupDragScrollAnimation =
+        null;
 }
 
 
@@ -783,10 +957,14 @@ function swapGroups(
     }
 
     const placeholderA =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     const placeholderB =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     placeholderA.style.display =
         "none";
@@ -835,10 +1013,9 @@ function getGroupUnderMouse(event) {
         return null;
     }
 
-    const group =
-        element.closest(".site-group");
-
-    return group;
+    return element.closest(
+        ".site-group"
+    );
 }
 
 
@@ -856,7 +1033,9 @@ function setupGroupDrag(group) {
     }
 
     const groupHeader =
-        group.querySelector(".group-header");
+        group.querySelector(
+            ".group-header"
+        );
 
     if (!groupHeader) {
         return;
@@ -880,12 +1059,17 @@ function setupGroupDrag(group) {
                     ".group-menu-button, .group-menu"
                 )
             ) {
+
                 event.preventDefault();
+
                 return;
             }
 
-            draggedGroup = group;
-            hoveredGroup = null;
+            draggedGroup =
+                group;
+
+            hoveredGroup =
+                null;
 
             groupDragMouseY =
                 event.clientY;
@@ -913,6 +1097,7 @@ function setupGroupDrag(group) {
             stopGroupDragAutoScroll();
 
             if (draggedGroup) {
+
                 draggedGroup.classList.remove(
                     "group-dragging"
                 );
@@ -924,6 +1109,7 @@ function setupGroupDrag(group) {
                 )
                 .forEach(
                     (otherGroup) => {
+
                         otherGroup.classList.remove(
                             "group-drag-over"
                         );
@@ -932,8 +1118,11 @@ function setupGroupDrag(group) {
 
             await saveCurrentData();
 
-            draggedGroup = null;
-            hoveredGroup = null;
+            draggedGroup =
+                null;
+
+            hoveredGroup =
+                null;
         }
     );
 }
@@ -975,13 +1164,18 @@ function setupGroupDragArea() {
             event.dataTransfer.dropEffect =
                 "move";
 
-            autoScrollWhileDragging(event);
+            autoScrollWhileDragging(
+                event
+            );
 
             const targetGroup =
                 getGroupUnderMouse(event);
 
             if (!targetGroup) {
-                hoveredGroup = null;
+
+                hoveredGroup =
+                    null;
+
                 return;
             }
 
@@ -990,7 +1184,8 @@ function setupGroupDragArea() {
                 draggedGroup
             ) {
 
-                hoveredGroup = null;
+                hoveredGroup =
+                    null;
 
                 document
                     .querySelectorAll(
@@ -998,6 +1193,7 @@ function setupGroupDragArea() {
                     )
                     .forEach(
                         (otherGroup) => {
+
                             otherGroup.classList.remove(
                                 "group-drag-over"
                             );
@@ -1028,6 +1224,7 @@ function setupGroupDragArea() {
                 )
                 .forEach(
                     (otherGroup) => {
+
                         otherGroup.classList.remove(
                             "group-drag-over"
                         );
@@ -1079,10 +1276,9 @@ function getSiteUnderMouse(event) {
         return null;
     }
 
-    const site =
-        element.closest(".site-card");
-
-    return site;
+    return element.closest(
+        ".site-card"
+    );
 }
 
 
@@ -1145,11 +1341,14 @@ function moveSiteToGroup(
         );
 
     if (addSiteCard) {
+
         sitesContainer.insertBefore(
             site,
             addSiteCard
         );
+
     } else {
+
         sitesContainer.appendChild(
             site
         );
@@ -1191,12 +1390,17 @@ function moveSiteAccordingToMouse(
     if (
         event.clientY < middleY
     ) {
+
         insertBefore = true;
+
     } else if (
         event.clientY > middleY
     ) {
+
         insertBefore = false;
+
     } else {
+
         insertBefore =
             event.clientX < middleX;
     }
@@ -1207,6 +1411,7 @@ function moveSiteAccordingToMouse(
             targetSite.previousElementSibling !==
             site
         ) {
+
             moveSiteBefore(
                 site,
                 targetSite
@@ -1223,11 +1428,14 @@ function moveSiteAccordingToMouse(
         ) {
 
             if (nextElement) {
+
                 moveSiteBefore(
                     site,
                     nextElement
                 );
+
             } else {
+
                 const group =
                     targetSite.closest(
                         ".site-group"
@@ -1274,13 +1482,20 @@ function setupSiteDrag(site) {
                     ".site-menu-button, .site-menu"
                 )
             ) {
+
                 event.preventDefault();
+
                 return;
             }
 
-            draggedSite = site;
-            hoveredSite = null;
-            draggedSiteMoved = false;
+            draggedSite =
+                site;
+
+            hoveredSite =
+                null;
+
+            draggedSiteMoved =
+                false;
 
             site.classList.add(
                 "site-dragging"
@@ -1301,6 +1516,7 @@ function setupSiteDrag(site) {
         async () => {
 
             if (draggedSite) {
+
                 draggedSite.classList.remove(
                     "site-dragging"
                 );
@@ -1312,6 +1528,7 @@ function setupSiteDrag(site) {
                 )
                 .forEach(
                     (otherSite) => {
+
                         otherSite.classList.remove(
                             "site-drag-over"
                         );
@@ -1322,12 +1539,16 @@ function setupSiteDrag(site) {
                 await saveCurrentData();
             }
 
-            draggedSite = null;
-            hoveredSite = null;
+            draggedSite =
+                null;
+
+            hoveredSite =
+                null;
 
             setTimeout(
                 () => {
-                    draggedSiteMoved = false;
+                    draggedSiteMoved =
+                        false;
                 },
                 0
             );
@@ -1407,8 +1628,11 @@ function setupSiteDragArea() {
                     event
                 );
 
-                draggedSiteMoved = true;
-                hoveredSite = targetSite;
+                draggedSiteMoved =
+                    true;
+
+                hoveredSite =
+                    targetSite;
 
                 document
                     .querySelectorAll(
@@ -1416,6 +1640,7 @@ function setupSiteDragArea() {
                     )
                     .forEach(
                         (otherSite) => {
+
                             otherSite.classList.remove(
                                 "site-drag-over"
                             );
@@ -1481,7 +1706,8 @@ function setupSiteDragArea() {
                     targetGroup
                 );
 
-                draggedSiteMoved = true;
+                draggedSiteMoved =
+                    true;
 
                 document
                     .querySelectorAll(
@@ -1489,6 +1715,7 @@ function setupSiteDragArea() {
                     )
                     .forEach(
                         (otherSite) => {
+
                             otherSite.classList.remove(
                                 "site-drag-over"
                             );
@@ -1510,7 +1737,8 @@ function setupSiteDragArea() {
                     targetGroup
                 );
 
-                draggedSiteMoved = true;
+                draggedSiteMoved =
+                    true;
 
                 document
                     .querySelectorAll(
@@ -1518,6 +1746,7 @@ function setupSiteDragArea() {
                     )
                     .forEach(
                         (otherSite) => {
+
                             otherSite.classList.remove(
                                 "site-drag-over"
                             );
@@ -1543,6 +1772,7 @@ function setupSiteDragArea() {
                 )
                 .forEach(
                     (otherSite) => {
+
                         otherSite.classList.remove(
                             "site-drag-over"
                         );
@@ -1560,10 +1790,14 @@ function setupSiteDragArea() {
 function setupSiteCard(site) {
 
     const menuButton =
-        site.querySelector(".site-menu-button");
+        site.querySelector(
+            ".site-menu-button"
+        );
 
     const menu =
-        site.querySelector(".site-menu");
+        site.querySelector(
+            ".site-menu"
+        );
 
     if (
         site.dataset.cardConfigured !==
@@ -1694,19 +1928,27 @@ let groupBeingAddedTo = null;
 // =========================================
 
 function clearAddSiteErrors() {
-    addSiteNameError.textContent = "";
-    addSiteUrlError.textContent = "";
+
+    addSiteNameError.textContent =
+        "";
+
+    addSiteUrlError.textContent =
+        "";
 }
 
 function resetAddSiteForm() {
+
     addSiteName.value = "";
     addSiteUrl.value = "";
     addSiteDescription.value = "";
+
     clearAddSiteErrors();
 }
 
 function resetAddSiteState() {
+
     groupBeingAddedTo = null;
+
     resetAddSiteForm();
 }
 
@@ -1737,10 +1979,15 @@ function loadSiteGroups() {
                 "option"
             );
 
-        option.value = groupName;
-        option.textContent = groupName;
+        option.value =
+            groupName;
 
-        addSiteGroup.appendChild(option);
+        option.textContent =
+            groupName;
+
+        addSiteGroup.appendChild(
+            option
+        );
     });
 }
 
@@ -1767,7 +2014,9 @@ function openAddSite() {
 
     resetAddSiteForm();
 
-    openOverlay(addSiteOverlay);
+    openOverlay(
+        addSiteOverlay
+    );
 
     addSiteName.focus();
 }
@@ -1779,7 +2028,9 @@ function openAddSite() {
 
 function closeAddSite() {
 
-    closeOverlay(addSiteOverlay);
+    closeOverlay(
+        addSiteOverlay
+    );
 
     resetAddSiteState();
 }
@@ -1802,6 +2053,7 @@ addSiteOverlay.addEventListener(
             event.target ===
             addSiteOverlay
         ) {
+
             closeAddSite();
         }
     }
@@ -1828,6 +2080,7 @@ function findGroupByName(groupName) {
             groupTitle.textContent.trim() ===
             groupName
         ) {
+
             return group;
         }
     }
@@ -1845,13 +2098,10 @@ function setupSiteIcon(
     url
 ) {
 
-    // Limpiamos cualquier icono anterior.
     siteIcon.innerHTML = "";
 
-    // Fallback inicial.
-    // Se mostrará mientras intentamos cargar
-    // el favicon real.
-    siteIcon.textContent = "🌐";
+    siteIcon.textContent =
+        "🌐";
 
     let parsedUrl;
 
@@ -1862,61 +2112,49 @@ function setupSiteIcon(
 
     } catch {
 
-        // Si la URL no es válida,
-        // dejamos el planeta.
         return;
     }
 
     const hostname =
         parsedUrl.hostname;
 
-    // -----------------------------------------
-    // LISTA DE FUENTES DE ICONOS
-    // -----------------------------------------
-
     const iconSources = [
 
-        // 1. Favicon directamente desde el sitio.
         new URL(
             "/favicon.ico",
             url
         ).href,
 
-        // 2. Servicio de favicon de Google.
         `https://www.google.com/s2/favicons?domain=${encodeURIComponent(
             hostname
         )}&sz=64`,
 
-        // 3. Servicio de favicon de DuckDuckGo.
         `https://icons.duckduckgo.com/ip3/${encodeURIComponent(
             hostname
         )}.ico`
-
     ];
 
     let currentSource = 0;
 
-    // -----------------------------------------
-    // INTENTAR CARGAR EL SIGUIENTE ICONO
-    // -----------------------------------------
-
     function tryNextIcon() {
 
-        // Si ya probamos todas las fuentes,
-        // dejamos el planeta.
         if (
             currentSource >=
             iconSources.length
         ) {
 
             siteIcon.innerHTML = "";
-            siteIcon.textContent = "🌐";
+
+            siteIcon.textContent =
+                "🌐";
 
             return;
         }
 
         const siteIconImage =
-            document.createElement("img");
+            document.createElement(
+                "img"
+            );
 
         siteIconImage.alt = "";
 
@@ -1924,8 +2162,6 @@ function setupSiteIcon(
             "load",
             () => {
 
-                // Si la imagen cargó correctamente,
-                // reemplazamos el planeta por ella.
                 siteIcon.innerHTML = "";
 
                 siteIcon.appendChild(
@@ -1938,8 +2174,6 @@ function setupSiteIcon(
             "error",
             () => {
 
-                // Esta fuente no funcionó.
-                // Intentamos la siguiente.
                 currentSource++;
 
                 tryNextIcon();
@@ -1950,7 +2184,6 @@ function setupSiteIcon(
             iconSources[currentSource];
     }
 
-    // Comenzamos con la primera fuente.
     tryNextIcon();
 }
 
@@ -1966,54 +2199,123 @@ function createSiteCard(
 ) {
 
     const site =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
-    site.className = "site-card";
-    site.dataset.url = url;
+    site.className =
+        "site-card";
+
+    site.dataset.url =
+        url;
+
+
+    // -----------------------------------------
+    // ICONO
+    // -----------------------------------------
 
     const siteIcon =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
-    siteIcon.className = "site-icon";
+    siteIcon.className =
+        "site-icon";
 
     setupSiteIcon(
         siteIcon,
         url
     );
 
+
+    // -----------------------------------------
+    // NOMBRE
+    // -----------------------------------------
+
     const siteName =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
 
-    siteName.className = "site-name";
-    siteName.textContent = name;
+    siteName.className =
+        "site-name";
 
-    const siteDescription =
-        document.createElement("div");
+    siteName.textContent =
+        name;
 
-    siteDescription.className =
-        "site-description";
 
-    siteDescription.textContent =
-        description;
+    // -----------------------------------------
+    // DESCRIPCIÓN
+    // -----------------------------------------
+    //
+    // IMPORTANTE:
+    //
+    // Solo creamos .site-description
+    // si realmente existe texto.
+    //
+    // Si está vacía, NO se crea.
+    //
+
+    let siteDescription = null;
+
+    if (
+        description &&
+        description.trim() !== ""
+    ) {
+
+        siteDescription =
+            document.createElement(
+                "div"
+            );
+
+        siteDescription.className =
+            "site-description";
+
+        siteDescription.textContent =
+            description.trim();
+    }
+
+
+    // -----------------------------------------
+    // BOTÓN DEL MENÚ
+    // -----------------------------------------
 
     const siteMenuButton =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
-    siteMenuButton.type = "button";
+    siteMenuButton.type =
+        "button";
+
     siteMenuButton.className =
         "site-menu-button";
 
-    siteMenuButton.textContent = "⋮";
+    siteMenuButton.textContent =
+        "⋮";
+
+
+    // -----------------------------------------
+    // MENÚ
+    // -----------------------------------------
 
     const siteMenu =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
-    siteMenu.className = "site-menu";
+    siteMenu.className =
+        "site-menu";
+
 
     const editSiteButton =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
-    editSiteButton.type = "button";
+    editSiteButton.type =
+        "button";
+
     editSiteButton.className =
         "edit-site-button";
 
@@ -2022,10 +2324,15 @@ function createSiteCard(
         Editar sitio
     `;
 
-    const deleteSiteButton =
-        document.createElement("button");
 
-    deleteSiteButton.type = "button";
+    const deleteSiteButton =
+        document.createElement(
+            "button"
+        );
+
+    deleteSiteButton.type =
+        "button";
+
     deleteSiteButton.className =
         "delete-site-button";
 
@@ -2033,6 +2340,7 @@ function createSiteCard(
         <span class="menu-icon">🗑️</span>
         Eliminar sitio
     `;
+
 
     siteMenu.appendChild(
         editSiteButton
@@ -2042,14 +2350,47 @@ function createSiteCard(
         deleteSiteButton
     );
 
-    site.appendChild(siteIcon);
-    site.appendChild(siteName);
-    site.appendChild(siteDescription);
-    site.appendChild(siteMenuButton);
-    site.appendChild(siteMenu);
+
+    // -----------------------------------------
+    // CONSTRUIR TARJETA
+    // -----------------------------------------
+
+    site.appendChild(
+        siteIcon
+    );
+
+    site.appendChild(
+        siteName
+    );
+
+    // Solo se agrega si existe.
+    if (siteDescription) {
+
+        site.appendChild(
+            siteDescription
+        );
+    }
+
+    site.appendChild(
+        siteMenuButton
+    );
+
+    site.appendChild(
+        siteMenu
+    );
+
+
+    // -----------------------------------------
+    // CONFIGURAR FUNCIONALIDADES
+    // -----------------------------------------
 
     setupSiteCard(site);
     setupSiteDrag(site);
+
+
+    // -----------------------------------------
+    // EDITAR SITIO
+    // -----------------------------------------
 
     editSiteButton.addEventListener(
         "click",
@@ -2060,9 +2401,16 @@ function createSiteCard(
 
             openEditSite(site);
 
-            closeMenu(siteMenu);
+            closeMenu(
+                siteMenu
+            );
         }
     );
+
+
+    // -----------------------------------------
+    // ELIMINAR SITIO
+    // -----------------------------------------
 
     deleteSiteButton.addEventListener(
         "click",
@@ -2077,7 +2425,9 @@ function createSiteCard(
 
             filterSiteCards();
 
-            closeMenu(siteMenu);
+            closeMenu(
+                siteMenu
+            );
         }
     );
 
@@ -2089,7 +2439,9 @@ function createSiteCard(
 // TARJETA AGREGAR SITIO
 // =========================================
 
-function setupAddSiteCard(addSiteCard) {
+function setupAddSiteCard(
+    addSiteCard
+) {
 
     if (
         addSiteCard.dataset.addConfigured ===
@@ -2113,7 +2465,8 @@ function setupAddSiteCard(addSiteCard) {
                     ".site-group"
                 );
 
-            groupBeingAddedTo = group;
+            groupBeingAddedTo =
+                group;
 
             addSiteGroup.style.display =
                 "none";
@@ -2140,7 +2493,8 @@ addSiteButton.addEventListener(
         event.preventDefault();
         event.stopPropagation();
 
-        groupBeingAddedTo = null;
+        groupBeingAddedTo =
+            null;
 
         loadSiteGroups();
 
@@ -2171,6 +2525,7 @@ saveAddSiteButton.addEventListener(
 
         clearAddSiteErrors();
 
+
         if (newName === "") {
 
             addSiteNameError.textContent =
@@ -2178,6 +2533,7 @@ saveAddSiteButton.addEventListener(
 
             return;
         }
+
 
         if (newUrl === "") {
 
@@ -2187,16 +2543,22 @@ saveAddSiteButton.addEventListener(
             return;
         }
 
+
         if (
             !newUrl.startsWith("http://") &&
             !newUrl.startsWith("https://")
         ) {
-            newUrl = "https://" + newUrl;
+
+            newUrl =
+                "https://" +
+                newUrl;
         }
+
 
         try {
 
-            const url = new URL(newUrl);
+            const url =
+                new URL(newUrl);
 
             if (
                 !url.hostname.includes(".")
@@ -2216,7 +2578,11 @@ saveAddSiteButton.addEventListener(
             return;
         }
 
-        if (groupBeingAddedTo === null) {
+
+        if (
+            groupBeingAddedTo ===
+            null
+        ) {
 
             groupBeingAddedTo =
                 findGroupByName(
@@ -2224,14 +2590,17 @@ saveAddSiteButton.addEventListener(
                 );
         }
 
+
         if (!groupBeingAddedTo) {
             return;
         }
+
 
         const sitesContainer =
             groupBeingAddedTo.querySelector(
                 ".sites-container"
             );
+
 
         const newSite =
             createSiteCard(
@@ -2240,25 +2609,30 @@ saveAddSiteButton.addEventListener(
                 newDescription
             );
 
+
         const addSiteCard =
             groupBeingAddedTo.querySelector(
                 ".add-site-card"
             );
+
 
         sitesContainer.insertBefore(
             newSite,
             addSiteCard
         );
 
+
         applyCardAppearance(
             cardColorInput.value,
             cardTransparencyInput.value
         );
 
+
         applyTextColors(
             cardTextColorInput.value,
             addSiteTextColorInput.value
         );
+
 
         await saveCurrentData();
 
@@ -2308,25 +2682,40 @@ const saveAddGroupButton =
         "save-add-group-button"
     );
 
+
 function clearAddGroupErrors() {
-    addGroupNameError.textContent = "";
+    addGroupNameError.textContent =
+        "";
 }
 
 function resetAddGroupForm() {
-    addGroupName.value = "";
+
+    addGroupName.value =
+        "";
+
     clearAddGroupErrors();
 }
 
 function openAddGroup() {
+
     resetAddGroupForm();
-    openOverlay(addGroupOverlay);
+
+    openOverlay(
+        addGroupOverlay
+    );
+
     addGroupName.focus();
 }
 
 function closeAddGroup() {
-    closeOverlay(addGroupOverlay);
+
+    closeOverlay(
+        addGroupOverlay
+    );
+
     resetAddGroupForm();
 }
+
 
 addGroupButton.addEventListener(
     "click",
@@ -2351,6 +2740,7 @@ addGroupOverlay.addEventListener(
             event.target ===
             addGroupOverlay
         ) {
+
             closeAddGroup();
         }
     }
@@ -2364,35 +2754,55 @@ addGroupOverlay.addEventListener(
 function createGroup(name) {
 
     const group =
-        document.createElement("section");
+        document.createElement(
+            "section"
+        );
 
-    group.className = "site-group";
+    group.className =
+        "site-group";
+
 
     const groupHeader =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     groupHeader.className =
         "group-header";
 
+
     const groupTitleContainer =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     groupTitleContainer.className =
         "group-title-container";
 
-    const groupTitle =
-        document.createElement("h2");
 
-    groupTitle.textContent = name;
+    const groupTitle =
+        document.createElement(
+            "h2"
+        );
+
+    groupTitle.textContent =
+        name;
+
 
     const groupMenuButton =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
-    groupMenuButton.type = "button";
+    groupMenuButton.type =
+        "button";
+
     groupMenuButton.className =
         "group-menu-button";
 
-    groupMenuButton.textContent = "⋮";
+    groupMenuButton.textContent =
+        "⋮";
+
 
     groupTitleContainer.appendChild(
         groupTitle
@@ -2406,15 +2816,24 @@ function createGroup(name) {
         groupTitleContainer
     );
 
-    const groupMenu =
-        document.createElement("div");
 
-    groupMenu.className = "group-menu";
+    const groupMenu =
+        document.createElement(
+            "div"
+        );
+
+    groupMenu.className =
+        "group-menu";
+
 
     const editGroupButton =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
-    editGroupButton.type = "button";
+    editGroupButton.type =
+        "button";
+
     editGroupButton.className =
         "edit-group-button";
 
@@ -2423,10 +2842,15 @@ function createGroup(name) {
         Editar grupo
     `;
 
-    const deleteGroupButton =
-        document.createElement("button");
 
-    deleteGroupButton.type = "button";
+    const deleteGroupButton =
+        document.createElement(
+            "button"
+        );
+
+    deleteGroupButton.type =
+        "button";
+
     deleteGroupButton.className =
         "delete-group-button";
 
@@ -2434,6 +2858,7 @@ function createGroup(name) {
         <span class="menu-icon">🗑️</span>
         Eliminar grupo
     `;
+
 
     groupMenu.appendChild(
         editGroupButton
@@ -2451,34 +2876,48 @@ function createGroup(name) {
         groupHeader
     );
 
+
     const sitesContainer =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     sitesContainer.className =
         "sites-container";
 
+
     const addSiteCard =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     addSiteCard.className =
         "add-site-card";
 
+
     const addSiteIcon =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     addSiteIcon.className =
         "add-site-icon";
 
-    addSiteIcon.textContent = "+";
+    addSiteIcon.textContent =
+        "+";
+
 
     const addSiteNameLabel =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
 
     addSiteNameLabel.className =
         "add-site-name";
 
     addSiteNameLabel.textContent =
         "Agregar sitio";
+
 
     addSiteCard.appendChild(
         addSiteIcon
@@ -2488,6 +2927,7 @@ function createGroup(name) {
         addSiteNameLabel
     );
 
+
     sitesContainer.appendChild(
         addSiteCard
     );
@@ -2496,9 +2936,11 @@ function createGroup(name) {
         sitesContainer
     );
 
+
     setupGroupMenu(group);
     setupGroupDrag(group);
     setupAddSiteCard(addSiteCard);
+
 
     editGroupButton.addEventListener(
         "click",
@@ -2509,9 +2951,12 @@ function createGroup(name) {
 
             openEditGroup(group);
 
-            closeMenu(groupMenu);
+            closeMenu(
+                groupMenu
+            );
         }
     );
+
 
     deleteGroupButton.addEventListener(
         "click",
@@ -2524,9 +2969,12 @@ function createGroup(name) {
 
             await saveCurrentData();
 
-            closeMenu(groupMenu);
+            closeMenu(
+                groupMenu
+            );
         }
     );
+
 
     return group;
 }
@@ -2545,6 +2993,7 @@ saveAddGroupButton.addEventListener(
 
         clearAddGroupErrors();
 
+
         if (newName === "") {
 
             addGroupNameError.textContent =
@@ -2553,23 +3002,34 @@ saveAddGroupButton.addEventListener(
             return;
         }
 
+
         const newGroup =
-            createGroup(newName);
+            createGroup(
+                newName
+            );
+
 
         const main =
-            document.querySelector("main");
+            document.querySelector(
+                "main"
+            );
 
-        main.appendChild(newGroup);
+        main.appendChild(
+            newGroup
+        );
+
 
         applyGroupAppearance(
             groupColorInput.value,
             groupTransparencyInput.value
         );
 
+
         applyTextColors(
             cardTextColorInput.value,
             addSiteTextColorInput.value
         );
+
 
         await saveCurrentData();
 
@@ -2631,17 +3091,31 @@ const saveEditSiteButton =
 
 let siteBeingEdited = null;
 
+
 function clearEditSiteErrors() {
-    editSiteNameError.textContent = "";
-    editSiteUrlError.textContent = "";
+
+    editSiteNameError.textContent =
+        "";
+
+    editSiteUrlError.textContent =
+        "";
 }
 
+
 function resetEditSiteForm() {
-    editSiteName.value = "";
-    editSiteUrl.value = "";
-    editSiteDescription.value = "";
+
+    editSiteName.value =
+        "";
+
+    editSiteUrl.value =
+        "";
+
+    editSiteDescription.value =
+        "";
+
     clearEditSiteErrors();
 }
+
 
 function openEditSite(site) {
 
@@ -2653,31 +3127,51 @@ function openEditSite(site) {
     const siteDescription =
         getSiteDescription(site);
 
-    siteBeingEdited = site;
+    siteBeingEdited =
+        site;
+
 
     editSiteName.value =
         siteName.textContent.trim();
 
+
     editSiteUrl.value =
         site.dataset.url || "";
 
-    editSiteDescription.value =
-        siteDescription.textContent.trim();
 
-    openOverlay(editSiteOverlay);
+    // IMPORTANTE:
+    //
+    // Si la tarjeta no tiene descripción,
+    // simplemente dejamos el campo vacío.
+    //
+    editSiteDescription.value =
+        siteDescription
+            ?.textContent
+            .trim() || "";
+
+
+    openOverlay(
+        editSiteOverlay
+    );
+
 
     editSiteName.focus();
     editSiteName.select();
 }
 
+
 function closeEditSite() {
 
-    closeOverlay(editSiteOverlay);
+    closeOverlay(
+        editSiteOverlay
+    );
 
-    siteBeingEdited = null;
+    siteBeingEdited =
+        null;
 
     resetEditSiteForm();
 }
+
 
 closeEditSiteButton.addEventListener(
     "click",
@@ -2697,6 +3191,7 @@ editSiteOverlay.addEventListener(
             event.target ===
             editSiteOverlay
         ) {
+
             closeEditSite();
         }
     }
@@ -2710,7 +3205,9 @@ editSiteOverlay.addEventListener(
 function setupExistingSiteEditButtons() {
 
     document
-        .querySelectorAll(".edit-site-button")
+        .querySelectorAll(
+            ".edit-site-button"
+        )
         .forEach((button) => {
 
             if (
@@ -2722,6 +3219,7 @@ function setupExistingSiteEditButtons() {
 
             button.dataset.editConfigured =
                 "true";
+
 
             button.addEventListener(
                 "click",
@@ -2735,7 +3233,9 @@ function setupExistingSiteEditButtons() {
                             ".site-card"
                         );
 
-                    openEditSite(site);
+                    openEditSite(
+                        site
+                    );
 
                     closeMenu(
                         site.querySelector(
@@ -2767,6 +3267,7 @@ saveEditSiteButton.addEventListener(
 
         clearEditSiteErrors();
 
+
         if (newName === "") {
 
             editSiteNameError.textContent =
@@ -2774,6 +3275,7 @@ saveEditSiteButton.addEventListener(
 
             return;
         }
+
 
         if (newUrl === "") {
 
@@ -2783,14 +3285,17 @@ saveEditSiteButton.addEventListener(
             return;
         }
 
+
         if (
             !newUrl.startsWith("http://") &&
             !newUrl.startsWith("https://")
         ) {
+
             newUrl =
                 "https://" +
                 newUrl;
         }
+
 
         try {
 
@@ -2815,24 +3320,46 @@ saveEditSiteButton.addEventListener(
             return;
         }
 
+
         const siteName =
-            getSiteName(siteBeingEdited);
+            getSiteName(
+                siteBeingEdited
+            );
 
-        const siteDescription =
-            getSiteDescription(siteBeingEdited);
 
-        siteName.textContent = newName;
+        siteName.textContent =
+            newName;
+
 
         siteBeingEdited.dataset.url =
             newUrl;
 
-        siteDescription.textContent =
-            newDescription;
+
+        // -----------------------------------------
+        // ACTUALIZAR DESCRIPCIÓN
+        // -----------------------------------------
+        //
+        // Aquí está una de las correcciones
+        // principales.
+        //
+        // La función:
+        //
+        // - crea la descripción si no existía
+        // - cambia el texto si existía
+        // - la elimina si queda vacía
+        //
+
+        updateSiteDescription(
+            siteBeingEdited,
+            newDescription
+        );
+
 
         const siteIcon =
             siteBeingEdited.querySelector(
                 ".site-icon"
             );
+
 
         if (siteIcon) {
 
@@ -2841,6 +3368,7 @@ saveEditSiteButton.addEventListener(
                 newUrl
             );
         }
+
 
         await saveCurrentData();
 
@@ -2887,45 +3415,65 @@ const saveEditGroupButton =
 
 let groupBeingEdited = null;
 
+
 function clearEditGroupErrors() {
-    editGroupNameError.textContent = "";
+
+    editGroupNameError.textContent =
+        "";
 }
 
+
 function resetEditGroupForm() {
-    editGroupName.value = "";
+
+    editGroupName.value =
+        "";
+
     clearEditGroupErrors();
 }
 
+
 function openEditGroup(group) {
 
-    groupBeingEdited = group;
+    groupBeingEdited =
+        group;
 
     const groupTitle =
-        getGroupTitle(group);
+        getGroupTitle(
+            group
+        );
 
     resetEditGroupForm();
 
     editGroupName.value =
         groupTitle.textContent.trim();
 
-    openOverlay(editGroupOverlay);
+    openOverlay(
+        editGroupOverlay
+    );
 
     closeMenu(
-        group.querySelector(".group-menu")
+        group.querySelector(
+            ".group-menu"
+        )
     );
 
     editGroupName.focus();
     editGroupName.select();
 }
 
+
 function closeEditGroup() {
 
-    closeOverlay(editGroupOverlay);
+    closeOverlay(
+        editGroupOverlay
+    );
 
-    groupBeingEdited = null;
+    groupBeingEdited =
+        null;
 
     resetEditGroupForm();
 }
+
 
 closeEditGroupButton.addEventListener(
     "click",
@@ -2945,6 +3493,7 @@ editGroupOverlay.addEventListener(
             event.target ===
             editGroupOverlay
         ) {
+
             closeEditGroup();
         }
     }
@@ -2958,7 +3507,9 @@ editGroupOverlay.addEventListener(
 function setupExistingGroupEditButtons() {
 
     document
-        .querySelectorAll(".edit-group-button")
+        .querySelectorAll(
+            ".edit-group-button"
+        )
         .forEach((button) => {
 
             if (
@@ -2970,6 +3521,7 @@ function setupExistingGroupEditButtons() {
 
             button.dataset.editConfigured =
                 "true";
+
 
             button.addEventListener(
                 "click",
@@ -2983,7 +3535,9 @@ function setupExistingGroupEditButtons() {
                             ".site-group"
                         );
 
-                    openEditGroup(group);
+                    openEditGroup(
+                        group
+                    );
                 }
             );
         });
@@ -3003,6 +3557,7 @@ saveEditGroupButton.addEventListener(
 
         clearEditGroupErrors();
 
+
         if (newName === "") {
 
             editGroupNameError.textContent =
@@ -3011,13 +3566,16 @@ saveEditGroupButton.addEventListener(
             return;
         }
 
+
         const groupTitle =
             getGroupTitle(
                 groupBeingEdited
             );
 
+
         groupTitle.textContent =
             newName;
+
 
         await saveCurrentData();
 
@@ -3033,44 +3591,57 @@ saveEditGroupButton.addEventListener(
 function renderGroups(groups) {
 
     const main =
-        document.querySelector("main");
+        document.querySelector(
+            "main"
+        );
 
-    groups.forEach((groupData) => {
+    groups.forEach(
+        (groupData) => {
 
-        const group =
-            createGroup(
-                groupData.name
-            );
-
-        const sitesContainer =
-            group.querySelector(
-                ".sites-container"
-            );
-
-        const addSiteCard =
-            group.querySelector(
-                ".add-site-card"
-            );
-
-        (
-            groupData.sites || []
-        ).forEach((siteData) => {
-
-            const site =
-                createSiteCard(
-                    siteData.name,
-                    siteData.url,
-                    siteData.description
+            const group =
+                createGroup(
+                    groupData.name
                 );
 
-            sitesContainer.insertBefore(
-                site,
-                addSiteCard
-            );
-        });
 
-        main.appendChild(group);
-    });
+            const sitesContainer =
+                group.querySelector(
+                    ".sites-container"
+                );
+
+
+            const addSiteCard =
+                group.querySelector(
+                    ".add-site-card"
+                );
+
+
+            (
+                groupData.sites || []
+            ).forEach(
+                (siteData) => {
+
+                    const site =
+                        createSiteCard(
+                            siteData.name,
+                            siteData.url,
+                            siteData.description
+                        );
+
+
+                    sitesContainer.insertBefore(
+                        site,
+                        addSiteCard
+                    );
+                }
+            );
+
+
+            main.appendChild(
+                group
+            );
+        }
+    );
 }
 
 
@@ -3083,43 +3654,45 @@ const containerWidthInput =
         "container-width"
     );
 
-function applyContainerWidth(width) {
 
-    // Este es el ancho que el usuario eligió.
-    // No se modifica cuando la ventana cambia.
+function applyContainerWidth(
+    width
+) {
+
     let preferredWidth =
         Number(width);
 
     if (isNaN(preferredWidth)) {
+
         preferredWidth =
             defaultSettings.containerWidth;
     }
 
-    // Ancho mínimo
+
     if (preferredWidth < 475) {
         preferredWidth = 475;
     }
 
-    // Máximo disponible actualmente en la ventana.
+
     const maxWidth =
         Math.floor(
             window.innerWidth * 0.92
         );
 
-    // El ancho visual se adapta a la ventana.
+
     const appliedWidth =
         Math.min(
             preferredWidth,
             maxWidth
         );
 
+
     document.documentElement.style.setProperty(
         "--container-width",
         `${appliedWidth}px`
     );
 
-    // El input conserva el valor que eligió
-    // el usuario.
+
     containerWidthInput.value =
         preferredWidth;
 }
@@ -3138,35 +3711,43 @@ containerWidthInput.addEventListener(
                 containerWidthInput.value
             );
 
+
         if (isNaN(preferredWidth)) {
+
             preferredWidth =
                 defaultSettings.containerWidth;
         }
 
-        // Ancho mínimo
+
         if (preferredWidth < 475) {
             preferredWidth = 475;
         }
 
-        // Máximo que permite actualmente
-        // la ventana.
+
         const maxWidth =
             Math.floor(
                 window.innerWidth * 0.92
             );
 
-        // Si el usuario escribe un valor mayor
-        // al espacio disponible, se limita.
-        if (preferredWidth > maxWidth) {
-            preferredWidth = maxWidth;
+
+        if (
+            preferredWidth >
+            maxWidth
+        ) {
+
+            preferredWidth =
+                maxWidth;
         }
+
 
         applyContainerWidth(
             preferredWidth
         );
 
+
         const data =
             await loadData();
+
 
         await saveData({
             settings: {
@@ -3188,11 +3769,6 @@ window.addEventListener(
     "resize",
     () => {
 
-        // Aquí NO modificamos el valor elegido
-        // por el usuario.
-        //
-        // Solamente recalculamos cuánto puede
-        // mostrarse actualmente.
         applyContainerWidth(
             containerWidthInput.value
         );
@@ -3209,40 +3785,50 @@ const cardSizeInput =
         "card-size"
     );
 
+
 function applyCardSize(size) {
 
     let validSize =
         Number(size);
 
+
     if (isNaN(validSize)) {
+
         validSize =
             defaultSettings.cardSize;
     }
+
 
     if (validSize < 95) {
         validSize = 95;
     }
 
+
     if (validSize > 140) {
         validSize = 140;
     }
+
 
     document
         .querySelectorAll(
             ".site-card, .add-site-card"
         )
-        .forEach((card) => {
+        .forEach(
+            (card) => {
 
-            card.style.width =
-                `${validSize}px`;
+                card.style.width =
+                    `${validSize}px`;
 
-            card.style.height =
-                `${validSize}px`;
-        });
+                card.style.height =
+                    `${validSize}px`;
+            }
+        );
+
 
     cardSizeInput.value =
         validSize;
 }
+
 
 cardSizeInput.addEventListener(
     "change",
@@ -3252,8 +3838,10 @@ cardSizeInput.addEventListener(
             cardSizeInput.value
         );
 
+
         const data =
             await loadData();
+
 
         await saveData({
             settings: {
@@ -3288,6 +3876,7 @@ const groupTransparencyValue =
         "group-transparency-value"
     );
 
+
 function applyGroupAppearance(
     color,
     transparency
@@ -3299,15 +3888,19 @@ function applyGroupAppearance(
             transparency
         );
 
+
     document
         .querySelectorAll(
             ".site-group"
         )
-        .forEach((group) => {
+        .forEach(
+            (group) => {
 
-            group.style.backgroundColor =
-                rgba;
-        });
+                group.style.backgroundColor =
+                    rgba;
+            }
+        );
+
 
     groupColorInput.value =
         color;
@@ -3319,6 +3912,7 @@ function applyGroupAppearance(
         `${transparency}%`;
 }
 
+
 groupColorInput.addEventListener(
     "input",
     async () => {
@@ -3329,13 +3923,16 @@ groupColorInput.addEventListener(
         const transparency =
             groupTransparencyInput.value;
 
+
         applyGroupAppearance(
             color,
             transparency
         );
 
+
         const data =
             await loadData();
+
 
         await saveData({
             settings: {
@@ -3350,6 +3947,7 @@ groupColorInput.addEventListener(
     }
 );
 
+
 groupTransparencyInput.addEventListener(
     "input",
     async () => {
@@ -3362,13 +3960,16 @@ groupTransparencyInput.addEventListener(
                 groupTransparencyInput.value
             );
 
+
         applyGroupAppearance(
             color,
             transparency
         );
 
+
         const data =
             await loadData();
+
 
         await saveData({
             settings: {
@@ -3403,6 +4004,7 @@ const cardTransparencyValue =
         "card-transparency-value"
     );
 
+
 function applyCardAppearance(
     color,
     transparency
@@ -3414,15 +4016,19 @@ function applyCardAppearance(
             transparency
         );
 
+
     document
         .querySelectorAll(
             ".site-card, .add-site-card"
         )
-        .forEach((card) => {
+        .forEach(
+            (card) => {
 
-            card.style.backgroundColor =
-                rgba;
-        });
+                card.style.backgroundColor =
+                    rgba;
+            }
+        );
+
 
     cardColorInput.value =
         color;
@@ -3434,6 +4040,7 @@ function applyCardAppearance(
         `${transparency}%`;
 }
 
+
 cardColorInput.addEventListener(
     "input",
     async () => {
@@ -3444,13 +4051,16 @@ cardColorInput.addEventListener(
         const transparency =
             cardTransparencyInput.value;
 
+
         applyCardAppearance(
             color,
             transparency
         );
 
+
         const data =
             await loadData();
+
 
         await saveData({
             settings: {
@@ -3465,6 +4075,7 @@ cardColorInput.addEventListener(
     }
 );
 
+
 cardTransparencyInput.addEventListener(
     "input",
     async () => {
@@ -3477,13 +4088,16 @@ cardTransparencyInput.addEventListener(
                 cardTransparencyInput.value
             );
 
+
         applyCardAppearance(
             color,
             transparency
         );
 
+
         const data =
             await loadData();
+
 
         await saveData({
             settings: {
@@ -3513,6 +4127,7 @@ const addSiteTextColorInput =
         "add-site-text-color"
     );
 
+
 function applyTextColors(
     cardTextColor,
     addSiteTextColor
@@ -3522,21 +4137,27 @@ function applyTextColors(
         .querySelectorAll(
             ".site-name"
         )
-        .forEach((siteName) => {
+        .forEach(
+            (siteName) => {
 
-            siteName.style.color =
-                cardTextColor;
-        });
+                siteName.style.color =
+                    cardTextColor;
+            }
+        );
+
 
     document
         .querySelectorAll(
             ".add-site-name"
         )
-        .forEach((addSiteName) => {
+        .forEach(
+            (addSiteName) => {
 
-            addSiteName.style.color =
-                addSiteTextColor;
-        });
+                addSiteName.style.color =
+                    addSiteTextColor;
+            }
+        );
+
 
     cardTextColorInput.value =
         cardTextColor;
@@ -3544,6 +4165,7 @@ function applyTextColors(
     addSiteTextColorInput.value =
         addSiteTextColor;
 }
+
 
 cardTextColorInput.addEventListener(
     "input",
@@ -3555,13 +4177,16 @@ cardTextColorInput.addEventListener(
         const addSiteTextColor =
             addSiteTextColorInput.value;
 
+
         applyTextColors(
             cardTextColor,
             addSiteTextColor
         );
 
+
         const data =
             await loadData();
+
 
         await saveData({
             settings: {
@@ -3576,6 +4201,7 @@ cardTextColorInput.addEventListener(
     }
 );
 
+
 addSiteTextColorInput.addEventListener(
     "input",
     async () => {
@@ -3586,13 +4212,16 @@ addSiteTextColorInput.addEventListener(
         const addSiteTextColor =
             addSiteTextColorInput.value;
 
+
         applyTextColors(
             cardTextColor,
             addSiteTextColor
         );
 
+
         const data =
             await loadData();
+
 
         await saveData({
             settings: {
@@ -3617,7 +4246,10 @@ const backgroundColorInput =
         "background-color"
     );
 
-function applyBackgroundColor(color) {
+
+function applyBackgroundColor(
+    color
+) {
 
     document.documentElement.classList.remove(
         "initial-background-image"
@@ -3627,11 +4259,13 @@ function applyBackgroundColor(color) {
         "--initial-background-image"
     );
 
+
     document.body.style.backgroundColor =
         color;
 
     document.body.style.backgroundImage =
         "none";
+
 
     localStorage.setItem(
         "newtabBackgroundType",
@@ -3643,6 +4277,7 @@ function applyBackgroundColor(color) {
     );
 }
 
+
 backgroundColorInput.addEventListener(
     "input",
     async () => {
@@ -3650,10 +4285,15 @@ backgroundColorInput.addEventListener(
         const color =
             backgroundColorInput.value;
 
-        applyBackgroundColor(color);
+
+        applyBackgroundColor(
+            color
+        );
+
 
         const data =
             await loadData();
+
 
         await saveData({
             settings: {
@@ -3678,6 +4318,7 @@ const backgroundImageInput =
 
 let pendingBackgroundImage = null;
 
+
 function imageToDataURL(file) {
 
     return new Promise(
@@ -3686,24 +4327,34 @@ function imageToDataURL(file) {
             const reader =
                 new FileReader();
 
+
             reader.onload = () => {
+
                 resolve(
                     reader.result
                 );
             };
 
+
             reader.onerror = () => {
+
                 reject(
                     reader.error
                 );
             };
 
-            reader.readAsDataURL(file);
+
+            reader.readAsDataURL(
+                file
+            );
         }
     );
 }
 
-function applyBackgroundImage(imageData) {
+
+function applyBackgroundImage(
+    imageData
+) {
 
     return new Promise(
         (resolve) => {
@@ -3711,16 +4362,19 @@ function applyBackgroundImage(imageData) {
             const image =
                 new Image();
 
+
             image.onload = () => {
 
                 document.documentElement.classList.add(
                     "initial-background-image"
                 );
 
+
                 document.documentElement.style.setProperty(
                     "--initial-background-image",
                     `url("${imageData}")`
                 );
+
 
                 document.body.style.backgroundImage =
                     `url("${imageData}")`;
@@ -3737,6 +4391,7 @@ function applyBackgroundImage(imageData) {
                 document.body.style.backgroundRepeat =
                     "no-repeat";
 
+
                 localStorage.setItem(
                     "newtabBackgroundType",
                     "image"
@@ -3747,17 +4402,23 @@ function applyBackgroundImage(imageData) {
                     imageData
                 );
 
+
                 resolve(true);
             };
 
+
             image.onerror = () => {
+
                 resolve(false);
             };
 
-            image.src = imageData;
+
+            image.src =
+                imageData;
         }
     );
 }
+
 
 backgroundImageInput.addEventListener(
     "change",
@@ -3766,45 +4427,58 @@ backgroundImageInput.addEventListener(
         const file =
             backgroundImageInput.files[0];
 
+
         if (!file) {
             return;
         }
 
+
         pendingBackgroundImage =
-            await imageToDataURL(file);
+            await imageToDataURL(
+                file
+            );
+
 
         const imageLoaded =
             await applyBackgroundImage(
                 pendingBackgroundImage
             );
 
+
         if (!imageLoaded) {
 
-            pendingBackgroundImage = null;
+            pendingBackgroundImage =
+                null;
 
             return;
         }
+
 
         document.getElementById(
             "background-image"
         ).checked = true;
 
+
         document.getElementById(
             "background-solid"
         ).checked = false;
+
 
         document.getElementById(
             "background-gradient"
         ).checked = false;
 
+
         const data =
             await loadData();
+
 
         await saveData({
             settings: {
                 ...defaultSettings,
                 ...data.settings,
-                backgroundType: "image",
+                backgroundType:
+                    "image",
                 backgroundImage:
                     pendingBackgroundImage
             }
@@ -3832,12 +4506,14 @@ const addGradientColorButton =
         "add-gradient-color-button"
     );
 
+
 function getGradientColors() {
 
     const colorInputs =
         gradientColorsContainer.querySelectorAll(
             'input[type="color"]'
         );
+
 
     return Array.from(
         colorInputs
@@ -3847,12 +4523,15 @@ function getGradientColors() {
     );
 }
 
+
 function createGradientCSS(
     direction,
     colors
 ) {
+
     return `linear-gradient(${direction}deg, ${colors.join(", ")})`;
 }
+
 
 function applyGradient(
     direction,
@@ -3866,16 +4545,20 @@ function applyGradient(
         return;
     }
 
+
     document.documentElement.classList.remove(
         "initial-background-image"
     );
+
 
     document.documentElement.style.removeProperty(
         "--initial-background-image"
     );
 
+
     document.body.style.backgroundColor =
         "transparent";
+
 
     document.body.style.backgroundImage =
         createGradientCSS(
@@ -3883,18 +4566,22 @@ function applyGradient(
             colors
         );
 
+
     document.body.style.backgroundSize =
         "cover";
+
 
     localStorage.setItem(
         "newtabBackgroundType",
         "gradient"
     );
 
+
     localStorage.removeItem(
         "newtabBackgroundImage"
     );
 }
+
 
 function createGradientColor(
     color,
@@ -3902,13 +4589,18 @@ function createGradientColor(
 ) {
 
     const wrapper =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     wrapper.className =
         "gradient-color";
 
+
     const label =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
 
     label.className =
         "gradient-color-label";
@@ -3916,21 +4608,33 @@ function createGradientColor(
     label.textContent =
         `Color ${number}`;
 
-    const input =
-        document.createElement("input");
 
-    input.type = "color";
-    input.value = color;
+    const input =
+        document.createElement(
+            "input"
+        );
+
+    input.type =
+        "color";
+
+    input.value =
+        color;
+
 
     const removeButton =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
-    removeButton.type = "button";
+    removeButton.type =
+        "button";
 
     removeButton.className =
         "remove-gradient-color-button";
 
-    removeButton.textContent = "×";
+    removeButton.textContent =
+        "×";
+
 
     removeButton.addEventListener(
         "click",
@@ -3939,18 +4643,22 @@ function createGradientColor(
             const colors =
                 getGradientColors();
 
+
             if (colors.length <= 2) {
                 return;
             }
+
 
             wrapper.remove();
 
             updateGradientColorLabels();
 
+
             const backgroundGradient =
                 document.getElementById(
                     "background-gradient"
                 );
+
 
             if (
                 backgroundGradient.checked
@@ -3962,9 +4670,11 @@ function createGradientColor(
                 );
             }
 
+
             await saveGradientSettings();
         }
     );
+
 
     input.addEventListener(
         "input",
@@ -3975,6 +4685,7 @@ function createGradientColor(
                     "background-gradient"
                 );
 
+
             if (
                 backgroundGradient.checked
             ) {
@@ -3985,16 +4696,28 @@ function createGradientColor(
                 );
             }
 
+
             await saveGradientSettings();
         }
     );
 
-    wrapper.appendChild(label);
-    wrapper.appendChild(input);
-    wrapper.appendChild(removeButton);
+
+    wrapper.appendChild(
+        label
+    );
+
+    wrapper.appendChild(
+        input
+    );
+
+    wrapper.appendChild(
+        removeButton
+    );
+
 
     return wrapper;
 }
+
 
 function updateGradientColorLabels() {
 
@@ -4002,6 +4725,7 @@ function updateGradientColorLabels() {
         gradientColorsContainer.querySelectorAll(
             ".gradient-color"
         );
+
 
     colors.forEach(
         (colorElement, index) => {
@@ -4011,13 +4735,16 @@ function updateGradientColorLabels() {
                     ".gradient-color-label"
                 );
 
+
             if (label) {
+
                 label.textContent =
                     `Color ${index + 1}`;
             }
         }
     );
 }
+
 
 addGradientColorButton.addEventListener(
     "click",
@@ -4026,6 +4753,7 @@ addGradientColorButton.addEventListener(
         const colors =
             getGradientColors();
 
+
         const newColor =
             colors[
                 colors.length - 1
@@ -4033,22 +4761,27 @@ addGradientColorButton.addEventListener(
             defaultSettings
                 .gradientColors[1];
 
+
         const gradientColor =
             createGradientColor(
                 newColor,
                 colors.length + 1
             );
 
+
         gradientColorsContainer.appendChild(
             gradientColor
         );
 
+
         updateGradientColorLabels();
+
 
         const backgroundGradient =
             document.getElementById(
                 "background-gradient"
             );
+
 
         if (
             backgroundGradient.checked
@@ -4060,9 +4793,11 @@ addGradientColorButton.addEventListener(
             );
         }
 
+
         await saveGradientSettings();
     }
 );
+
 
 async function saveGradientSettings() {
 
@@ -4071,11 +4806,14 @@ async function saveGradientSettings() {
             gradientDirectionInput.value
         );
 
+
     const colors =
         getGradientColors();
 
+
     const data =
         await loadData();
+
 
     await saveData({
         settings: {
@@ -4089,16 +4827,21 @@ async function saveGradientSettings() {
     });
 }
 
-function loadGradientColors(colors) {
+
+function loadGradientColors(
+    colors
+) {
 
     gradientColorsContainer.innerHTML =
         "";
+
 
     const gradientColorList =
         colors &&
         colors.length >= 2
             ? colors
             : defaultSettings.gradientColors;
+
 
     gradientColorList.forEach(
         (color, index) => {
@@ -4109,14 +4852,17 @@ function loadGradientColors(colors) {
                     index + 1
                 );
 
+
             gradientColorsContainer.appendChild(
                 gradientColor
             );
         }
     );
 
+
     updateGradientColorLabels();
 }
+
 
 gradientDirectionInput.addEventListener(
     "input",
@@ -4127,6 +4873,7 @@ gradientDirectionInput.addEventListener(
                 "background-gradient"
             );
 
+
         if (
             backgroundGradient.checked
         ) {
@@ -4137,9 +4884,11 @@ gradientDirectionInput.addEventListener(
             );
         }
 
+
         await saveGradientSettings();
     }
 );
+
 
 gradientDirectionInput.addEventListener(
     "change",
@@ -4150,6 +4899,7 @@ gradientDirectionInput.addEventListener(
                 "background-gradient"
             );
 
+
         if (
             backgroundGradient.checked
         ) {
@@ -4159,6 +4909,7 @@ gradientDirectionInput.addEventListener(
                 getGradientColors()
             );
         }
+
 
         await saveGradientSettings();
     }
@@ -4173,6 +4924,7 @@ const backgroundTypeInputs =
     document.querySelectorAll(
         'input[name="background-type"]'
     );
+
 
 backgroundTypeInputs.forEach(
     (radio) => {
@@ -4189,23 +4941,29 @@ backgroundTypeInputs.forEach(
                     const data =
                         await loadData();
 
+
                     const backgroundColor =
                         data.settings?.backgroundColor ??
                         defaultSettings.backgroundColor;
+
 
                     applyBackgroundColor(
                         backgroundColor
                     );
 
+
                     document.getElementById(
                         "background-solid"
                     ).checked = true;
 
+
                     backgroundColorInput.value =
                         backgroundColor;
 
+
                     pendingBackgroundImage =
                         null;
+
 
                     await saveData({
                         settings: {
@@ -4217,6 +4975,7 @@ backgroundTypeInputs.forEach(
                     });
                 }
 
+
                 if (
                     radio.value ===
                     "image"
@@ -4225,9 +4984,11 @@ backgroundTypeInputs.forEach(
                     const data =
                         await loadData();
 
+
                     const backgroundImage =
                         pendingBackgroundImage ??
                         data.settings?.backgroundImage;
+
 
                     if (backgroundImage) {
 
@@ -4242,6 +5003,7 @@ backgroundTypeInputs.forEach(
                                     if (
                                         imageLoaded
                                     ) {
+
                                         await saveData({
                                             settings: {
                                                 ...defaultSettings,
@@ -4258,6 +5020,7 @@ backgroundTypeInputs.forEach(
                     }
                 }
 
+
                 if (
                     radio.value ===
                     "gradient"
@@ -4266,26 +5029,35 @@ backgroundTypeInputs.forEach(
                     const data =
                         await loadData();
 
+
                     const direction =
                         data.settings?.gradientDirection ??
                         defaultSettings.gradientDirection;
+
 
                     const colors =
                         data.settings?.gradientColors ??
                         defaultSettings.gradientColors;
 
+
                     gradientDirectionInput.value =
                         direction;
 
-                    loadGradientColors(colors);
+
+                    loadGradientColors(
+                        colors
+                    );
+
 
                     applyGradient(
                         direction,
                         colors
                     );
 
+
                     pendingBackgroundImage =
                         null;
+
 
                     await saveData({
                         settings: {
@@ -4335,32 +5107,61 @@ const confirmResetButton =
         "confirm-reset-button"
     );
 
+
 function openResetConfirmation() {
+
     openOverlay(
         resetConfirmationOverlay
     );
 }
 
+
 function closeResetConfirmation() {
+
     closeOverlay(
         resetConfirmationOverlay
     );
 }
 
+
 async function resetExtension() {
 
     closeAllMenus();
 
-    closeOverlay(addSiteOverlay);
-    closeOverlay(addGroupOverlay);
-    closeOverlay(editSiteOverlay);
-    closeOverlay(editGroupOverlay);
-    closeOverlay(resetConfirmationOverlay);
 
-    groupBeingAddedTo = null;
-    siteBeingEdited = null;
-    groupBeingEdited = null;
-    pendingBackgroundImage = null;
+    closeOverlay(
+        addSiteOverlay
+    );
+
+    closeOverlay(
+        addGroupOverlay
+    );
+
+    closeOverlay(
+        editSiteOverlay
+    );
+
+    closeOverlay(
+        editGroupOverlay
+    );
+
+    closeOverlay(
+        resetConfirmationOverlay
+    );
+
+
+    groupBeingAddedTo =
+        null;
+
+    siteBeingEdited =
+        null;
+
+    groupBeingEdited =
+        null;
+
+    pendingBackgroundImage =
+        null;
+
 
     localStorage.removeItem(
         "newtabBackgroundType"
@@ -4370,6 +5171,7 @@ async function resetExtension() {
         "newtabBackgroundImage"
     );
 
+
     document.documentElement.classList.remove(
         "initial-background-image"
     );
@@ -4378,7 +5180,9 @@ async function resetExtension() {
         "--initial-background-image"
     );
 
+
     await chrome.storage.local.clear();
+
 
     const resetData = {
         groups: [
@@ -4403,74 +5207,100 @@ async function resetExtension() {
         }
     };
 
-    await saveData(resetData);
+
+    await saveData(
+        resetData
+    );
+
 
     const main =
-        document.querySelector("main");
+        document.querySelector(
+            "main"
+        );
 
-    main.innerHTML = "";
+
+    main.innerHTML =
+        "";
+
 
     renderGroups(
         resetData.groups
     );
 
+
     setupExistingElements();
+
 
     applyContainerWidth(
         defaultSettings.containerWidth
     );
 
+
     applyCardSize(
         defaultSettings.cardSize
     );
+
 
     applyGroupAppearance(
         defaultSettings.groupColor,
         defaultSettings.groupTransparency
     );
 
+
     applyCardAppearance(
         defaultSettings.cardColor,
         defaultSettings.cardTransparency
     );
+
 
     applyTextColors(
         defaultSettings.cardTextColor,
         defaultSettings.addSiteTextColor
     );
 
+
     backgroundColorInput.value =
         defaultSettings.backgroundColor;
+
 
     applyBackgroundColor(
         defaultSettings.backgroundColor
     );
 
+
     document.getElementById(
         "background-solid"
     ).checked = true;
+
 
     document.getElementById(
         "background-image"
     ).checked = false;
 
+
     document.getElementById(
         "background-gradient"
     ).checked = false;
 
+
     gradientDirectionInput.value =
         defaultSettings.gradientDirection;
+
 
     loadGradientColors(
         defaultSettings.gradientColors
     );
 
-    backgroundImageInput.value = "";
+
+    backgroundImageInput.value =
+        "";
+
 
     filterSiteCards();
 
     closeSettings();
 }
+
 
 resetBackgroundButton.addEventListener(
     "click",
@@ -4495,10 +5325,12 @@ resetConfirmationOverlay.addEventListener(
             event.target ===
             resetConfirmationOverlay
         ) {
+
             closeResetConfirmation();
         }
     }
 );
+
 
 confirmResetButton.addEventListener(
     "click",
@@ -4546,12 +5378,14 @@ exportDataButton.addEventListener(
                     null
                 );
 
+
             const json =
                 JSON.stringify(
                     data,
                     null,
                     4
                 );
+
 
             const blob =
                 new Blob(
@@ -4562,26 +5396,37 @@ exportDataButton.addEventListener(
                     }
                 );
 
+
             const url =
                 URL.createObjectURL(
                     blob
                 );
 
-            const link =
-                document.createElement("a");
 
-            link.href = url;
+            const link =
+                document.createElement(
+                    "a"
+                );
+
+
+            link.href =
+                url;
+
 
             link.download =
                 "respaldo-nueva-pestana.json";
+
 
             document.body.appendChild(
                 link
             );
 
+
             link.click();
 
+
             link.remove();
+
 
             URL.revokeObjectURL(
                 url
@@ -4593,6 +5438,7 @@ exportDataButton.addEventListener(
                 "Error al exportar los datos:",
                 error
             );
+
 
             alert(
                 "No se pudieron exportar los datos."
@@ -4614,6 +5460,7 @@ importDataButton.addEventListener(
     }
 );
 
+
 importDataFile.addEventListener(
     "change",
     async () => {
@@ -4621,17 +5468,23 @@ importDataFile.addEventListener(
         const file =
             importDataFile.files[0];
 
+
         if (!file) {
             return;
         }
+
 
         try {
 
             const text =
                 await file.text();
 
+
             const importedData =
-                JSON.parse(text);
+                JSON.parse(
+                    text
+                );
+
 
             if (
                 !importedData ||
@@ -4643,45 +5496,57 @@ importDataFile.addEventListener(
                     "El archivo no contiene datos válidos."
                 );
 
-                importDataFile.value = "";
+
+                importDataFile.value =
+                    "";
 
                 return;
             }
+
 
             if (
                 !Array.isArray(
                     importedData.groups
                 ) ||
                 !importedData.settings ||
-                typeof importedData.settings !== "object"
+                typeof importedData.settings !==
+                    "object"
             ) {
 
                 alert(
                     "El archivo no tiene el formato de una copia de seguridad de ReCodeVerse."
                 );
 
-                importDataFile.value = "";
+
+                importDataFile.value =
+                    "";
 
                 return;
             }
+
 
             const confirmed =
                 confirm(
                     "Importar estos datos reemplazará la configuración y los sitios actuales. ¿Quieres continuar?"
                 );
 
+
             if (!confirmed) {
 
-                importDataFile.value = "";
+                importDataFile.value =
+                    "";
 
                 return;
             }
 
+
             await chrome.storage.local.clear();
+
 
             await chrome.storage.local.set(
                 importedData
             );
+
 
             location.reload();
 
@@ -4692,11 +5557,14 @@ importDataFile.addEventListener(
                 error
             );
 
+
             alert(
                 "No se pudo importar el archivo. Verifica que sea un archivo JSON válido."
             );
 
-            importDataFile.value = "";
+
+            importDataFile.value =
+                "";
         }
     }
 );
@@ -4709,27 +5577,54 @@ importDataFile.addEventListener(
 function setupExistingElements() {
 
     document
-        .querySelectorAll(".site-group")
-        .forEach((group) => {
+        .querySelectorAll(
+            ".site-group"
+        )
+        .forEach(
+            (group) => {
 
-            setupGroupMenu(group);
-            setupGroupDrag(group);
-        });
+                setupGroupMenu(
+                    group
+                );
+
+                setupGroupDrag(
+                    group
+                );
+            }
+        );
+
 
     document
-        .querySelectorAll(".add-site-card")
-        .forEach((card) => {
+        .querySelectorAll(
+            ".add-site-card"
+        )
+        .forEach(
+            (card) => {
 
-            setupAddSiteCard(card);
-        });
+                setupAddSiteCard(
+                    card
+                );
+            }
+        );
+
 
     document
-        .querySelectorAll(".site-card")
-        .forEach((site) => {
+        .querySelectorAll(
+            ".site-card"
+        )
+        .forEach(
+            (site) => {
 
-            setupSiteCard(site);
-            setupSiteDrag(site);
-        });
+                setupSiteCard(
+                    site
+                );
+
+                setupSiteDrag(
+                    site
+                );
+            }
+        );
+
 
     setupExistingSiteEditButtons();
     setupExistingGroupEditButtons();
@@ -4743,36 +5638,43 @@ function setupExistingElements() {
         .querySelectorAll(
             ".delete-group-button"
         )
-        .forEach((button) => {
+        .forEach(
+            (button) => {
 
-            if (
-                button.dataset.deleteConfigured ===
-                "true"
-            ) {
-                return;
-            }
-
-            button.dataset.deleteConfigured =
-                "true";
-
-            button.addEventListener(
-                "click",
-                async (event) => {
-
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    const group =
-                        button.closest(
-                            ".site-group"
-                        );
-
-                    group.remove();
-
-                    await saveCurrentData();
+                if (
+                    button.dataset.deleteConfigured ===
+                    "true"
+                ) {
+                    return;
                 }
-            );
-        });
+
+
+                button.dataset.deleteConfigured =
+                    "true";
+
+
+                button.addEventListener(
+                    "click",
+                    async (event) => {
+
+                        event.preventDefault();
+                        event.stopPropagation();
+
+
+                        const group =
+                            button.closest(
+                                ".site-group"
+                            );
+
+
+                        group.remove();
+
+
+                        await saveCurrentData();
+                    }
+                );
+            }
+        );
 
 
     // =====================================
@@ -4783,38 +5685,46 @@ function setupExistingElements() {
         .querySelectorAll(
             ".delete-site-button"
         )
-        .forEach((button) => {
+        .forEach(
+            (button) => {
 
-            if (
-                button.dataset.deleteConfigured ===
-                "true"
-            ) {
-                return;
-            }
-
-            button.dataset.deleteConfigured =
-                "true";
-
-            button.addEventListener(
-                "click",
-                async (event) => {
-
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    const site =
-                        button.closest(
-                            ".site-card"
-                        );
-
-                    site.remove();
-
-                    await saveCurrentData();
-
-                    filterSiteCards();
+                if (
+                    button.dataset.deleteConfigured ===
+                    "true"
+                ) {
+                    return;
                 }
-            );
-        });
+
+
+                button.dataset.deleteConfigured =
+                    "true";
+
+
+                button.addEventListener(
+                    "click",
+                    async (event) => {
+
+                        event.preventDefault();
+                        event.stopPropagation();
+
+
+                        const site =
+                            button.closest(
+                                ".site-card"
+                            );
+
+
+                        site.remove();
+
+
+                        await saveCurrentData();
+
+
+                        filterSiteCards();
+                    }
+                );
+            }
+        );
 }
 
 
@@ -4827,10 +5737,12 @@ async function init() {
     let data =
         await loadData();
 
+
     if (!data.groups) {
 
         const initialGroups =
             defaultData.groups;
+
 
         const initialSettings = {
             ...defaultSettings,
@@ -4844,30 +5756,46 @@ async function init() {
             ]
         };
 
+
         await saveData({
-            groups: initialGroups,
-            settings: initialSettings
+            groups:
+                initialGroups,
+
+            settings:
+                initialSettings
         });
 
+
         data = {
-            groups: initialGroups,
-            settings: initialSettings
+            groups:
+                initialGroups,
+
+            settings:
+                initialSettings
         };
     }
+
 
     console.log(
         "Datos cargados:",
         data
     );
 
-    const main =
-        document.querySelector("main");
 
-    main.innerHTML = "";
+    const main =
+        document.querySelector(
+            "main"
+        );
+
+
+    main.innerHTML =
+        "";
+
 
     renderGroups(
         data.groups || []
     );
+
 
     setupExistingElements();
 
@@ -4876,29 +5804,47 @@ async function init() {
     setupSiteDragArea();
 
 
+    // =====================================
+    // ANCHO DEL CONTENEDOR
+    // =====================================
+
     const containerWidth =
         data.settings?.containerWidth ??
         defaultSettings.containerWidth;
+
 
     applyContainerWidth(
         containerWidth
     );
 
 
+    // =====================================
+    // TAMAÑO DE TARJETAS
+    // =====================================
+
     const cardSize =
         data.settings?.cardSize ??
         defaultSettings.cardSize;
 
-    applyCardSize(cardSize);
 
+    applyCardSize(
+        cardSize
+    );
+
+
+    // =====================================
+    // APARIENCIA DE GRUPOS
+    // =====================================
 
     const groupColor =
         data.settings?.groupColor ??
         defaultSettings.groupColor;
 
+
     const groupTransparency =
         data.settings?.groupTransparency ??
         defaultSettings.groupTransparency;
+
 
     applyGroupAppearance(
         groupColor,
@@ -4906,13 +5852,19 @@ async function init() {
     );
 
 
+    // =====================================
+    // APARIENCIA DE TARJETAS
+    // =====================================
+
     const cardColor =
         data.settings?.cardColor ??
         defaultSettings.cardColor;
 
+
     const cardTransparency =
         data.settings?.cardTransparency ??
         defaultSettings.cardTransparency;
+
 
     applyCardAppearance(
         cardColor,
@@ -4921,16 +5873,18 @@ async function init() {
 
 
     // =====================================
-    // CARGAR COLORES DEL TEXTO
+    // COLORES DEL TEXTO
     // =====================================
 
     const cardTextColor =
         data.settings?.cardTextColor ??
         defaultSettings.cardTextColor;
 
+
     const addSiteTextColor =
         data.settings?.addSiteTextColor ??
         defaultSettings.addSiteTextColor;
+
 
     applyTextColors(
         cardTextColor,
@@ -4938,9 +5892,14 @@ async function init() {
     );
 
 
+    // =====================================
+    // COLOR DE FONDO
+    // =====================================
+
     const backgroundColor =
         data.settings?.backgroundColor ??
         defaultSettings.backgroundColor;
+
 
     backgroundColorInput.value =
         backgroundColor;
@@ -4951,6 +5910,10 @@ async function init() {
         "solid";
 
 
+    // =====================================
+    // FONDO DE IMAGEN
+    // =====================================
+
     if (
         backgroundType === "image" &&
         data.settings?.backgroundImage
@@ -4960,13 +5923,16 @@ async function init() {
             "background-image"
         ).checked = true;
 
+
         document.getElementById(
             "background-solid"
         ).checked = false;
 
+
         document.getElementById(
             "background-gradient"
         ).checked = false;
+
 
         applyBackgroundImage(
             data.settings.backgroundImage
@@ -4980,21 +5946,26 @@ async function init() {
                         return;
                     }
 
+
                     applyBackgroundColor(
                         backgroundColor
                     );
+
 
                     document.getElementById(
                         "background-image"
                     ).checked = false;
 
+
                     document.getElementById(
                         "background-solid"
                     ).checked = true;
 
+
                     document.getElementById(
                         "background-gradient"
                     ).checked = false;
+
 
                     await saveData({
                         settings: {
@@ -5007,6 +5978,11 @@ async function init() {
                 }
             );
 
+
+    // =====================================
+    // FONDO DEGRADADO
+    // =====================================
+
     } else if (
         backgroundType ===
         "gradient"
@@ -5018,35 +5994,47 @@ async function init() {
             defaultSettings
                 .gradientDirection;
 
+
         const gradientColors =
             data.settings
                 ?.gradientColors ??
             defaultSettings
                 .gradientColors;
 
+
         gradientDirectionInput.value =
             gradientDirection;
+
 
         loadGradientColors(
             gradientColors
         );
+
 
         applyGradient(
             gradientDirection,
             gradientColors
         );
 
+
         document.getElementById(
             "background-image"
         ).checked = false;
+
 
         document.getElementById(
             "background-solid"
         ).checked = false;
 
+
         document.getElementById(
             "background-gradient"
         ).checked = true;
+
+
+    // =====================================
+    // FONDO SÓLIDO
+    // =====================================
 
     } else {
 
@@ -5054,22 +6042,32 @@ async function init() {
             backgroundColor
         );
 
+
         document.getElementById(
             "background-image"
         ).checked = false;
 
+
         document.getElementById(
             "background-solid"
         ).checked = true;
+
 
         document.getElementById(
             "background-gradient"
         ).checked = false;
     }
 
+
     filterSiteCards();
 }
 
+
+// =========================================
+// EJECUTAR
+// =========================================
+
+init();
 
 // =========================================
 // INICIAR EXTENSIÓN
