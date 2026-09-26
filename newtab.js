@@ -4911,6 +4911,46 @@ cardSizeInput.addEventListener(
         );
 
 
+        const newCardSize =
+            Number(cardSizeInput.value);
+
+
+        // =================================
+        // AJUSTAR "TARJETAS POR FILA" SI
+        // YA NO CABEN CON ESTE TAMAÑO
+        // =================================
+        //
+        // A diferencia de redimensionar la
+        // ventana (que es algo temporal),
+        // cambiar el tamaño de tarjeta es una
+        // decisión tuya: si con el tamaño
+        // nuevo ya no caben las tarjetas por
+        // fila que tenías puestas, se reduce
+        // esa cantidad de verdad (no solo
+        // visualmente).
+
+        const maxCardsPerRow =
+            getMaxCardsPerRow(newCardSize);
+
+        let newCardsPerRow =
+            Number(cardsPerRowInput.value);
+
+        if (newCardsPerRow > maxCardsPerRow) {
+            newCardsPerRow = maxCardsPerRow;
+        }
+
+
+        // =================================
+        // RECALCULAR ANCHO
+        // =================================
+
+        const appliedCardsPerRow =
+            applyCardsPerRow(
+                newCardsPerRow,
+                newCardSize
+            );
+
+
         const data =
             await loadData();
 
@@ -4920,14 +4960,13 @@ cardSizeInput.addEventListener(
                 ...defaultSettings,
                 ...data.settings,
                 cardSize:
-                    Number(
-                        cardSizeInput.value
-                    )
+                    newCardSize,
+                cardsPerRow:
+                    appliedCardsPerRow
             }
         });
     }
 );
-
 
 // =========================================
 // APARIENCIA DE GRUPOS
