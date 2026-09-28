@@ -7457,8 +7457,27 @@ function openBookmarkContextMenu(
     // =====================================
     // CERRAR MENÚS DE CARPETAS
     // =====================================
+    //
+    // Si el clic derecho fue sobre algo que
+    // está DENTRO de un panel de carpeta
+    // (un marcador o una subcarpeta), el
+    // panel se queda abierto.
+    //
+    // Solo se cierran los paneles cuando el
+    // clic derecho fue en la barra (fuera
+    // de cualquier panel).
 
-    closeBookmarkMenus();
+    const rightClickedInsideFolderMenu =
+        event.target.closest &&
+        event.target.closest(
+            ".bookmark-menu"
+        );
+
+    if (!rightClickedInsideFolderMenu) {
+
+        closeBookmarkMenus();
+
+    }
 
 
     // =====================================
@@ -11400,10 +11419,21 @@ document.addEventListener(
             );
 
 
+        // Clic dentro de un modal (editar, eliminar,
+        // renombrar, nueva carpeta). Los ids de todos
+        // terminan en "-overlay".
+        const clickedInsideModal =
+            event.target.closest &&
+            event.target.closest(
+                "[id$='-overlay']"
+            );
+
+
         if (
             clickedInsideBookmarkMenu ||
             clickedBookmarkFolder ||
-            clickedContextMenu
+            clickedContextMenu ||
+            clickedInsideModal
         ) {
 
             return;
