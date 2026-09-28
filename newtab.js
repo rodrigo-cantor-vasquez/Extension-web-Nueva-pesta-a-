@@ -5430,34 +5430,113 @@ const backgroundImageInput =
 let pendingBackgroundImage = null;
 
 
+// Tamaño máximo (en px) del lado más largo
+// de la imagen de fondo.
+const MAX_BACKGROUND_IMAGE_SIZE = 1920;
+
+
 function imageToDataURL(file) {
 
     return new Promise(
         (resolve, reject) => {
 
-            const reader =
-                new FileReader();
+            const objectUrl =
+                URL.createObjectURL(
+                    file
+                );
+
+            const image =
+                new Image();
 
 
-            reader.onload = () => {
+            image.onload = () => {
+
+                URL.revokeObjectURL(
+                    objectUrl
+                );
+
+
+                // Solo se reduce si es más grande
+                // que el máximo, nunca se agranda.
+                const scale =
+                    Math.min(
+                        1,
+                        MAX_BACKGROUND_IMAGE_SIZE /
+                        Math.max(
+                            image.width,
+                            image.height
+                        )
+                    );
+
+
+                const canvas =
+                    document.createElement(
+                        "canvas"
+                    );
+
+                canvas.width =
+                    Math.round(
+                        image.width * scale
+                    );
+
+                canvas.height =
+                    Math.round(
+                        image.height * scale
+                    );
+
+
+                const context =
+                    canvas.getContext(
+                        "2d"
+                    );
+
+
+                // Fondo blanco por si la imagen
+                // tiene partes transparentes (PNG).
+                context.fillStyle =
+                    "#ffffff";
+
+                context.fillRect(
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
+                context.drawImage(
+                    image,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
 
                 resolve(
-                    reader.result
+                    canvas.toDataURL(
+                        "image/jpeg",
+                        0.85
+                    )
                 );
             };
 
 
-            reader.onerror = () => {
+            image.onerror = () => {
+
+                URL.revokeObjectURL(
+                    objectUrl
+                );
 
                 reject(
-                    reader.error
+                    new Error(
+                        "No se pudo leer la imagen."
+                    )
                 );
             };
 
 
-            reader.readAsDataURL(
-                file
-            );
+            image.src =
+                objectUrl;
         }
     );
 }
@@ -5475,6 +5554,37 @@ function applyBackgroundImage(
 
 
             image.onload = () => {
+
+                // Primero se intenta guardar. Si no cabe,
+                // se avisa y no se toca nada más.
+                try {
+
+                    localStorage.setItem(
+                        "newtabBackgroundImage",
+                        imageData
+                    );
+
+                    localStorage.setItem(
+                        "newtabBackgroundType",
+                        "image"
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        "No se pudo guardar la imagen de fondo:",
+                        error
+                    );
+
+                    alert(
+                        "La imagen es demasiado grande para guardarla. Prueba con una más pequeña."
+                    );
+
+                    resolve(false);
+
+                    return;
+                }
+
 
                 document.documentElement.classList.add(
                     "initial-background-image"
@@ -5501,17 +5611,6 @@ function applyBackgroundImage(
 
                 document.body.style.backgroundRepeat =
                     "no-repeat";
-
-
-                localStorage.setItem(
-                    "newtabBackgroundType",
-                    "image"
-                );
-
-                localStorage.setItem(
-                    "newtabBackgroundImage",
-                    imageData
-                );
 
 
                 resolve(true);
@@ -5544,11 +5643,26 @@ backgroundImageInput.addEventListener(
         }
 
 
-        pendingBackgroundImage =
-            await imageToDataURL(
-                file
+        try {
+
+            pendingBackgroundImage =
+                await imageToDataURL(
+                    file
+                );
+
+        } catch (error) {
+
+            console.error(
+                "No se pudo leer la imagen:",
+                error
             );
 
+            alert(
+                "No se pudo leer esa imagen. Prueba con otro archivo (JPG o PNG)."
+            );
+
+            return;
+        }
 
         const imageLoaded =
             await applyBackgroundImage(
